@@ -1,0 +1,32 @@
+# Core Django
+django>=5.0,<6.0
+djangorestframework>=3.15.0
+django-cors-headers>=4.6.0
+django-environ>=0.11.2
+dj-database-url>=2.3.0
+
+# Database
+psycopg[binary]>=3.2.0
+
+# Cache & WebSocket
+redis>=5.2.0
+channels>=4.2.0
+channels-redis>=4.2.0
+
+# Production Server
+gunicorn>=23.0.0
+uvicorn[standard]>=0.32.0
+daphne>=4.1.0
+whitenoise>=6.8.0
+
+# Development
+pytest>=8.3.0
+pytest-django>=4.9.0
+pytest-cov>=6.0.0
+factory-boy>=3.3.0
+ruff>=0.8.0
+mypy>=1.13.0
+django-stubs>=5.1.0
+djangorestframework-stubs>=3.15.0
+pre-commit>=4.0.0
+ipython>=8.29.0

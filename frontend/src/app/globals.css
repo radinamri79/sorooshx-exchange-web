@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Import Vazirmatn for Persian */
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Background colors */
+    --background-primary: #0b0e11;
+    --background-secondary: #1e2329;
+    --background-tertiary: #2b3139;
+    --background-elevated: #181a20;
+
+    /* Text colors */
+    --text-primary: #eaecef;
+    --text-secondary: #848e9c;
+    --text-muted: #5e6673;
+
+    /* Border colors */
+    --border-default: #2b3139;
+    --border-light: #363c45;
+
+    /* Trading colors */
+    --color-long: #26a69a;
+    --color-short: #ef5350;
+    --color-neutral: #848e9c;
+
+    /* Brand colors */
+    --color-brand: #ed7620;
+  }
+
+  * {
+    border-color: var(--border-default);
+  }
+
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+  }
+
+  /* RTL font for Persian */
+  html[dir='rtl'] {
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+  }
+
+  body {
+    @apply bg-background-primary text-text-primary antialiased;
+    min-height: 100vh;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
+
+  /* Remove autofill background */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0px 1000px var(--background-secondary) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Number input hide arrows */
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  /* Trading panel card */
+  .trading-card {
+    @apply bg-background-secondary rounded-md border border-border;
+  }
+
+  /* Price display - green for positive, red for negative */
+  .price-positive {
+    @apply text-trading-long;
+  }
+
+  .price-negative {
+    @apply text-trading-short;
+  }
+
+  /* Button variants */
+  .btn-long {
+    @apply bg-trading-long hover:bg-trading-long/90 text-white font-medium;
+  }
+
+  .btn-short {
+    @apply bg-trading-short hover:bg-trading-short/90 text-white font-medium;
+  }
+
+  .btn-brand {
+    @apply bg-brand-500 hover:bg-brand-600 text-white font-medium;
+  }
+
+  /* Input styles */
+  .trading-input {
+    @apply w-full bg-background-tertiary border border-border rounded px-3 py-2 text-text-primary 
+           placeholder:text-text-muted focus:outline-none focus:border-brand-500 
+           transition-colors text-sm;
+  }
+
+  /* Tab styles */
+  .trading-tab {
+    @apply px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary 
+           transition-colors cursor-pointer;
+  }
+
+  .trading-tab-active {
+    @apply text-text-primary border-b-2 border-brand-500;
+  }
+
+  /* Orderbook row */
+  .orderbook-row {
+    @apply relative flex items-center justify-between px-2 py-0.5 text-xs 
+           font-mono cursor-pointer hover:bg-background-tertiary/50 transition-colors;
+  }
+
+  .orderbook-depth-bar {
+    @apply absolute inset-y-0 right-0 opacity-20;
+  }
+
+  /* RTL adjustments */
+  [dir='rtl'] .orderbook-depth-bar {
+    @apply right-auto left-0;
+  }
+}
+
+@layer utilities {
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Animation utilities */
+  .animate-flash-green {
+    animation: flashGreen 0.3s ease-out;
+  }
+
+  .animate-flash-red {
+    animation: flashRed 0.3s ease-out;
+  }
+
+  /* Grid utilities for trading layout */
+  .trading-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px 320px;
+    grid-template-rows: auto 1fr auto;
+    gap: 1px;
+    height: calc(100vh - 56px);
+    background-color: var(--border-default);
+  }
+
+  @media (max-width: 1280px) {
+    .trading-grid {
+      grid-template-columns: 1fr 280px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .trading-grid {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+    }
+  }
+
+  /* Mono numbers - always use monospace for prices */
+  .mono-numbers {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+  }
+
+  /* Use tabular numbers for aligned columns */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
