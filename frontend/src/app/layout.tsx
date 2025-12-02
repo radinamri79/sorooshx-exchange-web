@@ -7,7 +7,11 @@ export const metadata: Metadata = {
   keywords: ['crypto', 'trading', 'futures', 'bitcoin', 'exchange'],
   authors: [{ name: 'SorooshX Team' }],
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/logo.svg',
+    shortcut: '/favicon.svg',
   },
   openGraph: {
     title: 'SorooshX Exchange',
