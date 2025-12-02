@@ -32,17 +32,17 @@ const config: Config = {
           'short-bg': 'rgba(239, 83, 80, 0.1)',
           neutral: '#848e9c',
         },
-        // Background colors (dark theme)
+        // Background colors (pure black theme)
         background: {
-          primary: '#0b0e11',
-          secondary: '#1e2329',
-          tertiary: '#2b3139',
-          elevated: '#181a20',
+          primary: '#000000',
+          secondary: '#000000',
+          tertiary: '#1a1a1a',
+          elevated: '#0a0a0a',
         },
         // Border colors
         border: {
-          DEFAULT: '#2b3139',
-          light: '#363c45',
+          DEFAULT: '#1e2329',
+          light: '#2b3139',
         },
         // Text colors
         text: {

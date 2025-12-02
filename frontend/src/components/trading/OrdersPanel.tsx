@@ -2,9 +2,8 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, ChevronRight } from 'lucide-react';
+import { X, ChevronDown } from 'lucide-react';
 import { cn, formatPrice, formatNumber, formatCurrency } from '@/lib/utils';
-import { Tabs, TabsList, TabsTrigger, TabsContent, Button } from '@/components/ui';
 import { useTradeStore } from '@/stores/useTradeStore';
 import { useMarketStore } from '@/stores/useMarketStore';
 import type { Position, OrderStatus } from '@/types';
@@ -79,254 +78,322 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
       case 'filled':
-        return 'text-trading-long';
+        return 'text-[#26a69a]';
       case 'cancelled':
       case 'rejected':
-        return 'text-text-muted';
+        return 'text-[#5e6673]';
       case 'open':
       case 'pending':
-        return 'text-brand-400';
+        return 'text-[#ed7620]';
       case 'partially_filled':
         return 'text-yellow-400';
       default:
-        return 'text-text-secondary';
+        return 'text-[#848e9c]';
     }
   };
 
   return (
-    <div className={cn('flex flex-col bg-background-secondary rounded-lg border border-border overflow-hidden', className)}>
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)}>
-        <div className="flex items-center justify-between px-3 border-b border-border">
-          <TabsList className="border-0">
-            <TabsTrigger value="positions" className="text-xs">
-              {t('ordersPanel.positions')} ({filteredPositions.length})
-            </TabsTrigger>
-            <TabsTrigger value="openOrders" className="text-xs">
-              {t('ordersPanel.openOrders')} ({openOrders.length})
-            </TabsTrigger>
-            <TabsTrigger value="orderHistory" className="text-xs">
-              {t('ordersPanel.orderHistory')}
-            </TabsTrigger>
-          </TabsList>
+    <div className={cn('flex flex-col bg-black overflow-hidden', className)}>
+      {/* Header Tabs */}
+      <div className="flex items-center justify-between px-4 border-b border-[#1e2329]">
+        <div className="flex items-center gap-1">
+          {/* Positions Tab */}
+          <button
+            onClick={() => setActiveTab('positions')}
+            className={cn(
+              'px-3 py-2.5 text-sm font-medium transition-colors relative',
+              activeTab === 'positions' 
+                ? 'text-white' 
+                : 'text-[#848e9c] hover:text-white'
+            )}
+          >
+            Positions({filteredPositions.length})
+            {activeTab === 'positions' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+          
+          {/* Orders Tab with dropdown */}
+          <button
+            onClick={() => setActiveTab('openOrders')}
+            className={cn(
+              'flex items-center gap-1 px-3 py-2.5 text-sm font-medium transition-colors relative',
+              activeTab === 'openOrders' 
+                ? 'text-white' 
+                : 'text-[#848e9c] hover:text-white'
+            )}
+          >
+            Orders({openOrders.length})
+            <ChevronDown className="w-3 h-3" />
+            {activeTab === 'openOrders' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
 
-          <label className="flex items-center gap-1.5 text-xs text-text-secondary cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showAllSymbols}
-              onChange={(e) => setShowAllSymbols(e.target.checked)}
-              className="w-3.5 h-3.5 rounded border-border bg-background-tertiary text-brand-500 focus:ring-brand-500"
-            />
-            {t('ordersPanel.showAll')}
-          </label>
+          {/* Balances Tab */}
+          <button
+            className="px-3 py-2.5 text-sm font-medium text-[#848e9c] hover:text-white transition-colors"
+          >
+            Balances
+          </button>
+
+          {/* History Tab */}
+          <button
+            onClick={() => setActiveTab('orderHistory')}
+            className={cn(
+              'px-3 py-2.5 text-sm font-medium transition-colors relative',
+              activeTab === 'orderHistory' 
+                ? 'text-white' 
+                : 'text-[#848e9c] hover:text-white'
+            )}
+          >
+            History
+            {activeTab === 'orderHistory' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
         </div>
 
-        {/* Positions Tab */}
-        <TabsContent value="positions" className="mt-0">
-          {filteredPositions.length === 0 ? (
-            <EmptyState message={t('ordersPanel.noPositions')} />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-text-muted border-b border-border">
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.symbol')}</th>
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.size')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.entryPrice')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.markPrice')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.liqPrice')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.margin')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.pnl')}</th>
-                    <th className="px-3 py-2 text-center font-medium">{t('ordersPanel.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPositions.map((position) => {
-                    const ticker = tickers[position.symbol];
-                    const markPrice = ticker ? ticker.c : '--';
-                    const { pnl, roe } = getUnrealizedPnl(position);
-                    const isProfitable = pnl >= 0;
+        <div className="flex items-center gap-4">
+          {/* Hide other pairs checkbox */}
+          <label className="flex items-center gap-2 text-xs text-[#848e9c] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={!showAllSymbols}
+              onChange={(e) => setShowAllSymbols(!e.target.checked)}
+              className="w-3.5 h-3.5 rounded border-[#1e2329] bg-[#1a1a1a] text-[#ed7620] focus:ring-[#ed7620]"
+            />
+            Hide other pairs
+          </label>
 
-                    return (
-                      <tr key={position.id} className="border-b border-border/50 hover:bg-background-tertiary/50">
-                        <td className="px-3 py-2">
+          {/* Cancel all button */}
+          <button className="px-3 py-1 text-xs font-medium text-[#848e9c] hover:text-white border border-[#1e2329] rounded transition-colors">
+            Cancel all
+          </button>
+        </div>
+      </div>
+
+      {/* Positions Content */}
+      {activeTab === 'positions' && (
+        <div className="flex-1 overflow-auto">
+          {filteredPositions.length === 0 ? (
+            <EmptyState message="No open positions" />
+          ) : (
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-black">
+                <tr className="text-[#5e6673] border-b border-[#1e2329]">
+                  <th className="px-4 py-2 text-left font-medium">Pair</th>
+                  <th className="px-3 py-2 text-left font-medium">Positions(BTC)</th>
+                  <th className="px-3 py-2 text-right font-medium">Margin(USDT)</th>
+                  <th className="px-3 py-2 text-right font-medium">Entry Price(USDT)</th>
+                  <th className="px-3 py-2 text-right font-medium">Mark Price</th>
+                  <th className="px-3 py-2 text-right font-medium">MMR</th>
+                  <th className="px-3 py-2 text-right font-medium">Unrealized PNL</th>
+                  <th className="px-3 py-2 text-center font-medium">TP/SL</th>
+                  <th className="px-3 py-2 text-center font-medium"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPositions.map((position) => {
+                  const ticker = tickers[position.symbol];
+                  const markPrice = ticker ? ticker.c : '--';
+                  const { pnl, roe } = getUnrealizedPnl(position);
+                  const isProfitable = pnl >= 0;
+
+                  return (
+                    <tr key={position.id} className="border-b border-[#1e2329]/50 hover:bg-[#0a0a0a]">
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium text-white">
+                            {position.symbol.replace('USDT', '')}/USDT
+                          </span>
                           <div className="flex items-center gap-1">
-                            <span className="font-medium text-text-primary">
-                              {position.symbol.replace('USDT', '')}
-                            </span>
                             <span className={cn(
                               'px-1 py-0.5 rounded text-[10px] font-medium',
-                              position.side === 'long' ? 'bg-trading-long/10 text-trading-long' : 'bg-trading-short/10 text-trading-short'
+                              position.side === 'long' ? 'bg-[#26a69a]/20 text-[#26a69a]' : 'bg-[#ef5350]/20 text-[#ef5350]'
                             )}>
                               {position.side === 'long' ? 'Long' : 'Short'}
                             </span>
-                            <span className="text-text-muted text-[10px]">{position.leverage}x</span>
+                            <span className="text-[#ed7620] text-[10px]">{position.leverage}X</span>
+                            <span className="text-[#848e9c] text-[10px]">Cross</span>
                           </div>
-                        </td>
-                        <td className="px-3 py-2 text-text-primary tabular-nums">
-                          {formatNumber(position.quantity, { decimals: 4 })}
-                        </td>
-                        <td className="px-3 py-2 text-right text-text-primary tabular-nums">
-                          {formatPrice(position.entryPrice)}
-                        </td>
-                        <td className="px-3 py-2 text-right text-text-primary tabular-nums">
-                          {formatPrice(markPrice)}
-                        </td>
-                        <td className="px-3 py-2 text-right text-text-secondary tabular-nums">
-                          {position.liquidationPrice ? formatPrice(position.liquidationPrice) : '--'}
-                        </td>
-                        <td className="px-3 py-2 text-right text-text-primary tabular-nums">
-                          {formatCurrency(position.margin)}
-                        </td>
-                        <td className="px-3 py-2 text-right">
-                          <div className="flex flex-col items-end">
-                            <span className={cn('tabular-nums font-medium', isProfitable ? 'text-trading-long' : 'text-trading-short')}>
-                              {isProfitable ? '+' : ''}{formatCurrency(pnl.toString())}
-                            </span>
-                            <span className={cn('text-[10px] tabular-nums', isProfitable ? 'text-trading-long' : 'text-trading-short')}>
-                              ({isProfitable ? '+' : ''}{formatNumber(roe, { decimals: 2 })}%)
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-3 py-2 text-center">
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5 text-white tabular-nums">
+                        {formatNumber(position.quantity, { decimals: 2 })}
+                      </td>
+                      <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                        {formatNumber(position.margin, { decimals: 2 })}
+                      </td>
+                      <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                        {formatPrice(position.entryPrice)}
+                      </td>
+                      <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                        {formatPrice(markPrice)}
+                      </td>
+                      <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                        3.83%
+                      </td>
+                      <td className="px-3 py-2.5 text-right">
+                        <div className="flex flex-col items-end">
+                          <span className={cn('tabular-nums font-medium', isProfitable ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
+                            {isProfitable ? '+' : ''}{formatCurrency(pnl.toString())}
+                          </span>
+                          <span className={cn('text-[10px] tabular-nums', isProfitable ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
+                            ({isProfitable ? '+' : ''}{formatNumber(roe, { decimals: 0 })}%)
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5 text-center">
+                        <span className="text-[#ed7620] text-[10px]">
+                          {position.takeProfit || '--'} / <span className="text-[#ef5350]">{position.stopLoss || '--'}</span>
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center justify-center gap-2">
+                          <button className="px-2 py-1 text-[10px] font-medium text-[#848e9c] hover:text-white border border-[#1e2329] rounded transition-colors">
+                            TP/SL
+                          </button>
+                          <button className="px-2 py-1 text-[10px] font-medium text-[#848e9c] hover:text-white border border-[#1e2329] rounded transition-colors">
+                            Reverse
+                          </button>
+                          <button
                             onClick={() => handleClosePosition(position.id)}
-                            className="text-xs text-trading-short hover:text-trading-short hover:bg-trading-short/10"
+                            className="px-2 py-1 text-[10px] font-medium text-[#ef5350] hover:bg-[#ef5350]/10 border border-[#1e2329] rounded transition-colors"
                           >
-                            {t('ordersPanel.close')}
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                            Close
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
-        </TabsContent>
+        </div>
+      )}
 
-        {/* Open Orders Tab */}
-        <TabsContent value="openOrders" className="mt-0">
+      {/* Open Orders Content */}
+      {activeTab === 'openOrders' && (
+        <div className="flex-1 overflow-auto">
           {openOrders.length === 0 ? (
-            <EmptyState message={t('ordersPanel.noOpenOrders')} />
+            <EmptyState message="No open orders" />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-text-muted border-b border-border">
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.time')}</th>
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.symbol')}</th>
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.type')}</th>
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.side')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.price')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.amount')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.filled')}</th>
-                    <th className="px-3 py-2 text-center font-medium">{t('ordersPanel.actions')}</th>
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-black">
+                <tr className="text-[#5e6673] border-b border-[#1e2329]">
+                  <th className="px-4 py-2 text-left font-medium">Time</th>
+                  <th className="px-3 py-2 text-left font-medium">Symbol</th>
+                  <th className="px-3 py-2 text-left font-medium">Type</th>
+                  <th className="px-3 py-2 text-left font-medium">Side</th>
+                  <th className="px-3 py-2 text-right font-medium">Price</th>
+                  <th className="px-3 py-2 text-right font-medium">Amount</th>
+                  <th className="px-3 py-2 text-right font-medium">Filled</th>
+                  <th className="px-3 py-2 text-center font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {openOrders.map((order) => (
+                  <tr key={order.id} className="border-b border-[#1e2329]/50 hover:bg-[#0a0a0a]">
+                    <td className="px-4 py-2.5 text-[#848e9c]">
+                      {new Date(order.createdAt).toLocaleTimeString()}
+                    </td>
+                    <td className="px-3 py-2.5 font-medium text-white">
+                      {order.symbol.replace('USDT', '')}/USDT
+                    </td>
+                    <td className="px-3 py-2.5 text-[#848e9c] capitalize">
+                      {order.orderType.replace('_', ' ')}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className={cn(
+                        'font-medium',
+                        order.side === 'buy' ? 'text-[#26a69a]' : 'text-[#ef5350]'
+                      )}>
+                        {order.side === 'buy' ? 'Long' : 'Short'}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                      {order.price ? formatPrice(order.price) : 'Market'}
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                      {formatNumber(order.quantity, { decimals: 4 })}
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-[#848e9c] tabular-nums">
+                      {formatNumber(order.filledQuantity, { decimals: 4 })}
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <button
+                        onClick={() => handleCancelOrder(order.id)}
+                        className="p-1 text-[#5e6673] hover:text-[#ef5350] transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {openOrders.map((order) => (
-                    <tr key={order.id} className="border-b border-border/50 hover:bg-background-tertiary/50">
-                      <td className="px-3 py-2 text-text-muted">
-                        {new Date(order.createdAt).toLocaleTimeString()}
-                      </td>
-                      <td className="px-3 py-2 font-medium text-text-primary">
-                        {order.symbol.replace('USDT', '')}/USDT
-                      </td>
-                      <td className="px-3 py-2 text-text-secondary capitalize">
-                        {order.orderType.replace('_', ' ')}
-                      </td>
-                      <td className="px-3 py-2">
-                        <span className={cn(
-                          'font-medium',
-                          order.side === 'buy' ? 'text-trading-long' : 'text-trading-short'
-                        )}>
-                          {order.side === 'buy' ? 'Long' : 'Short'}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 text-right text-text-primary tabular-nums">
-                        {order.price ? formatPrice(order.price) : 'Market'}
-                      </td>
-                      <td className="px-3 py-2 text-right text-text-primary tabular-nums">
-                        {formatNumber(order.quantity, { decimals: 4 })}
-                      </td>
-                      <td className="px-3 py-2 text-right text-text-secondary tabular-nums">
-                        {formatNumber(order.filledQuantity, { decimals: 4 })}
-                      </td>
-                      <td className="px-3 py-2 text-center">
-                        <button
-                          onClick={() => handleCancelOrder(order.id)}
-                          className="p-1 text-text-muted hover:text-trading-short transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           )}
-        </TabsContent>
+        </div>
+      )}
 
-        {/* Order History Tab */}
-        <TabsContent value="orderHistory" className="mt-0">
+      {/* Order History Content */}
+      {activeTab === 'orderHistory' && (
+        <div className="flex-1 overflow-auto">
           {orderHistory.length === 0 ? (
-            <EmptyState message={t('ordersPanel.noOrderHistory')} />
+            <EmptyState message="No order history" />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-text-muted border-b border-border">
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.time')}</th>
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.symbol')}</th>
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.type')}</th>
-                    <th className="px-3 py-2 text-left font-medium">{t('ordersPanel.side')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.avgPrice')}</th>
-                    <th className="px-3 py-2 text-right font-medium">{t('ordersPanel.filled')}</th>
-                    <th className="px-3 py-2 text-center font-medium">{t('ordersPanel.status')}</th>
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-black">
+                <tr className="text-[#5e6673] border-b border-[#1e2329]">
+                  <th className="px-4 py-2 text-left font-medium">Time</th>
+                  <th className="px-3 py-2 text-left font-medium">Symbol</th>
+                  <th className="px-3 py-2 text-left font-medium">Type</th>
+                  <th className="px-3 py-2 text-left font-medium">Side</th>
+                  <th className="px-3 py-2 text-right font-medium">Avg. Price</th>
+                  <th className="px-3 py-2 text-right font-medium">Filled</th>
+                  <th className="px-3 py-2 text-center font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orderHistory.slice(0, 50).map((order) => (
+                  <tr key={order.id} className="border-b border-[#1e2329]/50 hover:bg-[#0a0a0a]">
+                    <td className="px-4 py-2.5 text-[#848e9c]">
+                      {new Date(order.createdAt).toLocaleString()}
+                    </td>
+                    <td className="px-3 py-2.5 font-medium text-white">
+                      {order.symbol.replace('USDT', '')}/USDT
+                    </td>
+                    <td className="px-3 py-2.5 text-[#848e9c] capitalize">
+                      {order.orderType.replace('_', ' ')}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className={cn(
+                        'font-medium',
+                        order.side === 'buy' ? 'text-[#26a69a]' : 'text-[#ef5350]'
+                      )}>
+                        {order.side === 'buy' ? 'Long' : 'Short'}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                      {order.averagePrice ? formatPrice(order.averagePrice) : '--'}
+                    </td>
+                    <td className="px-3 py-2.5 text-right text-white tabular-nums">
+                      {formatNumber(order.filledQuantity, { decimals: 4 })} / {formatNumber(order.quantity, { decimals: 4 })}
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <span className={cn('capitalize', getStatusColor(order.status))}>
+                        {order.status}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {orderHistory.slice(0, 50).map((order) => (
-                    <tr key={order.id} className="border-b border-border/50 hover:bg-background-tertiary/50">
-                      <td className="px-3 py-2 text-text-muted">
-                        {new Date(order.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-3 py-2 font-medium text-text-primary">
-                        {order.symbol.replace('USDT', '')}/USDT
-                      </td>
-                      <td className="px-3 py-2 text-text-secondary capitalize">
-                        {order.orderType.replace('_', ' ')}
-                      </td>
-                      <td className="px-3 py-2">
-                        <span className={cn(
-                          'font-medium',
-                          order.side === 'buy' ? 'text-trading-long' : 'text-trading-short'
-                        )}>
-                          {order.side === 'buy' ? 'Long' : 'Short'}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 text-right text-text-primary tabular-nums">
-                        {order.averagePrice ? formatPrice(order.averagePrice) : '--'}
-                      </td>
-                      <td className="px-3 py-2 text-right text-text-primary tabular-nums">
-                        {formatNumber(order.filledQuantity, { decimals: 4 })} / {formatNumber(order.quantity, { decimals: 4 })}
-                      </td>
-                      <td className="px-3 py-2 text-center">
-                        <span className={cn('capitalize', getStatusColor(order.status))}>
-                          {order.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 }
@@ -334,8 +401,8 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
 // Empty state component
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-text-muted">
-      <ChevronRight className="w-8 h-8 mb-2 opacity-50 rotate-90" />
+    <div className="flex flex-col items-center justify-center py-12 text-[#5e6673]">
+      <ChevronDown className="w-8 h-8 mb-2 opacity-50" />
       <p className="text-sm">{message}</p>
     </div>
   );

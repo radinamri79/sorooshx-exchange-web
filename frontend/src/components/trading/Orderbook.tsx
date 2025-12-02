@@ -8,6 +8,7 @@ import { useOrderbookStore } from '@/stores/useOrderbookStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchOrderbook } from '@/services/api';
 import type { OrderbookEntry } from '@/types';
+import * as React from 'react';
 
 interface OrderbookProps {
   className?: string;
@@ -32,16 +33,13 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
     <button
       type="button"
       onClick={() => onClick?.(price)}
-      className={cn(
-        'grid grid-cols-3 gap-2 px-2 py-0.5 text-xs tabular-nums hover:bg-background-tertiary transition-colors relative w-full text-left',
-        'focus:outline-none focus:bg-background-tertiary'
-      )}
+      className="grid grid-cols-3 gap-2 px-2 py-[3px] text-xs tabular-nums hover:bg-[#1a1a1a] transition-colors relative w-full text-left focus:outline-none"
     >
       {/* Depth bar background */}
       <div
         className={cn(
-          'absolute top-0 bottom-0 opacity-20',
-          isBid ? 'bg-trading-long right-0' : 'bg-trading-short left-0'
+          'absolute top-0 bottom-0 opacity-15',
+          isBid ? 'bg-[#26a69a] right-0' : 'bg-[#ef5350] left-0'
         )}
         style={{
           width: `${Math.min(depthPercentage, 100)}%`,
@@ -50,17 +48,17 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
       />
       
       {/* Price */}
-      <span className={cn('relative z-10', isBid ? 'text-trading-long' : 'text-trading-short')}>
+      <span className={cn('relative z-10 font-mono', isBid ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
         {formatPrice(price)}
       </span>
       
       {/* Quantity */}
-      <span className="relative z-10 text-text-primary text-right">
+      <span className="relative z-10 text-white text-right font-mono">
         {formatNumber(quantity, { decimals: 4 })}
       </span>
       
       {/* Total */}
-      <span className="relative z-10 text-text-secondary text-right">
+      <span className="relative z-10 text-[#848e9c] text-right font-mono">
         {formatNumber(total, { decimals: 2 })}
       </span>
     </button>
@@ -116,14 +114,12 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
         U: number;
         pu: number;
       };
-      // Only process if we have snapshot and this is a valid update
       if (!snapshotFetchedRef.current) return;
       if (depthData.U > lastUpdateId + 1) {
-        // Missing updates, refetch snapshot
         snapshotFetchedRef.current = false;
         return;
       }
-      if (depthData.u <= lastUpdateId) return; // Already processed
+      if (depthData.u <= lastUpdateId) return;
 
       mergeOrderbook(depthData.b, depthData.a, depthData.u);
     };
@@ -142,7 +138,6 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     const displayedBids = bids.slice(0, rowCount);
     const displayedAsks = asks.slice(0, rowCount);
 
-    // Calculate max total for depth visualization
     let maxTotal = 0;
     [...displayedBids, ...displayedAsks].forEach(([price, quantity]) => {
       const total = parseFloat(price) * parseFloat(quantity);
@@ -168,73 +163,69 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     return { value: spreadValue, percent: spreadPercent };
   }, [asks, bids]);
 
-  // Handle price click to fill order form
+  // Handle price click
   const handlePriceClick = useCallback((_price: string) => {
     // This would typically dispatch to order form
-    // Could emit an event or update a store
   }, []);
 
   return (
-    <div className={cn('flex flex-col bg-background-secondary rounded-lg border border-border overflow-hidden', className)}>
+    <div className={cn('flex flex-col bg-black overflow-hidden', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-        <h3 className="text-sm font-medium text-text-primary">{t('orderbook.title')}</h3>
+      <div className="flex items-center justify-between px-2 py-2 border-b border-[#1e2329]">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-white">Order book</span>
+          <span className="text-sm text-[#848e9c]">Trade history</span>
+        </div>
         
         {/* Display Mode Toggle */}
-        <div className="flex items-center gap-0.5 bg-background-tertiary rounded p-0.5">
+        <div className="flex items-center gap-0.5">
           <button
             onClick={() => setDisplayMode('both')}
             className={cn(
-              'px-2 py-1 rounded text-xs transition-colors',
-              displayMode === 'both'
-                ? 'bg-background-primary text-text-primary'
-                : 'text-text-muted hover:text-text-secondary'
+              'p-1 rounded transition-colors',
+              displayMode === 'both' ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
             )}
           >
-            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
-              <rect x="0" y="0" width="12" height="5" className="fill-trading-short" />
-              <rect x="0" y="7" width="12" height="5" className="fill-trading-long" />
+            <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="1" width="12" height="5" rx="1" fill="#ef5350" />
+              <rect x="1" y="8" width="12" height="5" rx="1" fill="#26a69a" />
             </svg>
           </button>
           <button
             onClick={() => setDisplayMode('bids')}
             className={cn(
-              'px-2 py-1 rounded text-xs transition-colors',
-              displayMode === 'bids'
-                ? 'bg-background-primary text-text-primary'
-                : 'text-text-muted hover:text-text-secondary'
+              'p-1 rounded transition-colors',
+              displayMode === 'bids' ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
             )}
           >
-            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
-              <rect x="0" y="0" width="12" height="12" className="fill-trading-long" />
+            <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="1" width="12" height="12" rx="1" fill="#26a69a" />
             </svg>
           </button>
           <button
             onClick={() => setDisplayMode('asks')}
             className={cn(
-              'px-2 py-1 rounded text-xs transition-colors',
-              displayMode === 'asks'
-                ? 'bg-background-primary text-text-primary'
-                : 'text-text-muted hover:text-text-secondary'
+              'p-1 rounded transition-colors',
+              displayMode === 'asks' ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
             )}
           >
-            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
-              <rect x="0" y="0" width="12" height="12" className="fill-trading-short" />
+            <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="1" width="12" height="12" rx="1" fill="#ef5350" />
             </svg>
           </button>
         </div>
       </div>
 
       {/* Column Headers */}
-      <div className="grid grid-cols-3 gap-2 px-2 py-1 text-xs text-text-muted border-b border-border">
-        <span>{t('orderbook.price')}</span>
-        <span className="text-right">{t('orderbook.amount')}</span>
-        <span className="text-right">{t('orderbook.total')}</span>
+      <div className="grid grid-cols-3 gap-2 px-2 py-1.5 text-[11px] text-[#848e9c] border-b border-[#1e2329]">
+        <span>Price</span>
+        <span className="text-right">Amount(BTC)</span>
+        <span className="text-right">Total (BTC)</span>
       </div>
 
       {/* Asks (Sell Orders) - Reversed so lowest ask is at bottom */}
       {(displayMode === 'both' || displayMode === 'asks') && (
-        <div className="flex flex-col-reverse overflow-hidden">
+        <div className="flex flex-col-reverse overflow-hidden flex-1">
           {displayedAsks.map((entry, index) => (
             <OrderbookRow
               key={`ask-${entry[0]}-${index}`}
@@ -248,21 +239,21 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
       )}
 
       {/* Current Price / Spread */}
-      <div className="flex items-center justify-between px-2 py-1.5 bg-background-tertiary border-y border-border">
+      <div className="flex items-center justify-between px-2 py-2 bg-black border-y border-[#1e2329]">
         <span className={cn(
-          'text-sm font-semibold tabular-nums',
-          isPositive ? 'text-trading-long' : 'text-trading-short'
+          'text-lg font-semibold tabular-nums',
+          isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
         )}>
           {formatPrice(lastPrice)}
         </span>
-        <span className="text-xs text-text-muted">
-          {t('orderbook.spread')}: {formatNumber(spread.value, { decimals: 2 })} ({formatNumber(spread.percent, { decimals: 3 })}%)
+        <span className="text-xs text-[#848e9c]">
+          Spread: {formatNumber(spread.value, { decimals: 2 })} ({formatNumber(spread.percent, { decimals: 3 })}%)
         </span>
       </div>
 
       {/* Bids (Buy Orders) */}
       {(displayMode === 'both' || displayMode === 'bids') && (
-        <div className="flex flex-col overflow-hidden">
+        <div className="flex flex-col overflow-hidden flex-1">
           {displayedBids.map((entry, index) => (
             <OrderbookRow
               key={`bid-${entry[0]}-${index}`}
@@ -274,9 +265,18 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
           ))}
         </div>
       )}
+
+      {/* Bottom depth indicator */}
+      <div className="flex items-center h-6 px-2 border-t border-[#1e2329]">
+        <div className="flex-1 h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden flex">
+          <div className="h-full bg-[#26a69a]" style={{ width: '72%' }} />
+          <div className="h-full bg-[#ef5350]" style={{ width: '28%' }} />
+        </div>
+        <div className="flex items-center gap-2 ml-2 text-[10px]">
+          <span className="text-[#26a69a]">72%</span>
+          <span className="text-[#ef5350]">28%</span>
+        </div>
+      </div>
     </div>
   );
 }
-
-// Need to import React for useState
-import * as React from 'react';

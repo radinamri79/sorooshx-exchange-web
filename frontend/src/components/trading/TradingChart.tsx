@@ -52,35 +52,35 @@ export function TradingChart({ className }: TradingChartProps) {
 
     const chart = createChart(chartContainerRef.current, {
       layout: {
-        background: { color: 'transparent' },
-        textColor: '#9CA3AF',
+        background: { color: '#000000' },
+        textColor: '#848e9c',
       },
       grid: {
-        vertLines: { color: 'rgba(42, 46, 57, 0.6)' },
-        horzLines: { color: 'rgba(42, 46, 57, 0.6)' },
+        vertLines: { color: 'rgba(30, 35, 41, 0.6)' },
+        horzLines: { color: 'rgba(30, 35, 41, 0.6)' },
       },
       crosshair: {
         mode: 1,
         vertLine: {
           width: 1,
-          color: '#3B82F6',
+          color: '#ed7620',
           style: 1,
         },
         horzLine: {
           width: 1,
-          color: '#3B82F6',
+          color: '#ed7620',
           style: 1,
         },
       },
       rightPriceScale: {
-        borderColor: 'rgba(42, 46, 57, 0.8)',
+        borderColor: '#1e2329',
         scaleMargins: {
           top: 0.1,
           bottom: 0.2,
         },
       },
       timeScale: {
-        borderColor: 'rgba(42, 46, 57, 0.8)',
+        borderColor: '#1e2329',
         timeVisible: true,
         secondsVisible: false,
       },
@@ -97,12 +97,12 @@ export function TradingChart({ className }: TradingChartProps) {
 
     // Add candlestick series
     const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#22C55E',
-      downColor: '#EF4444',
-      borderUpColor: '#22C55E',
-      borderDownColor: '#EF4444',
-      wickUpColor: '#22C55E',
-      wickDownColor: '#EF4444',
+      upColor: '#26a69a',
+      downColor: '#ef5350',
+      borderUpColor: '#26a69a',
+      borderDownColor: '#ef5350',
+      wickUpColor: '#26a69a',
+      wickDownColor: '#ef5350',
     });
 
     // Add volume series
@@ -169,7 +169,7 @@ export function TradingChart({ className }: TradingChartProps) {
           const volumeData: HistogramData<Time>[] = data.map((k: KlineData) => ({
             time: (k.time / 1000) as Time,
             value: k.volume,
-            color: k.close >= k.open ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)',
+            color: k.close >= k.open ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)',
           }));
 
           candlestickSeriesRef.current.setData(candlestickData);
@@ -224,7 +224,7 @@ export function TradingChart({ className }: TradingChartProps) {
       volumeSeriesRef.current.update({
         time,
         value: parseFloat(kline.v),
-        color: isGreen ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)',
+        color: isGreen ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)',
       });
     };
 
@@ -241,9 +241,9 @@ export function TradingChart({ className }: TradingChartProps) {
   }, []);
 
   return (
-    <div className={cn('flex flex-col bg-background-secondary rounded-lg border border-border overflow-hidden', className)}>
+    <div className={cn('flex flex-col bg-black overflow-hidden', className)}>
       {/* Timeframe Selector */}
-      <div className="flex items-center gap-1 px-3 py-2 border-b border-border overflow-x-auto">
+      <div className="flex items-center gap-1 px-3 py-2 border-b border-[#1e2329] overflow-x-auto">
         {TIMEFRAMES.map(({ value, label }) => (
           <button
             key={value}
@@ -251,8 +251,8 @@ export function TradingChart({ className }: TradingChartProps) {
             className={cn(
               'px-2 py-1 text-xs font-medium rounded transition-colors whitespace-nowrap',
               timeframe === value
-                ? 'bg-brand-500 text-white'
-                : 'text-text-secondary hover:text-text-primary hover:bg-background-tertiary'
+                ? 'bg-[#ed7620] text-white'
+                : 'text-[#848e9c] hover:text-white hover:bg-[#1a1a1a]'
             )}
           >
             {label}
@@ -263,8 +263,8 @@ export function TradingChart({ className }: TradingChartProps) {
       {/* Chart Container */}
       <div className="relative flex-1 min-h-[300px]">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background-secondary/50 z-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ed7620]" />
           </div>
         )}
         <div ref={chartContainerRef} className="w-full h-full" />

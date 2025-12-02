@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn, formatPrice, formatNumber, formatPercentage } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { binanceWS } from '@/services/websocket';
@@ -68,78 +67,84 @@ export function MarketInfo({ className }: MarketInfoProps) {
     };
   }, [ticker]);
 
-  const PriceChangeIcon = isPositive ? TrendingUp : TrendingDown;
-
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-4 md:gap-6 bg-background-secondary border-b border-border px-4 py-3',
+        'flex items-center bg-black border-b border-[#1e2329] px-4 py-2',
         className
       )}
     >
-      {/* Current Price */}
-      <div className="flex flex-col gap-0.5">
-        <span className="text-xs text-text-muted">{t('marketInfo.lastPrice')}</span>
-        <div className="flex items-center gap-2">
+      {/* Symbol and Price */}
+      <div className="flex items-center gap-6 mr-8">
+        {/* Main Price */}
+        <div className="flex flex-col">
           <span
             className={cn(
-              'text-xl font-semibold tabular-nums',
-              isPositive ? 'text-trading-long' : 'text-trading-short'
+              'text-2xl font-bold tabular-nums',
+              isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
             )}
           >
             {stats.lastPrice}
           </span>
-          <span className="text-sm text-text-secondary">USDT</span>
-        </div>
-      </div>
-
-      {/* 24h Change */}
-      <div className="flex flex-col gap-0.5">
-        <span className="text-xs text-text-muted">{t('marketInfo.change24h')}</span>
-        <div className="flex items-center gap-1">
-          <PriceChangeIcon
-            className={cn(
-              'w-4 h-4',
-              isPositive ? 'text-trading-long' : 'text-trading-short'
-            )}
-          />
-          <span
-            className={cn(
-              'text-sm font-medium tabular-nums',
-              isPositive ? 'text-trading-long' : 'text-trading-short'
-            )}
-          >
-            {stats.priceChange} ({stats.priceChangePercent})
+          <span className={cn(
+            'text-xs tabular-nums',
+            isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
+          )}>
+            ≈${stats.lastPrice}
           </span>
         </div>
       </div>
 
-      {/* 24h High */}
-      <div className="flex flex-col gap-0.5">
-        <span className="text-xs text-text-muted">{t('marketInfo.high24h')}</span>
-        <span className="text-sm text-text-primary tabular-nums">{stats.high24h}</span>
-      </div>
+      {/* Stats Row */}
+      <div className="flex items-center gap-6 overflow-x-auto">
+        {/* 24h Change */}
+        <div className="flex flex-col gap-0.5 min-w-fit">
+          <span className="text-[10px] text-[#5e6673]">24h Change</span>
+          <span
+            className={cn(
+              'text-xs font-medium tabular-nums',
+              isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
+            )}
+          >
+            {isPositive ? '+' : ''}{stats.priceChangePercent}
+          </span>
+        </div>
 
-      {/* 24h Low */}
-      <div className="flex flex-col gap-0.5">
-        <span className="text-xs text-text-muted">{t('marketInfo.low24h')}</span>
-        <span className="text-sm text-text-primary tabular-nums">{stats.low24h}</span>
-      </div>
+        {/* 24h High */}
+        <div className="flex flex-col gap-0.5 min-w-fit">
+          <span className="text-[10px] text-[#5e6673]">24h High</span>
+          <span className="text-xs text-white tabular-nums">{stats.high24h}</span>
+        </div>
 
-      {/* 24h Volume */}
-      <div className="flex flex-col gap-0.5">
-        <span className="text-xs text-text-muted">{t('marketInfo.volume24h')}</span>
-        <span className="text-sm text-text-primary tabular-nums">
-          {stats.volume24h} <span className="text-text-muted">{currentSymbol.replace('USDT', '')}</span>
-        </span>
-      </div>
+        {/* 24h Low */}
+        <div className="flex flex-col gap-0.5 min-w-fit">
+          <span className="text-[10px] text-[#5e6673]">24h Low</span>
+          <span className="text-xs text-white tabular-nums">{stats.low24h}</span>
+        </div>
 
-      {/* 24h Turnover */}
-      <div className="flex flex-col gap-0.5 hidden md:flex">
-        <span className="text-xs text-text-muted">{t('marketInfo.turnover24h')}</span>
-        <span className="text-sm text-text-primary tabular-nums">
-          {stats.quoteVolume24h} <span className="text-text-muted">USDT</span>
-        </span>
+        {/* 24h Volume (base) */}
+        <div className="flex flex-col gap-0.5 min-w-fit">
+          <span className="text-[10px] text-[#5e6673]">24h Volume({currentSymbol.replace('USDT', '')})</span>
+          <span className="text-xs text-white tabular-nums">{stats.volume24h}</span>
+        </div>
+
+        {/* 24h Volume (quote) */}
+        <div className="flex flex-col gap-0.5 min-w-fit">
+          <span className="text-[10px] text-[#5e6673]">24h Volume(USDT)</span>
+          <span className="text-xs text-white tabular-nums">{stats.quoteVolume24h}</span>
+        </div>
+
+        {/* Funding Rate */}
+        <div className="flex flex-col gap-0.5 min-w-fit">
+          <span className="text-[10px] text-[#5e6673]">Funding / Countdown</span>
+          <span className="text-xs text-[#26a69a] tabular-nums">0.0100% / 02:15:32</span>
+        </div>
+
+        {/* Open Interest */}
+        <div className="flex flex-col gap-0.5 min-w-fit">
+          <span className="text-[10px] text-[#5e6673]">Open Interest(USDT)</span>
+          <span className="text-xs text-white tabular-nums">4,521,891,234</span>
+        </div>
       </div>
     </div>
   );

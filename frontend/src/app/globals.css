@@ -10,11 +10,11 @@
 
 @layer base {
   :root {
-    /* Background colors */
-    --background-primary: #0b0e11;
-    --background-secondary: #1e2329;
-    --background-tertiary: #2b3139;
-    --background-elevated: #181a20;
+    /* Background colors - Pure black theme */
+    --background-primary: #000000;
+    --background-secondary: #000000;
+    --background-tertiary: #1a1a1a;
+    --background-elevated: #0a0a0a;
 
     /* Text colors */
     --text-primary: #eaecef;
@@ -22,8 +22,8 @@
     --text-muted: #5e6673;
 
     /* Border colors */
-    --border-default: #2b3139;
-    --border-light: #363c45;
+    --border-default: #1e2329;
+    --border-light: #2b3139;
 
     /* Trading colors */
     --color-long: #26a69a;
@@ -40,7 +40,7 @@
 
   html {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: var(--background-primary);
+    background-color: #000000;
     color: var(--text-primary);
   }
 
@@ -50,27 +50,30 @@
   }
 
   body {
-    @apply bg-background-primary text-text-primary antialiased;
+    background-color: #000000;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--background-secondary);
+    background: #000000;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--border-light);
-    border-radius: 3px;
+    background: #1e2329;
+    border-radius: 2px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+    background: #2b3139;
   }
 
   /* Remove autofill background */
@@ -78,7 +81,7 @@
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--text-primary);
-    -webkit-box-shadow: 0 0 0px 1000px var(--background-secondary) inset;
+    -webkit-box-shadow: 0 0 0px 1000px #000000 inset;
     transition: background-color 5000s ease-in-out 0s;
   }
 
@@ -95,9 +98,9 @@
 }
 
 @layer components {
-  /* Trading panel card */
+  /* Trading panel card - Black background */
   .trading-card {
-    @apply bg-background-secondary rounded-md border border-border;
+    @apply bg-black rounded-md border border-[#1e2329];
   }
 
   /* Price display - green for positive, red for negative */
@@ -122,27 +125,27 @@
     @apply bg-brand-500 hover:bg-brand-600 text-white font-medium;
   }
 
-  /* Input styles */
+  /* Input styles - Dark theme */
   .trading-input {
-    @apply w-full bg-background-tertiary border border-border rounded px-3 py-2 text-text-primary 
-           placeholder:text-text-muted focus:outline-none focus:border-brand-500 
+    @apply w-full bg-[#1a1a1a] border border-[#1e2329] rounded px-3 py-2 text-[#eaecef] 
+           placeholder:text-[#5e6673] focus:outline-none focus:border-[#ed7620] 
            transition-colors text-sm;
   }
 
   /* Tab styles */
   .trading-tab {
-    @apply px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary 
+    @apply px-3 py-1.5 text-sm text-[#848e9c] hover:text-[#eaecef] 
            transition-colors cursor-pointer;
   }
 
   .trading-tab-active {
-    @apply text-text-primary border-b-2 border-brand-500;
+    @apply text-[#eaecef] border-b-2 border-[#ed7620];
   }
 
   /* Orderbook row */
   .orderbook-row {
     @apply relative flex items-center justify-between px-2 py-0.5 text-xs 
-           font-mono cursor-pointer hover:bg-background-tertiary/50 transition-colors;
+           font-mono cursor-pointer hover:bg-[#1a1a1a] transition-colors;
   }
 
   .orderbook-depth-bar {
@@ -152,6 +155,11 @@
   /* RTL adjustments */
   [dir='rtl'] .orderbook-depth-bar {
     @apply right-auto left-0;
+  }
+  
+  /* Safe area for mobile devices */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
