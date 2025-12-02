@@ -24,6 +24,7 @@ A professional cryptocurrency futures trading platform built with Django (backen
 ### Trading Interface
 - **5-Zone Professional Layout**: Order Form, Orderbook, Ticker/Search, Chart, Positions
 - **Real-time Data**: Live prices, orderbook depth, trade executions via WebSocket
+- **Multi-Source Data**: Automatic fallback from Binance → OKX → Bybit → Bitget → CoinGecko
 - **TradingView Charts**: Professional candlestick charts with multiple timeframes
 - **Responsive Design**: Desktop-first with mobile-optimized tab navigation
 
@@ -32,6 +33,13 @@ A professional cryptocurrency futures trading platform built with Django (backen
 - **Leverage**: 1x to 125x with slider/quick buttons
 - **Margin Modes**: Cross and Isolated margin
 - **Position Management**: Real-time P&L, TP/SL settings
+
+### Data Integrity & Reliability
+- **Zero Mock Data**: Only real market data or clearly marked cached/unavailable states
+- **Intelligent Fallback**: Seamless switching between 5 data sources
+- **Smart Caching**: Real data cached with localStorage for offline fallback
+- **Status Indicators**: Users always know if data is LIVE, CACHED, or UNAVAILABLE
+- **Geo-Bypass**: Works even when primary exchanges are geo-blocked
 
 ### User Experience
 - **Dark Theme**: Professional trading interface with dark backgrounds
@@ -340,6 +348,21 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 | POST | `/api/v1/users/guest-session/` | Create guest session |
 | POST | `/api/v1/users/register/` | Register account |
 | POST | `/api/v1/users/login/` | Login |
+
+### Multi-Source Data
+
+The platform automatically fetches real market data from multiple sources with intelligent fallback:
+
+**WebSocket Sources (Real-time):**
+1. Binance (`wss://stream.binance.com:9443`)
+2. OKX (`wss://ws.okx.com:8443/ws/v5/public`)
+3. Bybit (`wss://stream.bybit.com/v5/public/spot`)
+
+**REST API Fallback:**
+4. Bitget (REST API)
+5. CoinGecko (Last resort, always available)
+
+See [MULTI_SOURCE_DATA.md](./MULTI_SOURCE_DATA.md) for detailed documentation.
 
 ### WebSocket Streams (Binance)
 

@@ -5,7 +5,8 @@
  * - Multiple stream multiplexing
  * - Subscription management
  * - Heartbeat/ping-pong
- * - Mock data fallback when Binance is geo-blocked
+ * - Alternative WebSocket sources when primary is blocked
+ * - NO MOCK DATA - only real market data or unavailable state
  */
 
 import { BINANCE_WS_URL, WS_RECONNECT_DELAY, WS_MAX_RECONNECT_DELAY, WS_RECONNECT_MULTIPLIER } from '@/lib/constants';
@@ -13,95 +14,86 @@ import { BINANCE_WS_URL, WS_RECONNECT_DELAY, WS_MAX_RECONNECT_DELAY, WS_RECONNEC
 type MessageHandler = (data: unknown) => void;
 type ConnectionHandler = () => void;
 type ErrorHandler = (error: Event) => void;
+type StatusHandler = (status: ConnectionStatus) => void;
 
 interface Subscription {
   stream: string;
   handlers: Set<MessageHandler>;
 }
 
-// Mock data generators for when Binance is blocked
-const BASE_PRICES: Record<string, number> = {
-  btcusdt: 97500,
-  ethusdt: 3650,
-  bnbusdt: 635,
-  xrpusdt: 2.35,
-  solusdt: 235,
-  dogeusdt: 0.42,
-  adausdt: 1.05,
-  avaxusdt: 45,
-  dotusdt: 9.5,
-  linkusdt: 24,
+// Connection status for UI display
+export type ConnectionStatus = 
+  | 'connecting'
+  | 'connected'
+  | 'disconnected'
+  | 'unavailable'
+  | 'reconnecting';
+
+// WebSocket sources to try in order
+type WebSocketSource = 'binance' | 'okx' | 'bybit';
+
+const WS_SOURCES: Record<WebSocketSource, string> = {
+  binance: 'wss://stream.binance.com:9443',
+  okx: 'wss://ws.okx.com:8443/ws/v5/public',
+  bybit: 'wss://stream.bybit.com/v5/public/spot',
 };
 
-function generateMockTickerData(symbol: string) {
-  const basePrice = BASE_PRICES[symbol.toLowerCase()] || 100;
-  const priceChange = (Math.random() - 0.5) * basePrice * 0.02;
-  const lastPrice = basePrice + priceChange;
+// Normalize data from different sources to Binance format
+function normalizeTickerData(data: unknown, source: WebSocketSource): unknown {
+  if (source === 'binance') return data;
   
-  return {
-    e: '24hrTicker',
-    E: Date.now(),
-    s: symbol.toUpperCase(),
-    p: priceChange.toFixed(2),
-    P: ((priceChange / basePrice) * 100).toFixed(2),
-    w: basePrice.toFixed(2),
-    c: lastPrice.toFixed(2),
-    Q: (Math.random() * 10).toFixed(4),
-    o: basePrice.toFixed(2),
-    h: (basePrice * 1.02).toFixed(2),
-    l: (basePrice * 0.98).toFixed(2),
-    v: (10000 + Math.random() * 100000).toFixed(4),
-    q: ((10000 + Math.random() * 100000) * basePrice).toFixed(2),
-  };
-}
-
-function generateMockDepthUpdate(symbol: string) {
-  const basePrice = BASE_PRICES[symbol.toLowerCase()] || 100;
-  const bids: [string, string][] = [];
-  const asks: [string, string][] = [];
-  
-  for (let i = 0; i < 5; i++) {
-    bids.push([(basePrice - i * 0.1).toFixed(2), (Math.random() * 10).toFixed(4)]);
-    asks.push([(basePrice + i * 0.1).toFixed(2), (Math.random() * 10).toFixed(4)]);
+  try {
+    if (source === 'okx') {
+      const okxData = data as { arg?: { instId: string }, data?: Array<{ last: string, open24h: string, high24h: string, low24h: string, vol24h: string }> };
+      if (okxData.data && okxData.data[0]) {
+        const d = okxData.data[0];
+        const symbol = okxData.arg?.instId?.replace('-', '') || '';
+        const lastPrice = parseFloat(d.last);
+        const openPrice = parseFloat(d.open24h);
+        const priceChange = lastPrice - openPrice;
+        
+        return {
+          e: '24hrTicker',
+          E: Date.now(),
+          s: symbol,
+          c: d.last,
+          o: d.open24h,
+          h: d.high24h,
+          l: d.low24h,
+          v: d.vol24h,
+          p: priceChange.toFixed(8),
+          P: ((priceChange / openPrice) * 100).toFixed(2),
+          _source: 'okx',
+        };
+      }
+    } else if (source === 'bybit') {
+      const bybitData = data as { topic?: string, data?: { symbol: string, lastPrice: string, prevPrice24h: string, highPrice24h: string, lowPrice24h: string, volume24h: string } };
+      if (bybitData.data) {
+        const d = bybitData.data;
+        const lastPrice = parseFloat(d.lastPrice);
+        const openPrice = parseFloat(d.prevPrice24h);
+        const priceChange = lastPrice - openPrice;
+        
+        return {
+          e: '24hrTicker',
+          E: Date.now(),
+          s: d.symbol,
+          c: d.lastPrice,
+          o: d.prevPrice24h,
+          h: d.highPrice24h,
+          l: d.lowPrice24h,
+          v: d.volume24h,
+          p: priceChange.toFixed(8),
+          P: ((priceChange / openPrice) * 100).toFixed(2),
+          _source: 'bybit',
+        };
+      }
+    }
+  } catch {
+    // Return null if normalization fails
   }
   
-  return {
-    e: 'depthUpdate',
-    E: Date.now(),
-    T: Date.now(),
-    s: symbol.toUpperCase(),
-    U: Date.now(),
-    u: Date.now() + 1,
-    b: bids,
-    a: asks,
-  };
-}
-
-function generateMockKlineData(symbol: string, interval: string) {
-  const basePrice = BASE_PRICES[symbol.toLowerCase()] || 100;
-  const open = basePrice * (0.99 + Math.random() * 0.02);
-  const close = open * (0.99 + Math.random() * 0.02);
-  const high = Math.max(open, close) * (1 + Math.random() * 0.005);
-  const low = Math.min(open, close) * (1 - Math.random() * 0.005);
-  
-  return {
-    e: 'kline',
-    E: Date.now(),
-    s: symbol.toUpperCase(),
-    k: {
-      t: Date.now() - 60000,
-      T: Date.now(),
-      s: symbol.toUpperCase(),
-      i: interval,
-      o: open.toFixed(2),
-      c: close.toFixed(2),
-      h: high.toFixed(2),
-      l: low.toFixed(2),
-      v: (100 + Math.random() * 1000).toFixed(4),
-      n: Math.floor(50 + Math.random() * 200),
-      x: false,
-    },
-  };
+  return null;
 }
 
 class BinanceWebSocketManager {
@@ -110,52 +102,61 @@ class BinanceWebSocketManager {
   private reconnectDelay = WS_RECONNECT_DELAY;
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   private pingInterval: ReturnType<typeof setInterval> | null = null;
-  private mockIntervals: Map<string, ReturnType<typeof setInterval>> = new Map();
   private isConnecting = false;
   private shouldReconnect = true;
-  private useMockData = false;
   private connectionAttempts = 0;
-  private maxConnectionAttempts = 2; // Reduced to fail faster
-  private hasEverConnected = false; // Track if we ever successfully connected
-  private connectionFailedPermanently = false; // Track if we've determined connection won't work
+  private maxConnectionAttempts = 3;
+  private hasEverConnected = false;
+  
+  // Multi-source support
+  private currentSource: WebSocketSource = 'binance';
+  private sourceAttempts: Map<WebSocketSource, number> = new Map();
+  private failedSources: Set<WebSocketSource> = new Set();
+  private connectionStatus: ConnectionStatus = 'disconnected';
   
   private onConnectHandlers: Set<ConnectionHandler> = new Set();
   private onDisconnectHandlers: Set<ConnectionHandler> = new Set();
   private onErrorHandlers: Set<ErrorHandler> = new Set();
+  private onStatusChangeHandlers: Set<StatusHandler> = new Set();
 
   constructor() {
-    // Check if we should use mock data immediately (e.g., from environment or previous failures)
-    if (typeof window !== 'undefined') {
-      // Check localStorage for previous connection failures
-      const useMock = localStorage.getItem('binance_ws_use_mock');
-      if (useMock === 'true') {
-        this.useMockData = true;
-        this.connectionFailedPermanently = true;
-        console.info('Using mock WebSocket data (previously detected connection issues)');
-      }
+    // Initialize source attempts
+    this.sourceAttempts.set('binance', 0);
+    this.sourceAttempts.set('okx', 0);
+    this.sourceAttempts.set('bybit', 0);
+  }
+
+  /**
+   * Update and notify connection status
+   */
+  private setConnectionStatus(status: ConnectionStatus): void {
+    if (this.connectionStatus !== status) {
+      this.connectionStatus = status;
+      this.onStatusChangeHandlers.forEach((handler) => handler(status));
     }
   }
 
   /**
-   * Connect to Binance WebSocket
+   * Get current connection status
+   */
+  getConnectionStatus(): ConnectionStatus {
+    return this.connectionStatus;
+  }
+
+  /**
+   * Get current data source name
+   */
+  getCurrentSource(): WebSocketSource {
+    return this.currentSource;
+  }
+
+  /**
+   * Connect to WebSocket (tries multiple sources)
    */
   connect(): void {
-    // If connection has permanently failed, use mock data
-    if (this.connectionFailedPermanently || this.useMockData) {
-      if (!this.useMockData) {
-        this.switchToMockData();
-      } else {
-        this.startMockDataIntervals();
-      }
-      return;
-    }
-
     if (this.ws?.readyState === WebSocket.OPEN || this.isConnecting) {
       return;
     }
-
-    this.isConnecting = true;
-    this.shouldReconnect = true;
 
     // Build URL with streams
     const streams = Array.from(this.subscriptions.keys());
@@ -164,23 +165,71 @@ class BinanceWebSocketManager {
       return;
     }
 
-    const url = `${BINANCE_WS_URL}/stream?streams=${streams.join('/')}`;
+    this.isConnecting = true;
+    this.shouldReconnect = true;
+    this.setConnectionStatus('connecting');
+
+    this.connectToSource(this.currentSource, streams);
+  }
+
+  /**
+   * Try to connect to a specific source
+   */
+  private connectToSource(source: WebSocketSource, streams: string[]): void {
+    let url: string;
+    
+    if (source === 'binance') {
+      url = `${BINANCE_WS_URL}/stream?streams=${streams.join('/')}`;
+    } else if (source === 'okx') {
+      url = WS_SOURCES.okx;
+    } else if (source === 'bybit') {
+      url = WS_SOURCES.bybit;
+    } else {
+      this.tryNextSource();
+      return;
+    }
     
     try {
       this.ws = new WebSocket(url);
-      this.setupEventHandlers();
+      this.setupEventHandlers(source);
     } catch (error) {
-      console.error('WebSocket connection error:', error);
-      this.isConnecting = false;
-      this.connectionAttempts++;
+      console.error(`WebSocket connection error (${source}):`, error);
+      this.tryNextSource();
+    }
+  }
+
+  /**
+   * Try next available WebSocket source
+   */
+  private tryNextSource(): void {
+    const sources: WebSocketSource[] = ['binance', 'okx', 'bybit'];
+    const currentIndex = sources.indexOf(this.currentSource);
+    
+    // Mark current source as failed
+    this.failedSources.add(this.currentSource);
+    
+    // Find next source that hasn't failed
+    for (let i = 1; i <= sources.length; i++) {
+      const nextIndex = (currentIndex + i) % sources.length;
+      const nextSource = sources[nextIndex];
       
-      if (this.connectionAttempts >= this.maxConnectionAttempts) {
-        console.warn('Max connection attempts reached, switching to mock data');
-        this.switchToMockData();
-      } else {
-        this.scheduleReconnect();
+      if (nextSource && !this.failedSources.has(nextSource)) {
+        this.currentSource = nextSource;
+        console.info(`Trying WebSocket source: ${nextSource}`);
+        
+        const streams = Array.from(this.subscriptions.keys());
+        this.connectToSource(nextSource, streams);
+        return;
       }
     }
+    
+    // All sources failed - set unavailable status
+    this.isConnecting = false;
+    this.setConnectionStatus('unavailable');
+    console.warn('All WebSocket sources unavailable - live data cannot be displayed');
+    
+    // Notify handlers that connection is unavailable
+    this.onDisconnectHandlers.forEach((handler) => handler());
   }
 
   /**
@@ -189,12 +238,13 @@ class BinanceWebSocketManager {
   disconnect(): void {
     this.shouldReconnect = false;
     this.clearTimers();
-    this.stopMockDataIntervals();
     
     if (this.ws) {
       this.ws.close();
       this.ws = null;
     }
+    
+    this.setConnectionStatus('disconnected');
   }
 
   /**
@@ -215,17 +265,11 @@ class BinanceWebSocketManager {
       subscription.handlers.add(handler);
     }
     
-    // If using mock data, start mock interval for this stream
-    if (this.useMockData) {
-      this.startMockIntervalForStream(normalizedStream);
-      return () => this.unsubscribe(normalizedStream, handler);
-    }
-    
-    // Reconnect if needed to add new stream
+    // Connect or reconnect if needed
     if (this.ws?.readyState === WebSocket.OPEN) {
       // For combined streams, we need to reconnect with new URL
       this.reconnect();
-    } else {
+    } else if (this.connectionStatus !== 'unavailable') {
       this.connect();
     }
     
@@ -247,13 +291,8 @@ class BinanceWebSocketManager {
       if (subscription.handlers.size === 0) {
         this.subscriptions.delete(normalizedStream);
         
-        // Stop mock interval for this stream if using mock data
-        if (this.useMockData) {
-          this.stopMockIntervalForStream(normalizedStream);
-        }
-        
         // Reconnect without this stream
-        if (this.subscriptions.size > 0 && !this.useMockData) {
+        if (this.subscriptions.size > 0 && this.connectionStatus === 'connected') {
           this.reconnect();
         } else if (this.subscriptions.size === 0) {
           this.disconnect();
@@ -287,10 +326,20 @@ class BinanceWebSocketManager {
   }
 
   /**
+   * Add status change event handler
+   */
+  onStatusChange(handler: StatusHandler): () => void {
+    this.onStatusChangeHandlers.add(handler);
+    // Immediately notify of current status
+    handler(this.connectionStatus);
+    return () => this.onStatusChangeHandlers.delete(handler);
+  }
+
+  /**
    * Check if connected
    */
   isConnected(): boolean {
-    return this.ws?.readyState === WebSocket.OPEN || this.useMockData;
+    return this.ws?.readyState === WebSocket.OPEN;
   }
 
   /**
@@ -300,21 +349,26 @@ class BinanceWebSocketManager {
     return Array.from(this.subscriptions.keys());
   }
 
-  private setupEventHandlers(): void {
+  private setupEventHandlers(source: WebSocketSource): void {
     if (!this.ws) return;
 
     this.ws.onopen = () => {
       this.isConnecting = false;
       this.reconnectDelay = WS_RECONNECT_DELAY;
-      this.connectionAttempts = 0; // Reset on successful connection
+      this.connectionAttempts = 0;
       this.hasEverConnected = true;
+      this.failedSources.clear(); // Clear failed sources on successful connection
+      this.setConnectionStatus('connected');
       this.startPingInterval();
       
-      // Clear the mock data flag from localStorage since we connected successfully
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('binance_ws_use_mock');
+      // For OKX and Bybit, we need to send subscription messages
+      if (source === 'okx') {
+        this.sendOKXSubscriptions();
+      } else if (source === 'bybit') {
+        this.sendBybitSubscriptions();
       }
       
+      console.info(`WebSocket connected to ${source}`);
       this.onConnectHandlers.forEach((handler) => handler());
     };
 
@@ -322,32 +376,30 @@ class BinanceWebSocketManager {
       this.isConnecting = false;
       this.clearTimers();
       
-      this.onDisconnectHandlers.forEach((handler) => handler());
-      
-      // If the connection closed immediately (within a few ms) and we never connected,
-      // it's likely geo-blocked - switch to mock data faster
-      if (!this.hasEverConnected && this.shouldReconnect && !this.useMockData) {
+      // Update status based on situation
+      if (!this.hasEverConnected && this.shouldReconnect) {
         this.connectionAttempts++;
         
-        // Be more aggressive - if connection closes immediately, likely geo-blocked
+        // If connection closes immediately, likely blocked
         if (this.connectionAttempts >= this.maxConnectionAttempts || event.wasClean === false) {
-          // Only log once when switching to mock data
-          if (this.connectionAttempts === this.maxConnectionAttempts) {
-            console.info('WebSocket blocked, using mock data');
-          }
-          this.switchToMockData();
+          // Try next source
+          this.tryNextSource();
         } else {
+          this.setConnectionStatus('reconnecting');
           this.scheduleReconnect();
         }
-      } else if (this.hasEverConnected && this.shouldReconnect && !this.useMockData) {
-        // We had a working connection before, try to reconnect
+      } else if (this.hasEverConnected && this.shouldReconnect) {
+        // We had a working connection, try to reconnect to same source first
+        this.setConnectionStatus('reconnecting');
         this.scheduleReconnect();
+      } else {
+        this.setConnectionStatus('disconnected');
       }
+      
+      this.onDisconnectHandlers.forEach((handler) => handler());
     };
 
     this.ws.onerror = () => {
-      // Suppress error logging - connection issues are handled in onclose
-      // Only notify registered error handlers
       this.onErrorHandlers.forEach((handler) => handler(new Event('error')));
     };
 
@@ -355,18 +407,33 @@ class BinanceWebSocketManager {
       try {
         const message = JSON.parse(event.data as string);
         
-        // Handle combined stream format: { stream: "btcusdt@ticker", data: {...} }
-        if (message.stream && message.data) {
-          const subscription = this.subscriptions.get(message.stream);
-          if (subscription) {
-            subscription.handlers.forEach((handler) => handler(message.data));
+        // Normalize data based on source
+        let normalizedData: unknown;
+        
+        if (source === 'binance') {
+          // Handle combined stream format: { stream: "btcusdt@ticker", data: {...} }
+          if (message.stream && message.data) {
+            const subscription = this.subscriptions.get(message.stream);
+            if (subscription) {
+              subscription.handlers.forEach((handler) => handler(message.data));
+            }
+          } else {
+            // Handle single stream format
+            this.subscriptions.forEach((subscription) => {
+              subscription.handlers.forEach((handler) => handler(message));
+            });
           }
         } else {
-          // Handle single stream format
-          // Notify all subscriptions (for single-stream connections)
-          this.subscriptions.forEach((subscription) => {
-            subscription.handlers.forEach((handler) => handler(message));
-          });
+          // Normalize data from other sources
+          normalizedData = normalizeTickerData(message, source);
+          if (normalizedData) {
+            // Send to relevant subscriptions
+            this.subscriptions.forEach((subscription) => {
+              if (subscription.stream.includes('@ticker')) {
+                subscription.handlers.forEach((handler) => handler(normalizedData));
+              }
+            });
+          }
         }
       } catch (error) {
         console.error('WebSocket message parse error:', error);
@@ -374,14 +441,68 @@ class BinanceWebSocketManager {
     };
   }
 
+  /**
+   * Send subscription messages to OKX WebSocket
+   */
+  private sendOKXSubscriptions(): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    
+    const args: Array<{ channel: string; instId: string }> = [];
+    
+    this.subscriptions.forEach((_, stream) => {
+      const parts = stream.split('@');
+      const symbol = parts[0]?.toUpperCase() || '';
+      const streamType = parts[1] || '';
+      
+      if (streamType === 'ticker') {
+        const instId = symbol.replace('USDT', '-USDT');
+        args.push({ channel: 'tickers', instId });
+      }
+    });
+    
+    if (args.length > 0) {
+      this.ws.send(JSON.stringify({ op: 'subscribe', args }));
+    }
+  }
+
+  /**
+   * Send subscription messages to Bybit WebSocket
+   */
+  private sendBybitSubscriptions(): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    
+    const args: string[] = [];
+    
+    this.subscriptions.forEach((_, stream) => {
+      const parts = stream.split('@');
+      const symbol = parts[0]?.toUpperCase() || '';
+      const streamType = parts[1] || '';
+      
+      if (streamType === 'ticker') {
+        args.push(`tickers.${symbol}`);
+      }
+    });
+    
+    if (args.length > 0) {
+      this.ws.send(JSON.stringify({ op: 'subscribe', args }));
+    }
+  }
+
   private startPingInterval(): void {
     this.clearTimers();
     
-    // Send ping every 3 minutes (Binance timeout is 10 minutes)
+    // Send ping every 3 minutes to keep connection alive
     this.pingInterval = setInterval(() => {
       if (this.ws?.readyState === WebSocket.OPEN) {
-        // Binance doesn't require explicit ping, but we can send a simple message
-        // to keep the connection alive through proxies
+        // Binance: no explicit ping needed
+        // OKX: send ping message
+        if (this.currentSource === 'okx') {
+          this.ws.send('ping');
+        }
+        // Bybit: send ping message
+        else if (this.currentSource === 'bybit') {
+          this.ws.send(JSON.stringify({ op: 'ping' }));
+        }
       }
     }, 180000);
   }
@@ -413,11 +534,6 @@ class BinanceWebSocketManager {
   }
 
   private reconnect(): void {
-    // Don't try to reconnect if we're using mock data
-    if (this.useMockData || this.connectionFailedPermanently) {
-      return;
-    }
-    
     if (this.ws) {
       this.shouldReconnect = true;
       this.ws.close();
@@ -425,147 +541,32 @@ class BinanceWebSocketManager {
   }
 
   /**
-   * Reset mock data mode and try to connect to real WebSocket again
-   * Useful for users who want to retry after enabling VPN
+   * Reset connection and try all sources again
+   * Useful for users who want to retry after changing network/VPN
    */
-  resetMockMode(): void {
-    this.useMockData = false;
-    this.connectionFailedPermanently = false;
+  retryConnection(): void {
+    this.failedSources.clear();
     this.connectionAttempts = 0;
+    this.currentSource = 'binance'; // Start with primary source
     this.hasEverConnected = false;
-    
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('binance_ws_use_mock');
-    }
-    
-    this.stopMockDataIntervals();
-    
-    // Reconnect with real WebSocket
-    if (this.subscriptions.size > 0) {
-      this.connect();
-    }
-  }
-
-  /**
-   * Check if using mock data
-   */
-  isUsingMockData(): boolean {
-    return this.useMockData;
-  }
-
-  /**
-   * Switch to mock data mode when WebSocket connection fails
-   */
-  private switchToMockData(): void {
-    this.useMockData = true;
-    this.connectionFailedPermanently = true;
-    this.shouldReconnect = false;
-    this.isConnecting = false;
-    
-    // Persist the mock mode to localStorage to avoid repeated failed attempts on page reload
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('binance_ws_use_mock', 'true');
-    }
+    this.setConnectionStatus('connecting');
     
     if (this.ws) {
       this.ws.close();
       this.ws = null;
     }
     
-    // Start mock intervals for all current subscriptions
-    this.startMockDataIntervals();
-    
-    // Notify handlers that we're "connected" (via mock data)
-    this.onConnectHandlers.forEach((handler) => handler());
-  }
-
-  /**
-   * Start mock data intervals for all subscriptions
-   */
-  private startMockDataIntervals(): void {
-    this.subscriptions.forEach((_, stream) => {
-      this.startMockIntervalForStream(stream);
-    });
-  }
-
-  /**
-   * Start mock data interval for a specific stream
-   */
-  private startMockIntervalForStream(stream: string): void {
-    // Don't create duplicate intervals
-    if (this.mockIntervals.has(stream)) {
-      return;
-    }
-
-    // Parse stream to determine type and symbol
-    // Formats: btcusdt@ticker, btcusdt@depth@100ms, btcusdt@kline_1m
-    const parts = stream.split('@');
-    const symbol = parts[0] || 'btcusdt';
-    const streamType = parts[1] || 'ticker';
-
-    let interval: ReturnType<typeof setInterval>;
-
-    if (streamType === 'ticker') {
-      // Ticker updates every 1 second
-      interval = setInterval(() => {
-        const mockData = generateMockTickerData(symbol);
-        const subscription = this.subscriptions.get(stream);
-        if (subscription) {
-          subscription.handlers.forEach((handler) => handler(mockData));
-        }
-      }, 1000);
-    } else if (streamType === 'depth') {
-      // Depth updates every 100-500ms
-      interval = setInterval(() => {
-        const mockData = generateMockDepthUpdate(symbol);
-        const subscription = this.subscriptions.get(stream);
-        if (subscription) {
-          subscription.handlers.forEach((handler) => handler(mockData));
-        }
-      }, 500);
-    } else if (streamType.startsWith('kline_')) {
-      // Kline updates every 2 seconds
-      const klineInterval = streamType.replace('kline_', '');
-      interval = setInterval(() => {
-        const mockData = generateMockKlineData(symbol, klineInterval);
-        const subscription = this.subscriptions.get(stream);
-        if (subscription) {
-          subscription.handlers.forEach((handler) => handler(mockData));
-        }
-      }, 2000);
-    } else {
-      // Default: generic update every second
-      interval = setInterval(() => {
-        const mockData = generateMockTickerData(symbol);
-        const subscription = this.subscriptions.get(stream);
-        if (subscription) {
-          subscription.handlers.forEach((handler) => handler(mockData));
-        }
-      }, 1000);
-    }
-
-    this.mockIntervals.set(stream, interval);
-  }
-
-  /**
-   * Stop mock data interval for a specific stream
-   */
-  private stopMockIntervalForStream(stream: string): void {
-    const interval = this.mockIntervals.get(stream);
-    if (interval) {
-      clearInterval(interval);
-      this.mockIntervals.delete(stream);
+    // Reconnect with subscriptions
+    if (this.subscriptions.size > 0) {
+      this.connect();
     }
   }
 
   /**
-   * Stop all mock data intervals
+   * Check if data is currently unavailable
    */
-  private stopMockDataIntervals(): void {
-    this.mockIntervals.forEach((interval) => {
-      clearInterval(interval);
-    });
-    this.mockIntervals.clear();
+  isUnavailable(): boolean {
+    return this.connectionStatus === 'unavailable';
   }
 }
 

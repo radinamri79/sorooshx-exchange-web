@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn, formatNumber, formatPrice, formatCurrency } from '@/lib/utils';
-import { Button, Input, Slider, Tabs, TabsList, TabsTrigger } from '@/components/ui';
+import { Slider } from '@/components/ui';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { useTradeStore } from '@/stores/useTradeStore';
 import type { OrderSide, OrderType, MarginMode } from '@/types';

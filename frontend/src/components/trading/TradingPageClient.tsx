@@ -20,7 +20,8 @@ interface TradingPageClientProps {
 }
 
 export function TradingPageClient({ locale }: TradingPageClientProps) {
-  const t = useTranslations('nav');
+  // Translation hook ready for future localization
+  useTranslations('nav');
   const isRTL = locale === 'fa';
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);

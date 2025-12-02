@@ -66,7 +66,8 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
 }
 
 export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
-  const t = useTranslations('trading');
+  // Translation hook ready for future localization
+  useTranslations('trading');
   const { currentSymbol, tickers } = useMarketStore();
   const { bids, asks, lastUpdateId, setOrderbook, mergeOrderbook, reset } = useOrderbookStore();
   

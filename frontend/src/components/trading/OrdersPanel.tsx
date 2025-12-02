@@ -15,7 +15,8 @@ interface OrdersPanelProps {
 type TabValue = 'positions' | 'openOrders' | 'orderHistory';
 
 export function OrdersPanel({ className }: OrdersPanelProps) {
-  const t = useTranslations('trading');
+  // Translation hook ready for future localization
+  useTranslations('trading');
   const { currentSymbol, tickers } = useMarketStore();
   const { orders, positions, cancelOrder, closePosition } = useTradeStore();
   const [activeTab, setActiveTab] = useState<TabValue>('positions');

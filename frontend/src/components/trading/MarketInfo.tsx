@@ -12,7 +12,8 @@ interface MarketInfoProps {
 }
 
 export function MarketInfo({ className }: MarketInfoProps) {
-  const t = useTranslations('trading');
+  // Translation hook ready for future localization
+  useTranslations('trading');
   const { currentSymbol, tickers, setTicker } = useMarketStore();
   const tickerRef = useRef<BinanceTicker | null>(null);
 

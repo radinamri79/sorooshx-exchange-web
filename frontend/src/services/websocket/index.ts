@@ -6,3 +6,5 @@ export {
   subscribeAggTrade,
   subscribeMarkPrice,
 } from './binance';
+
+export type { ConnectionStatus } from './binance';
