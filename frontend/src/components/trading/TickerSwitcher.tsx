@@ -17,6 +17,7 @@ import { fetchAllTickers } from '@/services/api';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -111,9 +112,11 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
     const streamName = '!miniTicker@arr';
 
     const handleTickerArray = (data: unknown) => {
-      const tickers = data as BinanceTicker[];
+      // Handle both array (real Binance) and single object (mock data)
+      const tickerArray = Array.isArray(data) ? data : [data];
+      const tickers = tickerArray as BinanceTicker[];
       tickers.forEach((ticker) => {
-        if (ticker.s.endsWith('USDT')) {
+        if (ticker?.s?.endsWith('USDT')) {
           setTicker(ticker.s, ticker);
         }
       });
@@ -233,6 +236,9 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t('searchPlaceholder')}
+          </DialogDescription>
         </DialogHeader>
 
         {/* Search Input */}
@@ -306,11 +312,19 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                 const isFav = isFavorite(symbol);
 
                 return (
-                  <button
+                  <div
                     key={symbol}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleSelectSymbol(symbol)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSelectSymbol(symbol);
+                      }
+                    }}
                     className={cn(
-                      'grid grid-cols-[auto_1fr_1fr_1fr] gap-2 px-3 py-2 rounded-md transition-colors text-left',
+                      'grid grid-cols-[auto_1fr_1fr_1fr] gap-2 px-3 py-2 rounded-md transition-colors text-left cursor-pointer',
                       symbol === currentSymbol
                         ? 'bg-brand-500/10 border border-brand-500/20'
                         : 'hover:bg-background-tertiary'
@@ -360,7 +374,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                         {ticker ? formatPercentage(ticker.P) : '--'}
                       </span>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
 

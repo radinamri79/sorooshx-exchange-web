@@ -94,6 +94,43 @@
         "altcoins": "Altcoins"
       },
       "showingCount": "Showing {count} of {total}"
+    },
+    "marketInfo": {
+      "lastPrice": "Last Price",
+      "markPrice": "Mark Price",
+      "indexPrice": "Index Price",
+      "change24h": "24h Change",
+      "high24h": "24h High",
+      "low24h": "24h Low",
+      "volume24h": "24h Volume",
+      "turnover24h": "24h Turnover",
+      "fundingRate": "Funding / Settlement",
+      "settlement": "Settlement",
+      "openInterest": "Open Interest"
+    },
+    "ordersPanel": {
+      "positions": "Positions",
+      "openOrders": "Open Orders",
+      "orderHistory": "Order History",
+      "tradeHistory": "Trade History",
+      "showAll": "Show All Pairs",
+      "noPositions": "No open positions",
+      "noOpenOrders": "No open orders",
+      "noOrderHistory": "No order history",
+      "noTradeHistory": "No trade history",
+      "time": "Time",
+      "symbol": "Symbol",
+      "type": "Type",
+      "side": "Side",
+      "price": "Price",
+      "amount": "Amount",
+      "filled": "Filled",
+      "actions": "Actions",
+      "status": "Status",
+      "total": "Total",
+      "fee": "Fee",
+      "cancel": "Cancel",
+      "cancelAll": "Cancel All"
     }
   },
   "orderbook": {
@@ -103,19 +140,6 @@
     "amount": "Amount",
     "total": "Total",
     "spread": "Spread"
-  },
-  "marketInfo": {
-    "lastPrice": "Last Price",
-    "markPrice": "Mark Price",
-    "indexPrice": "Index Price",
-    "change24h": "24h Change",
-    "high24h": "24h High",
-    "low24h": "24h Low",
-    "volume24h": "24h Volume",
-    "turnover24h": "24h Turnover",
-    "fundingRate": "Funding / Settlement",
-    "settlement": "Settlement",
-    "openInterest": "Open Interest"
   },
   "chart": {
     "time": "Time",

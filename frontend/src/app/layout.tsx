@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: 'Professional cryptocurrency futures trading platform',
   keywords: ['crypto', 'trading', 'futures', 'bitcoin', 'exchange'],
   authors: [{ name: 'SorooshX Team' }],
+  icons: {
+    icon: '/favicon.svg',
+  },
   openGraph: {
     title: 'SorooshX Exchange',
     description: 'Professional cryptocurrency futures trading platform',

@@ -1,11 +1,13 @@
-import { BINANCE_REST_URL } from '@/lib/constants';
 import type { KlineData, SymbolInfo, TickerData, OrderbookData } from '@/types';
+
+// Use local API proxy to avoid CORS issues
+const API_PROXY_BASE = '/api/binance';
 
 /**
  * Fetch exchange info (symbols, precision, etc.)
  */
 export async function fetchExchangeInfo(): Promise<SymbolInfo[]> {
-  const response = await fetch(`${BINANCE_REST_URL}/fapi/v1/exchangeInfo`);
+  const response = await fetch(`${API_PROXY_BASE}/exchangeInfo`);
   
   if (!response.ok) {
     throw new Error('Failed to fetch exchange info');
@@ -38,7 +40,7 @@ export async function fetchExchangeInfo(): Promise<SymbolInfo[]> {
  */
 export async function fetchTicker(symbol: string): Promise<TickerData> {
   const response = await fetch(
-    `${BINANCE_REST_URL}/fapi/v1/ticker/24hr?symbol=${symbol.toUpperCase()}`
+    `${API_PROXY_BASE}/ticker?symbol=${symbol.toUpperCase()}`
   );
   
   if (!response.ok) {
@@ -63,7 +65,7 @@ export async function fetchTicker(symbol: string): Promise<TickerData> {
  * Fetch all tickers
  */
 export async function fetchAllTickers(): Promise<TickerData[]> {
-  const response = await fetch(`${BINANCE_REST_URL}/fapi/v1/ticker/24hr`);
+  const response = await fetch(`${API_PROXY_BASE}/ticker`);
   
   if (!response.ok) {
     throw new Error('Failed to fetch tickers');
@@ -97,7 +99,7 @@ export async function fetchAllTickers(): Promise<TickerData[]> {
  */
 export async function fetchOrderbook(symbol: string, limit = 100): Promise<OrderbookData> {
   const response = await fetch(
-    `${BINANCE_REST_URL}/fapi/v1/depth?symbol=${symbol.toUpperCase()}&limit=${limit}`
+    `${API_PROXY_BASE}/depth?symbol=${symbol.toUpperCase()}&limit=${limit}`
   );
   
   if (!response.ok) {
@@ -123,7 +125,7 @@ export async function fetchKlines(
   limit = 500
 ): Promise<KlineData[]> {
   const response = await fetch(
-    `${BINANCE_REST_URL}/fapi/v1/klines?symbol=${symbol.toUpperCase()}&interval=${interval}&limit=${limit}`
+    `${API_PROXY_BASE}/klines?symbol=${symbol.toUpperCase()}&interval=${interval}&limit=${limit}`
   );
   
   if (!response.ok) {
@@ -152,7 +154,7 @@ export async function fetchMarkPrice(symbol: string): Promise<{
   nextFundingTime: number;
 }> {
   const response = await fetch(
-    `${BINANCE_REST_URL}/fapi/v1/premiumIndex?symbol=${symbol.toUpperCase()}`
+    `${API_PROXY_BASE}/premiumIndex?symbol=${symbol.toUpperCase()}`
   );
   
   if (!response.ok) {
