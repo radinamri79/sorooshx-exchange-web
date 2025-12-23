@@ -4,9 +4,22 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { createChart, IChartApi, ISeriesApi, CandlestickData, HistogramData, Time } from 'lightweight-charts';
 import { cn } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
+import { useChartStore } from '@/stores/useChartStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchKlines } from '@/services/api';
 import type { KlineData } from '@/types';
+import { ChartToolbar } from './ChartToolbar';
+import { ChartSettingsModal } from './ChartSettingsModal';
+import { PriceAlertsModal } from './PriceAlertsModal';
+import {
+  calculateSMA,
+  calculateEMA,
+  calculateRSI,
+  calculateBBands,
+  calculateMACD,
+  calculateStochastic,
+  calculateATR,
+} from '@/lib/indicators';
 
 interface TradingChartProps {
   className?: string;
@@ -37,14 +50,26 @@ const BINANCE_INTERVALS: Record<TimeframeValue, string> = {
 
 export function TradingChart({ className }: TradingChartProps) {
   const { currentSymbol } = useMarketStore();
+  const {
+    indicators,
+    showVolume,
+    showGrid,
+    showCrosshair,
+    alerts,
+    triggerAlert,
+  } = useChartStore();
   
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
+  const indicatorSeriesRef = useRef<Map<string, ISeriesApi<any>>>(new Map());
   
   const [timeframe, setTimeframe] = useState<TimeframeValue>('15m');
   const [isLoading, setIsLoading] = useState(true);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [klineData, setKlineData] = useState<KlineData[]>([]);
 
   // Initialize chart
   useEffect(() => {
@@ -56,11 +81,11 @@ export function TradingChart({ className }: TradingChartProps) {
         textColor: '#848e9c',
       },
       grid: {
-        vertLines: { color: 'rgba(30, 35, 41, 0.6)' },
-        horzLines: { color: 'rgba(30, 35, 41, 0.6)' },
+        vertLines: { color: showGrid ? 'rgba(30, 35, 41, 0.6)' : 'transparent' },
+        horzLines: { color: showGrid ? 'rgba(30, 35, 41, 0.6)' : 'transparent' },
       },
       crosshair: {
-        mode: 1,
+        mode: showCrosshair ? 1 : 0,
         vertLine: {
           width: 1,
           color: '#ed7620',
@@ -144,7 +169,7 @@ export function TradingChart({ className }: TradingChartProps) {
       candlestickSeriesRef.current = null;
       volumeSeriesRef.current = null;
     };
-  }, []);
+  }, [showGrid, showCrosshair]);
 
   // Fetch historical klines
   useEffect(() => {
@@ -154,6 +179,8 @@ export function TradingChart({ className }: TradingChartProps) {
       try {
         const interval = BINANCE_INTERVALS[timeframe];
         const data = await fetchKlines(currentSymbol, interval, 500);
+        
+        setKlineData(data);
         
         if (candlestickSeriesRef.current && volumeSeriesRef.current) {
           // Format candlestick data
@@ -173,7 +200,7 @@ export function TradingChart({ className }: TradingChartProps) {
           }));
 
           candlestickSeriesRef.current.setData(candlestickData);
-          volumeSeriesRef.current.setData(volumeData);
+          volumeSeriesRef.current.setData(showVolume ? volumeData : []);
           
           // Fit content
           chartRef.current?.timeScale().fitContent();
@@ -186,7 +213,7 @@ export function TradingChart({ className }: TradingChartProps) {
     };
 
     loadKlines();
-  }, [currentSymbol, timeframe]);
+  }, [currentSymbol, timeframe, showVolume]);
 
   // Subscribe to kline WebSocket updates
   useEffect(() => {
@@ -226,6 +253,29 @@ export function TradingChart({ className }: TradingChartProps) {
         value: parseFloat(kline.v),
         color: isGreen ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)',
       });
+
+      // Check price alerts
+      const closePrice = parseFloat(kline.c);
+      alerts.forEach((alert) => {
+        if (!alert.triggered) {
+          if (alert.condition === 'above' && closePrice >= alert.price) {
+            triggerAlert(alert.id);
+            // Show browser notification
+            if (Notification.permission === 'granted') {
+              new Notification(`Price Alert: ${currentSymbol}`, {
+                body: `Price reached $${alert.price.toFixed(2)}!`,
+              });
+            }
+          } else if (alert.condition === 'below' && closePrice <= alert.price) {
+            triggerAlert(alert.id);
+            if (Notification.permission === 'granted') {
+              new Notification(`Price Alert: ${currentSymbol}`, {
+                body: `Price reached $${alert.price.toFixed(2)}!`,
+              });
+            }
+          }
+        }
+      });
     };
 
     binanceWS.subscribe(streamName, handleKlineUpdate);
@@ -233,7 +283,112 @@ export function TradingChart({ className }: TradingChartProps) {
     return () => {
       binanceWS.unsubscribe(streamName, handleKlineUpdate);
     };
-  }, [currentSymbol, timeframe]);
+  }, [currentSymbol, timeframe, alerts, triggerAlert]);
+
+  // Render technical indicators
+  useEffect(() => {
+    if (!chartRef.current || klineData.length === 0) return;
+
+    // Clean up old indicator series
+    indicatorSeriesRef.current.forEach((series) => {
+      chartRef.current?.removeSeries(series);
+    });
+    indicatorSeriesRef.current.clear();
+
+    const closes = klineData.map((k) => k.close);
+    const highs = klineData.map((k) => k.high);
+    const lows = klineData.map((k) => k.low);
+    const times = klineData.map((k) => ((k.time / 1000) as Time));
+
+    // SMA
+    if (indicators.sma?.enabled) {
+      const smaValues = calculateSMA(closes, indicators.sma.value || 20);
+      const smaSeries = chartRef.current.addLineSeries({
+        color: '#ffd700',
+        lineWidth: 1,
+        priceScaleId: 'right',
+      });
+      
+      const smaData = smaValues
+        .map((value, idx) => ({
+          time: times[idx],
+          value: value,
+        }))
+        .filter((d) => !isNaN(d.value));
+      
+      smaSeries.setData(smaData);
+      indicatorSeriesRef.current.set('sma', smaSeries);
+    }
+
+    // EMA
+    if (indicators.ema?.enabled) {
+      const emaValues = calculateEMA(closes, indicators.ema.value || 20);
+      const emaSeries = chartRef.current.addLineSeries({
+        color: '#00d4ff',
+        lineWidth: 1,
+        priceScaleId: 'right',
+      });
+      
+      const emaData = emaValues
+        .map((value, idx) => ({
+          time: times[idx],
+          value: value,
+        }))
+        .filter((d) => !isNaN(d.value));
+      
+      emaSeries.setData(emaData);
+      indicatorSeriesRef.current.set('ema', emaSeries);
+    }
+
+    // Bollinger Bands
+    if (indicators.bbands?.enabled) {
+      const bbandsValues = calculateBBands(
+        closes,
+        indicators.bbands.period || 20,
+        indicators.bbands.stdDevMultiplier || 2
+      );
+      
+      const upperSeries = chartRef.current.addLineSeries({
+        color: 'rgba(255, 107, 107, 0.5)',
+        lineWidth: 1,
+        priceScaleId: 'right',
+      });
+      
+      const lowerSeries = chartRef.current.addLineSeries({
+        color: 'rgba(107, 255, 107, 0.5)',
+        lineWidth: 1,
+        priceScaleId: 'right',
+      });
+      
+      const middleSeries = chartRef.current.addLineSeries({
+        color: 'rgba(255, 255, 255, 0.3)',
+        lineWidth: 1,
+        lineStyle: 2,
+        priceScaleId: 'right',
+      });
+
+      const upperData = bbandsValues
+        .map((d) => ({ time: d.time as Time, value: d.upper }))
+        .filter((d) => !isNaN(d.value));
+      
+      const lowerData = bbandsValues
+        .map((d) => ({ time: d.time as Time, value: d.lower }))
+        .filter((d) => !isNaN(d.value));
+      
+      const middleData = bbandsValues
+        .map((d) => ({ time: d.time as Time, value: d.middle }))
+        .filter((d) => !isNaN(d.value));
+
+      upperSeries.setData(upperData);
+      lowerSeries.setData(lowerData);
+      middleSeries.setData(middleData);
+      
+      indicatorSeriesRef.current.set('bbands-upper', upperSeries);
+      indicatorSeriesRef.current.set('bbands-lower', lowerSeries);
+      indicatorSeriesRef.current.set('bbands-middle', middleSeries);
+    }
+
+  }, [klineData, indicators]);
 
   // Handle timeframe change
   const handleTimeframeChange = useCallback((newTimeframe: TimeframeValue) => {
@@ -242,6 +397,12 @@ export function TradingChart({ className }: TradingChartProps) {
 
   return (
     <div className={cn('flex flex-col bg-black overflow-hidden', className)}>
+      {/* Chart Toolbar */}
+      <ChartToolbar
+        onSettingsClick={() => setSettingsOpen(true)}
+        onAlertsClick={() => setAlertsOpen(true)}
+      />
+
       {/* Timeframe Selector */}
       <div className="flex items-center gap-1 px-3 py-2 border-b border-[#1e2329] overflow-x-auto">
         {TIMEFRAMES.map(({ value, label }) => (
@@ -269,6 +430,12 @@ export function TradingChart({ className }: TradingChartProps) {
         )}
         <div ref={chartContainerRef} className="w-full h-full" />
       </div>
+
+      {/* Settings Modal */}
+      <ChartSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+
+      {/* Alerts Modal */}
+      <PriceAlertsModal open={alertsOpen} onOpenChange={setAlertsOpen} />
     </div>
   );
 }
