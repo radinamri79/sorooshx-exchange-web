@@ -11,6 +11,7 @@ import {
   Orderbook,
   TradingChart,
   OrdersPanel,
+  AccountInfoPanel,
 } from '@/components/trading';
 import { binanceWS } from '@/services/websocket';
 import { BarChart3, BookOpen, Wallet, History, Menu, X } from 'lucide-react';
@@ -202,25 +203,30 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           </div>
         </main>
 
-        {/* RIGHT COLUMN: Order Book + Order Form */}
+        {/* RIGHT COLUMN: Order Book + Order Form + Account Info */}
         <aside className={cn(
           'w-96 flex flex-col bg-black border-l border-[#1e2329] overflow-hidden',
           isRTL && 'order-1 border-l-0 border-r border-[#1e2329]'
         )}>
           {/* Order Book Section */}
-          <div className="flex-1 border-b border-[#1e2329] overflow-hidden flex flex-col">
+          <div className="h-1/3 border-b border-[#1e2329] overflow-hidden flex flex-col">
             <div className="px-3 py-2 border-b border-[#1e2329] bg-[#0a0e27]">
               <h3 className="text-xs font-semibold text-white">Order book</h3>
             </div>
             <Orderbook 
               className="flex-1 bg-black border-0 rounded-none overflow-auto" 
-              maxRows={20}
+              maxRows={12}
             />
           </div>
 
           {/* Order Form Section */}
-          <div className="flex-1 bg-black overflow-auto flex flex-col">
+          <div className="h-1/3 border-b border-[#1e2329] bg-black overflow-auto flex flex-col">
             <OrderForm className="flex-1 bg-black border-0 rounded-none" />
+          </div>
+
+          {/* Account Info Section */}
+          <div className="flex-1 border-t border-[#1e2329] overflow-auto">
+            <AccountInfoPanel className="h-full" />
           </div>
         </aside>
       </div>
