@@ -10,7 +10,6 @@ interface TradingViewWidgetProps {
 
 // Convert our symbol format to TradingView format
 function formatSymbolForTradingView(symbol: string): string {
-  // Remove USDT suffix and format for TradingView
   // Example: BTCUSDT -> BINANCE:BTCUSDT
   return `BINANCE:${symbol}`;
 }
@@ -18,118 +17,79 @@ function formatSymbolForTradingView(symbol: string): string {
 function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { currentSymbol } = useMarketStore();
-  const scriptRef = useRef<HTMLScriptElement | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Clear previous widget
     const container = containerRef.current;
-    container.innerHTML = '';
+    
+    // Set the symbol for display
+    const formattedSymbol = formatSymbolForTradingView(currentSymbol);
+    
+    // Clear and build HTML structure
+    container.innerHTML = `
+      <div class="tradingview-widget-container" style="height: 100%; width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%; position: relative;"></div>
+        <div class="tradingview-widget-copyright" style="font-size: 13px; line-height: 20px; color: rgba(132, 142, 156, 0.8); margin-bottom: 8px;">
+          <a href="https://www.tradingview.com/symbols/${formattedSymbol}/" rel="noopener nofollow" target="_blank" style="color: #23a897; text-decoration: none;">
+            <span>${currentSymbol}</span>
+          </a> by TradingView
+        </div>
+      </div>
+    `;
 
-    // Create widget container structure
-    const widgetContainer = document.createElement('div');
-    widgetContainer.className = 'tradingview-widget-container';
-    widgetContainer.style.height = '100%';
-    widgetContainer.style.width = '100%';
-
-    const widgetDiv = document.createElement('div');
-    widgetDiv.className = 'tradingview-widget-container__widget';
-    widgetDiv.style.height = '100%';
-    widgetDiv.style.width = '100%';
-    widgetContainer.appendChild(widgetDiv);
-
-    // Create and configure the script
+    // Load the TradingView script
     const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
     script.type = 'text/javascript';
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
     script.async = true;
     
-    // TradingView widget configuration - Bitget-style professional chart
-    const config = {
-      // Symbol Settings
-      symbol: formatSymbolForTradingView(currentSymbol),
+    // Configuration for the widget
+    const widgetConfig = {
+      symbol: formattedSymbol,
       interval: '15',
-      
-      // Theme - Dark mode matching Bitget
+      timezone: 'Etc/UTC',
       theme: 'dark',
+      style: '1',
+      locale: 'en',
       backgroundColor: 'rgba(0, 0, 0, 1)',
       gridColor: 'rgba(30, 35, 41, 0.6)',
-      
-      // Size
       autosize: true,
-      
-      // Toolbar Configuration - Show ALL tools like Bitget
       hide_top_toolbar: false,
-      hide_side_toolbar: false,  // IMPORTANT: Show left toolbar with drawing tools!
+      hide_side_toolbar: false,
       hide_legend: false,
       hide_volume: false,
-      
-      // Features
       allow_symbol_change: true,
       save_image: true,
       withdateranges: true,
       details: false,
       hotlist: false,
       calendar: false,
-      
-      // Style - Candlestick
-      style: '1',
-      
-      // Locale & Timezone
-      locale: 'en',
-      timezone: 'Etc/UTC',
-      
-      // Default Studies/Indicators (like Bitget's EMA lines)
-      studies: [
-        'STD;EMA',
-        'STD;EMA',
-        'STD;EMA',
-        'STD;EMA',
-      ],
-      
-      // Enable additional features
       support_host: 'https://www.tradingview.com',
-      
-      // Compare symbols (empty by default)
       compareSymbols: [],
-      
-      // Watchlist (empty by default)
       watchlist: [],
-      
-      // Overrides for styling
-      overrides: {
-        'mainSeriesProperties.candleStyle.upColor': '#26a69a',
-        'mainSeriesProperties.candleStyle.downColor': '#ef5350',
-        'mainSeriesProperties.candleStyle.borderUpColor': '#26a69a',
-        'mainSeriesProperties.candleStyle.borderDownColor': '#ef5350',
-        'mainSeriesProperties.candleStyle.wickUpColor': '#26a69a',
-        'mainSeriesProperties.candleStyle.wickDownColor': '#ef5350',
-        'paneProperties.background': '#000000',
-        'paneProperties.backgroundType': 'solid',
-      },
+      studies: [],
     };
-    
-    script.innerHTML = JSON.stringify(config);
-    widgetContainer.appendChild(script);
-    container.appendChild(widgetContainer);
-    scriptRef.current = script;
+
+    script.textContent = JSON.stringify(widgetConfig);
+    container.appendChild(script);
 
     return () => {
-      if (container) {
-        container.innerHTML = '';
-      }
-      scriptRef.current = null;
+      // Cleanup handled by React
     };
   }, [currentSymbol]);
 
   return (
     <div 
-      className={cn('relative w-full h-full min-h-[400px]', className)} 
       ref={containerRef}
+      className={cn('relative w-full h-full bg-black', className)}
+      style={{ 
+        minHeight: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     />
   );
 }
 
-// Memoize to prevent unnecessary re-renders
 export const TradingViewWidget = memo(TradingViewWidgetComponent);
