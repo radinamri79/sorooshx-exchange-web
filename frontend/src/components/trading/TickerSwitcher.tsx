@@ -236,9 +236,9 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col bg-[#121214] border-[#2a2a2d]">
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] overflow-hidden flex flex-col bg-[#121214] border-[#2a2a2d] p-3 md:p-6">
         <DialogHeader>
-          <DialogTitle className="text-[#f5f5f5]">{t('title')}</DialogTitle>
+          <DialogTitle className="text-[#f5f5f5] text-sm md:text-base">{t('title')}</DialogTitle>
           <DialogDescription className="sr-only">
             {t('searchPlaceholder')}
           </DialogDescription>
@@ -253,26 +253,26 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full h-9 pl-10 pr-10 rounded border border-[#2a2a2d] bg-[#17181b] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-1 focus:ring-[#ed7620] text-sm"
+            className="w-full h-10 md:h-9 pl-10 pr-10 rounded border border-[#2a2a2d] bg-[#17181b] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-1 focus:ring-[#ed7620] text-sm"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#a1a1a1]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#a1a1a1] p-1"
             >
               <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
-        {/* Category Tabs */}
-        <div className="flex items-center gap-1.5 py-2 border-b border-[#2a2a2d]">
+        {/* Category Tabs - Scrollable on mobile */}
+        <div className="flex items-center gap-1.5 py-2 border-b border-[#2a2a2d] overflow-x-auto scrollbar-hide">
           {CATEGORIES.map((category) => (
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
               className={cn(
-                'px-2 py-1 text-xs font-medium rounded whitespace-nowrap transition-colors flex items-center gap-1',
+                'px-2.5 py-1.5 text-[11px] md:text-xs font-medium rounded whitespace-nowrap transition-colors flex items-center gap-1 shrink-0',
                 selectedCategory === category.id
                   ? 'bg-[#ed7620] text-white'
                   : 'text-[#6b6b6b] hover:text-[#a1a1a1] hover:bg-[#17181b]'
@@ -290,7 +290,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         </div>
 
         {/* Ticker List */}
-        <div className="flex-1 overflow-y-auto min-h-[300px]">
+        <div className="flex-1 overflow-y-auto min-h-[250px] md:min-h-[300px]">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ed7620]" />
@@ -330,7 +330,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                       }
                     }}
                     className={cn(
-                      'grid grid-cols-[auto_1fr_1fr_1fr] gap-2 px-2 py-2 rounded transition-colors text-left cursor-pointer',
+                      'grid grid-cols-[auto_1fr_1fr_1fr] gap-2 px-2 py-2.5 md:py-2 rounded transition-colors text-left cursor-pointer active:bg-[#1e1f23]',
                       symbol === currentSymbol
                         ? 'bg-[#ed7620]/10 border border-[#ed7620]/30'
                         : 'hover:bg-[#17181b]'
@@ -339,11 +339,11 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                     {/* Favorite Star */}
                     <button
                       onClick={(e) => handleToggleFavorite(e, symbol)}
-                      className="w-5 flex items-center justify-center"
+                      className="w-6 flex items-center justify-center"
                     >
                       <Star
                         className={cn(
-                          'w-3.5 h-3.5 transition-colors',
+                          'w-4 h-4 transition-colors',
                           isFav
                             ? 'fill-[#f0b90b] text-[#f0b90b]'
                             : 'text-[#6b6b6b] hover:text-[#f0b90b]'
@@ -357,7 +357,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                         {symbol.replace('USDT', '')}
                       </span>
                       <span className="text-[#6b6b6b] text-[10px]">/USDT</span>
-                      <span className="text-[8px] font-medium px-0.5 py-0.5 rounded bg-[#ed7620]/10 text-[#ed7620]">
+                      <span className="text-[8px] font-medium px-1 py-0.5 rounded bg-[#ed7620]/10 text-[#ed7620]">
                         Perp
                       </span>
                     </div>
@@ -370,9 +370,9 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                     {/* Change */}
                     <div className="flex items-center justify-end gap-0.5">
                       {isUp ? (
-                        <TrendingUp className="w-2.5 h-2.5 text-[#26a69a]" />
+                        <TrendingUp className="w-3 h-3 text-[#26a69a]" />
                       ) : (
-                        <TrendingDown className="w-2.5 h-2.5 text-[#ef5350]" />
+                        <TrendingDown className="w-3 h-3 text-[#ef5350]" />
                       )}
                       <span
                         className={cn(

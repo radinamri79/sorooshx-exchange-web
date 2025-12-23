@@ -69,74 +69,74 @@ export function MarketInfo({ className }: MarketInfoProps) {
   return (
     <div
       className={cn(
-        'flex items-center gap-4 px-0 py-0 bg-transparent border-0',
+        'flex items-center gap-3 md:gap-4 px-0 py-0 bg-transparent border-0',
         className
       )}
     >
       {/* Main Price with Change */}
-      <div className="flex items-center gap-2 min-w-fit">
+      <div className="flex items-center gap-2 min-w-fit shrink-0">
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
             <span
               className={cn(
-                'text-base font-bold tabular-nums',
+                'text-sm md:text-base font-bold tabular-nums',
                 isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
               )}
             >
               {stats.lastPrice}
             </span>
             <div className={cn(
-              'flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-medium',
+              'flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] md:text-[9px] font-medium',
               isPositive ? 'bg-[#26a69a]/10 text-[#26a69a]' : 'bg-[#ef5350]/10 text-[#ef5350]'
             )}>
               {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
               {isPositive ? '+' : ''}{stats.priceChangePercent}
             </div>
           </div>
-          <span className="text-[9px] text-[#6b6b6b] tabular-nums">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b] tabular-nums">
             ≈ ${stats.lastPrice}
           </span>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="w-px h-7 bg-[#2a2a2d]" />
+      {/* Divider - Hidden on very small screens */}
+      <div className="hidden xs:block w-px h-6 md:h-7 bg-[#2a2a2d] shrink-0" />
 
-      {/* Compact Stats */}
-      <div className="flex items-center gap-4 overflow-x-auto">
-        <div className="flex flex-col gap-0 min-w-fit">
-          <span className="text-[9px] text-[#6b6b6b]">24h High</span>
-          <span className="text-[10px] text-[#f5f5f5] tabular-nums">{stats.high24h}</span>
+      {/* Compact Stats - Scrollable on mobile */}
+      <div className="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide">
+        <div className="flex flex-col gap-0 min-w-fit shrink-0">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24h High</span>
+          <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.high24h}</span>
         </div>
 
-        <div className="flex flex-col gap-0 min-w-fit">
-          <span className="text-[9px] text-[#6b6b6b]">24h Low</span>
-          <span className="text-[10px] text-[#f5f5f5] tabular-nums">{stats.low24h}</span>
+        <div className="flex flex-col gap-0 min-w-fit shrink-0">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24h Low</span>
+          <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.low24h}</span>
         </div>
 
-        <div className="flex flex-col gap-0 min-w-fit">
-          <span className="text-[9px] text-[#6b6b6b]">24h Vol</span>
-          <span className="text-[10px] text-[#f5f5f5] tabular-nums">{stats.volume24h}</span>
+        <div className="flex flex-col gap-0 min-w-fit shrink-0">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24h Vol</span>
+          <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.volume24h}</span>
         </div>
 
-        <div className="flex flex-col gap-0 min-w-fit">
-          <span className="text-[9px] text-[#6b6b6b]">Vol(USDT)</span>
-          <span className="text-[10px] text-[#f5f5f5] tabular-nums">{stats.quoteVolume24h}</span>
+        <div className="hidden sm:flex flex-col gap-0 min-w-fit shrink-0">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Vol(USDT)</span>
+          <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.quoteVolume24h}</span>
         </div>
 
-        <div className="flex flex-col gap-0 min-w-fit">
-          <span className="text-[9px] text-[#6b6b6b]">Funding</span>
-          <span className="text-[10px] text-[#26a69a] tabular-nums">0.0100%</span>
+        <div className="hidden md:flex flex-col gap-0 min-w-fit shrink-0">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Funding</span>
+          <span className="text-[9px] md:text-[10px] text-[#26a69a] tabular-nums">0.0100%</span>
         </div>
 
-        <div className="flex flex-col gap-0 min-w-fit">
-          <span className="text-[9px] text-[#6b6b6b]">Next</span>
-          <span className="text-[10px] text-[#f5f5f5] tabular-nums">02:15:32</span>
+        <div className="hidden md:flex flex-col gap-0 min-w-fit shrink-0">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Next</span>
+          <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">02:15:32</span>
         </div>
 
-        <div className="flex flex-col gap-0 min-w-fit">
-          <span className="text-[9px] text-[#6b6b6b]">OI</span>
-          <span className="text-[10px] text-[#f5f5f5] tabular-nums">4.52B</span>
+        <div className="hidden lg:flex flex-col gap-0 min-w-fit shrink-0">
+          <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">OI</span>
+          <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">4.52B</span>
         </div>
       </div>
     </div>

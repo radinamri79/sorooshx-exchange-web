@@ -14,7 +14,19 @@ import {
   AccountInfoPanel,
 } from '@/components/trading';
 import { binanceWS } from '@/services/websocket';
-import { BarChart3, BookOpen, Wallet, History, Menu, X, Bell, Settings, User, HelpCircle } from 'lucide-react';
+import { 
+  CandlestickChart, 
+  BookOpenText, 
+  ArrowRightLeft, 
+  ClipboardList, 
+  Menu, 
+  X, 
+  Bell, 
+  Settings, 
+  User, 
+  HelpCircle,
+  Wallet
+} from 'lucide-react';
 
 interface TradingPageClientProps {
   locale: string;
@@ -44,92 +56,119 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
     return () => binanceWS.disconnect();
   }, []);
 
-  // Mobile Layout
+  // Mobile Layout - Optimized for small screens
   if (isMobile) {
     return (
-      <div className="flex flex-col h-screen bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
-        <header className="flex items-center justify-between px-2 py-1.5 bg-[#121214] border-b border-[#2a2a2d]">
-          <div className="flex items-center gap-1.5">
-            <Image src="/logo.svg" alt="SorooshX" width={24} height={24} className="rounded" />
-            <span className="font-bold text-white text-xs">SOROOSHX</span>
+      <div className="flex flex-col h-[100dvh] bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
+        {/* Mobile Header - Compact */}
+        <header className="flex items-center justify-between px-3 h-11 bg-[#121214] border-b border-[#2a2a2d] shrink-0">
+          <div className="flex items-center gap-2">
+            <Image src="/logo.svg" alt="SorooshX" width={22} height={22} className="rounded" />
+            <span className="font-bold text-white text-[11px] tracking-tight">SOROOSHX</span>
           </div>
-          <div className="flex items-center gap-1">
-            <button className="p-1.5 text-[#a1a1a1] hover:text-white transition-colors">
-              <Bell className="w-4 h-4" />
+          <div className="flex items-center gap-0.5">
+            <button className="p-2 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
+              <Bell className="w-[18px] h-[18px]" />
+            </button>
+            <button className="p-2 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
+              <Wallet className="w-[18px] h-[18px]" />
             </button>
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 text-[#a1a1a1] hover:text-white transition-colors"
+              className="p-2 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors"
             >
-              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {mobileMenuOpen ? <X className="w-[18px] h-[18px]" /> : <Menu className="w-[18px] h-[18px]" />}
             </button>
           </div>
         </header>
 
-        <div className="bg-[#121214] border-b border-[#2a2a2d]">
-          <div className="flex items-center gap-1.5 px-2 py-1.5">
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="absolute top-11 left-0 right-0 z-50 bg-[#121214] border-b border-[#2a2a2d] shadow-lg">
+            <div className="p-3 space-y-2">
+              <button className="w-full py-2.5 px-3 text-left text-sm text-[#f5f5f5] hover:bg-[#1e1f23] rounded-lg flex items-center gap-2">
+                <User className="w-4 h-4 text-[#ed7620]" />
+                Login / Register
+              </button>
+              <div className="border-t border-[#2a2a2d] pt-2 grid grid-cols-2 gap-2">
+                <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Spot</button>
+                <button className="py-2 px-3 text-xs text-[#ed7620] bg-[#ed7620]/10 rounded-lg font-medium">Futures</button>
+                <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Convert</button>
+                <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Copy Trade</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Symbol & Market Info Bar */}
+        <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0">
+          <div className="flex items-center gap-2 px-3 py-2">
             <TickerSwitcher className="shrink-0" />
           </div>
-          <MarketInfo className="bg-transparent border-0 px-2 py-1" />
+          <MarketInfo className="bg-transparent border-0 px-3 py-1.5 overflow-x-auto" />
         </div>
 
-        <div className="flex-1 overflow-auto bg-[#0d0d0f]">
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
           {activeTab === 'chart' && (
-            <TradingChart className="h-[calc(100vh-240px)] min-h-[280px] bg-[#0d0d0f] border-0 rounded-none" />
+            <TradingChart className="h-full min-h-[300px] bg-[#0d0d0f] border-0 rounded-none" />
           )}
           {activeTab === 'orderbook' && (
-            <Orderbook className="h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={20} />
+            <Orderbook className="h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={25} />
           )}
           {activeTab === 'order' && (
-            <OrderForm className="bg-[#0d0d0f] border-0 rounded-none" />
+            <div className="h-full overflow-y-auto">
+              <OrderForm className="bg-[#0d0d0f] border-0 rounded-none" />
+            </div>
           )}
           {activeTab === 'positions' && (
             <OrdersPanel className="h-full bg-[#0d0d0f] border-0 rounded-none" />
           )}
         </div>
 
-        <div className="flex items-center justify-around bg-[#121214] border-t border-[#2a2a2d] py-1.5 safe-area-bottom">
+        {/* Bottom Navigation - iOS/Android Style */}
+        <nav className="flex items-center justify-around bg-[#121214] border-t border-[#2a2a2d] h-14 shrink-0 safe-area-bottom">
           <button
             onClick={() => setActiveTab('chart')}
             className={cn(
-              'flex flex-col items-center gap-0.5 px-3 py-1.5 transition-colors',
+              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
               activeTab === 'chart' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
             )}
           >
-            <BarChart3 className="w-4 h-4" />
-            <span className="text-[9px]">Chart</span>
+            <CandlestickChart className={cn('w-5 h-5', activeTab === 'chart' && 'stroke-[2.5]')} />
+            <span className="text-[10px] font-medium">Chart</span>
           </button>
           <button
             onClick={() => setActiveTab('orderbook')}
             className={cn(
-              'flex flex-col items-center gap-0.5 px-3 py-1.5 transition-colors',
+              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
               activeTab === 'orderbook' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
             )}
           >
-            <BookOpen className="w-4 h-4" />
-            <span className="text-[9px]">Book</span>
+            <BookOpenText className={cn('w-5 h-5', activeTab === 'orderbook' && 'stroke-[2.5]')} />
+            <span className="text-[10px] font-medium">Order Book</span>
           </button>
           <button
             onClick={() => setActiveTab('order')}
             className={cn(
-              'flex flex-col items-center gap-0.5 px-3 py-1.5 transition-colors',
+              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
               activeTab === 'order' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
             )}
           >
-            <Wallet className="w-4 h-4" />
-            <span className="text-[9px]">Trade</span>
+            <ArrowRightLeft className={cn('w-5 h-5', activeTab === 'order' && 'stroke-[2.5]')} />
+            <span className="text-[10px] font-medium">Trade</span>
           </button>
           <button
             onClick={() => setActiveTab('positions')}
             className={cn(
-              'flex flex-col items-center gap-0.5 px-3 py-1.5 transition-colors',
+              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
               activeTab === 'positions' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
             )}
           >
-            <History className="w-4 h-4" />
-            <span className="text-[9px]">Orders</span>
+            <ClipboardList className={cn('w-5 h-5', activeTab === 'positions' && 'stroke-[2.5]')} />
+            <span className="text-[10px] font-medium">Positions</span>
           </button>
-        </div>
+        </nav>
       </div>
     );
   }
@@ -138,26 +177,31 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   if (isTablet) {
     return (
       <div className="flex flex-col h-screen bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
-        <header className="bg-[#121214] border-b border-[#2a2a2d] px-2 py-1.5">
-          <div className="flex items-center gap-2">
+        <header className="bg-[#121214] border-b border-[#2a2a2d] px-3 h-11 flex items-center">
+          <div className="flex items-center gap-2 w-full">
             <div className="flex items-center gap-1.5 shrink-0">
-              <Image src="/logo.svg" alt="SorooshX" width={24} height={24} className="rounded" />
+              <Image src="/logo.svg" alt="SorooshX" width={22} height={22} className="rounded" />
               <span className="font-bold text-white text-xs">SOROOSHX</span>
             </div>
             <TickerSwitcher />
-            <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0" />
+            <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0 overflow-hidden" />
+            <button className="p-1.5 text-[#6b6b6b] hover:text-white rounded hover:bg-[#1e1f23]">
+              <User className="w-4 h-4" />
+            </button>
           </div>
         </header>
 
         <div className="flex-1 flex overflow-hidden">
           <main className="flex-1 flex flex-col overflow-hidden">
-            <TradingChart className="flex-1 min-h-[280px] bg-[#0d0d0f] border-0 rounded-none border-r border-[#2a2a2d]" />
-            <OrdersPanel className="h-[160px] bg-[#0d0d0f] border-0 rounded-none border-t border-[#2a2a2d]" />
+            <TradingChart className="flex-1 min-h-[280px] bg-[#0d0d0f] border-0 rounded-none" />
+            <OrdersPanel className="h-[140px] bg-[#0d0d0f] border-0 rounded-none border-t border-[#2a2a2d]" />
           </main>
 
-          <aside className="w-72 flex flex-col border-l border-[#2a2a2d]">
-            <Orderbook className="flex-1 bg-[#0d0d0f] border-0 rounded-none border-b border-[#2a2a2d]" maxRows={12} />
-            <OrderForm className="h-auto bg-[#0d0d0f] border-0 rounded-none overflow-auto flex-shrink-0" />
+          <aside className="w-[280px] flex flex-col border-l border-[#2a2a2d]">
+            <Orderbook className="flex-[1.2] bg-[#0d0d0f] border-0 rounded-none border-b border-[#2a2a2d]" maxRows={10} />
+            <div className="flex-1 overflow-auto">
+              <OrderForm className="bg-[#0d0d0f] border-0 rounded-none" />
+            </div>
           </aside>
         </div>
       </div>
