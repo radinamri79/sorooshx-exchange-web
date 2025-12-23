@@ -22,11 +22,18 @@ A professional cryptocurrency futures trading platform built with Django (backen
 ## ✨ Features
 
 ### Trading Interface
-- **5-Zone Professional Layout**: Order Form, Orderbook, Ticker/Search, Chart, Positions
-- **Real-time Data**: Live prices, orderbook depth, trade executions via WebSocket
-- **Multi-Source Data**: Automatic fallback from Binance → OKX → Bybit → Bitget → CoinGecko
-- **TradingView Charts**: Professional candlestick charts with multiple timeframes
-- **Responsive Design**: Desktop-first with mobile-optimized tab navigation
+- **Professional Bitget-like Layout**: 3-column responsive design with chart in center
+- **Real-time TradingView Charts**: 
+  - Official TradingView Advanced Chart widget
+  - Left-side drawing toolbar (fibonacci, trend lines, shapes, text)
+  - Top toolbar with timeframes (1m-1w), chart types, and 100+ indicators
+  - Real-time candlestick data from Binance
+- **Real-time Market Data**: Live prices, funding rates, 24h stats via WebSocket
+- **Order Book**: Real-time bid/ask depth with visualization
+- **Trading Form**: Leverage (1-125x), order types, quantity presets
+- **Order Management**: Create, cancel, view active orders and positions
+- **Multi-Source Fallback**: Binance → OKX → Bybit → Bitget → CoinGecko
+- **Responsive Design**: Desktop (3-col), Tablet (2-col), Mobile (tabs)
 
 ### Order Management
 - **Order Types**: Limit and Market orders
