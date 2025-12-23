@@ -34,7 +34,7 @@ export interface ChartSettings {
   alerts: PriceAlert[];
   
   // Drawing Tools
-  drawingMode?: 'line' | 'rectangle' | 'fibonacci' | 'text' | null;
+  drawingMode?: 'line' | 'rectangle' | 'fibonacci' | 'text' | 'trendline' | 'triangle' | 'circle' | 'measure' | null;
 }
 
 export interface PriceAlert {

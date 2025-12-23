@@ -17,6 +17,7 @@ import {
   calculateStochastic,
   calculateATR,
 } from '@/lib/indicators';
+import { ChartLeftToolbar } from './ChartLeftToolbar';
 
 interface TradingChartProps {
   className?: string;
@@ -391,9 +392,9 @@ export function TradingChart({ className }: TradingChartProps) {
   }, []);
 
   return (
-    <div className={cn('flex flex-col bg-black overflow-hidden', className)}>
-      {/* Timeframe Selector */}
-      <div className="flex items-center gap-1 px-3 py-2 border-b border-[#1e2329] overflow-x-auto">
+    <div className={cn('flex flex-col h-full bg-black overflow-hidden', className)}>
+      {/* Timeframe Selector - Top Bar */}
+      <div className="flex items-center gap-1 px-3 py-2 border-b border-[#1e2329] overflow-x-auto bg-[#0a0e27]">
         {TIMEFRAMES.map(({ value, label }) => (
           <button
             key={value}
@@ -410,14 +411,20 @@ export function TradingChart({ className }: TradingChartProps) {
         ))}
       </div>
 
-      {/* Chart Container */}
-      <div className="relative flex-1 min-h-[300px]">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ed7620]" />
-          </div>
-        )}
-        <div ref={chartContainerRef} className="w-full h-full" />
+      {/* Main Chart Area with Left Toolbar */}
+      <div className="flex flex-1 min-h-0">
+        {/* Left Toolbar */}
+        <ChartLeftToolbar onIndicatorClick={() => {}} />
+
+        {/* Chart Container */}
+        <div className="relative flex-1 min-h-[300px]">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ed7620]" />
+            </div>
+          )}
+          <div ref={chartContainerRef} className="w-full h-full" />
+        </div>
       </div>
     </div>
   );
