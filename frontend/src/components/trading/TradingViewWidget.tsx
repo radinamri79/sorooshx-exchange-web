@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
 
@@ -8,78 +8,97 @@ interface TradingViewWidgetProps {
   className?: string;
 }
 
+declare global {
+  interface Window {
+    TradingView?: {
+      widget: new (config: Record<string, unknown>) => unknown;
+    };
+  }
+}
+
 function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const scriptRef = useRef<HTMLScriptElement | null>(null);
+  const widgetIdRef = useRef<string>(`tradingview_${Math.random().toString(36).substring(7)}`);
   const { currentSymbol } = useMarketStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Remove any existing script and content
-    if (scriptRef.current) {
-      scriptRef.current.remove();
-      scriptRef.current = null;
-    }
+    setIsLoading(true);
+    setError(null);
+
+    // Clean up previous content
     containerRef.current.innerHTML = '';
 
-    // Create the widget container structure that TradingView expects
+    // Create a unique container for this widget instance
+    const containerId = widgetIdRef.current;
+    
+    // Create widget container
     const widgetContainer = document.createElement('div');
-    widgetContainer.className = 'tradingview-widget-container';
+    widgetContainer.id = containerId;
     widgetContainer.style.cssText = 'height: 100%; width: 100%;';
-
-    const widgetInner = document.createElement('div');
-    widgetInner.className = 'tradingview-widget-container__widget';
-    widgetInner.style.cssText = 'height: calc(100% - 32px); width: 100%;';
-    widgetContainer.appendChild(widgetInner);
-
-    const copyright = document.createElement('div');
-    copyright.className = 'tradingview-widget-copyright';
-    copyright.innerHTML = '<a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a>';
-    copyright.style.cssText = 'font-size: 10px; line-height: 32px; text-align: center; color: #6b6b6b;';
-    widgetContainer.appendChild(copyright);
-
     containerRef.current.appendChild(widgetContainer);
 
-    // Create and append the script
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    script.type = 'text/javascript';
-    script.async = true;
-    
-    // TradingView widget configuration
-    const config = {
-      autosize: true,
-      symbol: `BINANCE:${currentSymbol}`,
-      interval: '15',
-      timezone: 'Etc/UTC',
-      theme: 'dark',
-      style: '1',
-      locale: 'en',
-      allow_symbol_change: true,
-      calendar: false,
-      support_host: 'https://www.tradingview.com',
-      hide_top_toolbar: false,
-      hide_legend: false,
-      save_image: false,
-      backgroundColor: 'rgba(13, 13, 15, 1)',
-      gridColor: 'rgba(42, 42, 45, 0.6)',
-      hide_volume: false,
-      withdateranges: true,
-      details: false,
-      hotlist: false,
-      studies: ['RSI@tv-basicstudies'],
+    // Symbol format for TradingView (Binance perpetual futures)
+    const tvSymbol = `BINANCE:${currentSymbol.replace('USDT', '')}USDT.P`;
+
+    // Load TradingView library script if not already loaded
+    const loadWidget = () => {
+      if (typeof window !== 'undefined' && window.TradingView) {
+        try {
+          new window.TradingView.widget({
+            autosize: true,
+            symbol: tvSymbol,
+            interval: '15',
+            timezone: 'Etc/UTC',
+            theme: 'dark',
+            style: '1',
+            locale: 'en',
+            toolbar_bg: '#0d0d0f',
+            enable_publishing: false,
+            allow_symbol_change: true,
+            container_id: containerId,
+            hide_side_toolbar: false,
+            withdateranges: true,
+            hide_volume: false,
+            studies: ['RSI@tv-basicstudies', 'MASimple@tv-basicstudies'],
+            backgroundColor: '#0d0d0f',
+            gridColor: 'rgba(42, 42, 45, 0.6)',
+            overrides: {
+              'paneProperties.background': '#0d0d0f',
+              'paneProperties.backgroundType': 'solid',
+              'scalesProperties.backgroundColor': '#0d0d0f',
+            },
+          });
+          setIsLoading(false);
+        } catch (err) {
+          console.error('TradingView widget error:', err);
+          setError('Failed to load chart');
+          setIsLoading(false);
+        }
+      }
     };
-    
-    script.textContent = JSON.stringify(config);
-    scriptRef.current = script;
-    widgetInner.appendChild(script);
+
+    // Check if TradingView is already loaded
+    if (window.TradingView) {
+      loadWidget();
+    } else {
+      // Load the TradingView library
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/tv.js';
+      script.async = true;
+      script.onload = loadWidget;
+      script.onerror = () => {
+        setError('Failed to load TradingView library');
+        setIsLoading(false);
+      };
+      document.head.appendChild(script);
+    }
 
     return () => {
-      if (scriptRef.current) {
-        scriptRef.current.remove();
-        scriptRef.current = null;
-      }
+      // Cleanup
       if (containerRef.current) {
         containerRef.current.innerHTML = '';
       }
@@ -89,8 +108,31 @@ function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
   return (
     <div 
       ref={containerRef}
-      className={cn('relative w-full h-full min-h-[400px]', className)}
-    />
+      className={cn('relative w-full h-full', className)}
+      style={{ minHeight: '400px' }}
+    >
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#0d0d0f]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-[#ed7620] border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs text-[#6b6b6b]">Loading chart...</span>
+          </div>
+        </div>
+      )}
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#0d0d0f]">
+          <div className="flex flex-col items-center gap-2 text-center px-4">
+            <span className="text-sm text-[#ef5350]">{error}</span>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-3 py-1.5 text-xs bg-[#ed7620] text-white rounded hover:bg-[#ff8c3a] transition-colors"
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
