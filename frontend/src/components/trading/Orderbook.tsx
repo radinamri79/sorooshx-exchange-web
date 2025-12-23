@@ -9,6 +9,7 @@ import { binanceWS } from '@/services/websocket';
 import { fetchOrderbook } from '@/services/api';
 import type { OrderbookEntry } from '@/types';
 import * as React from 'react';
+import { ArrowUp, ArrowDown, Settings2 } from 'lucide-react';
 
 interface OrderbookProps {
   className?: string;
@@ -33,12 +34,12 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
     <button
       type="button"
       onClick={() => onClick?.(price)}
-      className="grid grid-cols-3 gap-2 px-2 py-[3px] text-xs tabular-nums hover:bg-[#1a1a1a] transition-colors relative w-full text-left focus:outline-none"
+      className="grid grid-cols-3 gap-1 px-2 py-[2px] text-[10px] tabular-nums hover:bg-[#1e1f23] transition-colors relative w-full text-left focus:outline-none"
     >
       {/* Depth bar background */}
       <div
         className={cn(
-          'absolute top-0 bottom-0 opacity-15',
+          'absolute top-0 bottom-0 opacity-10',
           isBid ? 'bg-[#26a69a] right-0' : 'bg-[#ef5350] left-0'
         )}
         style={{
@@ -53,12 +54,12 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
       </span>
       
       {/* Quantity */}
-      <span className="relative z-10 text-white text-right font-mono">
+      <span className="relative z-10 text-[#f5f5f5] text-right font-mono">
         {formatNumber(quantity, { decimals: 4 })}
       </span>
       
       {/* Total */}
-      <span className="relative z-10 text-[#848e9c] text-right font-mono">
+      <span className="relative z-10 text-[#6b6b6b] text-right font-mono">
         {formatNumber(total, { decimals: 2 })}
       </span>
     </button>
@@ -66,7 +67,6 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
 }
 
 export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
-  // Translation hook ready for future localization
   useTranslations('trading');
   const { currentSymbol, tickers } = useMarketStore();
   const { bids, asks, lastUpdateId, setOrderbook, mergeOrderbook, reset } = useOrderbookStore();
@@ -80,7 +80,6 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
   const priceChangePercent = currentTicker ? parseFloat(currentTicker.P) : 0;
   const isPositive = priceChangePercent >= 0;
 
-  // Fetch initial orderbook snapshot
   useEffect(() => {
     const loadSnapshot = async () => {
       if (symbolRef.current !== currentSymbol) {
@@ -103,7 +102,6 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     loadSnapshot();
   }, [currentSymbol, setOrderbook, reset]);
 
-  // Subscribe to depth updates
   useEffect(() => {
     const streamName = `${currentSymbol.toLowerCase()}@depth@100ms`;
 
@@ -132,7 +130,6 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     };
   }, [currentSymbol, lastUpdateId, mergeOrderbook]);
 
-  // Calculate displayed bids and asks
   const { displayedBids, displayedAsks, maxTotal } = useMemo(() => {
     const rowCount = displayMode === 'both' ? maxRows : maxRows * 2;
     
@@ -148,7 +145,6 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     return { displayedBids, displayedAsks, maxTotal };
   }, [bids, asks, maxRows, displayMode]);
 
-  // Calculate spread
   const spread = useMemo(() => {
     if (asks.length === 0 || bids.length === 0) return { value: 0, percent: 0 };
     
@@ -164,18 +160,17 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     return { value: spreadValue, percent: spreadPercent };
   }, [asks, bids]);
 
-  // Handle price click
   const handlePriceClick = useCallback((_price: string) => {
-    // This would typically dispatch to order form
+    // Dispatch to order form
   }, []);
 
   return (
-    <div className={cn('flex flex-col bg-black overflow-hidden', className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-2 py-2 border-b border-[#1e2329]">
+    <div className={cn('flex flex-col bg-transparent overflow-hidden', className)}>
+      {/* Header - Compact */}
+      <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#2a2a2d]">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-white">Order book</span>
-          <span className="text-sm text-[#848e9c]">Trade history</span>
+          <span className="text-xs font-semibold text-[#f5f5f5]">Order Book</span>
+          <span className="text-xs text-[#6b6b6b] hover:text-[#a1a1a1] cursor-pointer">Trades</span>
         </div>
         
         {/* Display Mode Toggle */}
@@ -184,47 +179,50 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
             onClick={() => setDisplayMode('both')}
             className={cn(
               'p-1 rounded transition-colors',
-              displayMode === 'both' ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
+              displayMode === 'both' ? 'bg-[#17181b]' : 'hover:bg-[#17181b]'
             )}
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
-              <rect x="1" y="1" width="12" height="5" rx="1" fill="#ef5350" />
-              <rect x="1" y="8" width="12" height="5" rx="1" fill="#26a69a" />
+            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="5" rx="1" fill="#ef5350" />
+              <rect x="2" y="9" width="12" height="5" rx="1" fill="#26a69a" />
             </svg>
           </button>
           <button
             onClick={() => setDisplayMode('bids')}
             className={cn(
               'p-1 rounded transition-colors',
-              displayMode === 'bids' ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
+              displayMode === 'bids' ? 'bg-[#17181b]' : 'hover:bg-[#17181b]'
             )}
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
-              <rect x="1" y="1" width="12" height="12" rx="1" fill="#26a69a" />
+            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="12" rx="1" fill="#26a69a" />
             </svg>
           </button>
           <button
             onClick={() => setDisplayMode('asks')}
             className={cn(
               'p-1 rounded transition-colors',
-              displayMode === 'asks' ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
+              displayMode === 'asks' ? 'bg-[#17181b]' : 'hover:bg-[#17181b]'
             )}
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
-              <rect x="1" y="1" width="12" height="12" rx="1" fill="#ef5350" />
+            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="12" rx="1" fill="#ef5350" />
             </svg>
+          </button>
+          <button className="p-1 rounded hover:bg-[#17181b] transition-colors">
+            <Settings2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
           </button>
         </div>
       </div>
 
       {/* Column Headers */}
-      <div className="grid grid-cols-3 gap-2 px-2 py-1.5 text-[11px] text-[#848e9c] border-b border-[#1e2329]">
-        <span>Price</span>
-        <span className="text-right">Amount(BTC)</span>
-        <span className="text-right">Total (BTC)</span>
+      <div className="grid grid-cols-3 gap-1 px-2 py-1 text-[9px] text-[#6b6b6b] border-b border-[#2a2a2d]">
+        <span>Price(USDT)</span>
+        <span className="text-right">Amount</span>
+        <span className="text-right">Total</span>
       </div>
 
-      {/* Asks (Sell Orders) - Reversed so lowest ask is at bottom */}
+      {/* Asks (Sell Orders) */}
       {(displayMode === 'both' || displayMode === 'asks') && (
         <div className="flex flex-col-reverse overflow-hidden flex-1">
           {displayedAsks.map((entry, index) => (
@@ -239,16 +237,23 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
         </div>
       )}
 
-      {/* Current Price / Spread */}
-      <div className="flex items-center justify-between px-2 py-2 bg-black border-y border-[#1e2329]">
-        <span className={cn(
-          'text-lg font-semibold tabular-nums',
-          isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
-        )}>
-          {formatPrice(lastPrice)}
-        </span>
-        <span className="text-xs text-[#848e9c]">
-          Spread: {formatNumber(spread.value, { decimals: 2 })} ({formatNumber(spread.percent, { decimals: 3 })}%)
+      {/* Current Price / Spread - Compact */}
+      <div className="flex items-center justify-between px-2 py-1.5 bg-[#17181b] border-y border-[#2a2a2d]">
+        <div className="flex items-center gap-1.5">
+          <span className={cn(
+            'text-sm font-bold tabular-nums',
+            isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
+          )}>
+            {formatPrice(lastPrice)}
+          </span>
+          {isPositive ? (
+            <ArrowUp className="w-3 h-3 text-[#26a69a]" />
+          ) : (
+            <ArrowDown className="w-3 h-3 text-[#ef5350]" />
+          )}
+        </div>
+        <span className="text-[9px] text-[#6b6b6b] tabular-nums">
+          {formatNumber(spread.value, { decimals: 2 })} ({formatNumber(spread.percent, { decimals: 3 })}%)
         </span>
       </div>
 
@@ -268,14 +273,14 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
       )}
 
       {/* Bottom depth indicator */}
-      <div className="flex items-center h-6 px-2 border-t border-[#1e2329]">
-        <div className="flex-1 h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden flex">
+      <div className="flex items-center h-5 px-2 border-t border-[#2a2a2d] bg-[#121214]">
+        <div className="flex-1 h-0.5 bg-[#17181b] rounded-full overflow-hidden flex">
           <div className="h-full bg-[#26a69a]" style={{ width: '72%' }} />
           <div className="h-full bg-[#ef5350]" style={{ width: '28%' }} />
         </div>
-        <div className="flex items-center gap-2 ml-2 text-[10px]">
-          <span className="text-[#26a69a]">72%</span>
-          <span className="text-[#ef5350]">28%</span>
+        <div className="flex items-center gap-2 ml-2 text-[9px] font-medium">
+          <span className="text-[#26a69a]">B 72%</span>
+          <span className="text-[#ef5350]">S 28%</span>
         </div>
       </div>
     </div>
