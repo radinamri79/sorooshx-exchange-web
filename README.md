@@ -24,16 +24,20 @@ A professional cryptocurrency futures trading platform built with Django (backen
 ### Trading Interface
 - **Professional Bitget-like Layout**: 3-column responsive design with chart in center
 - **Real-time TradingView Charts**: 
-  - Official TradingView Advanced Chart widget
+  - TradingView Advanced Chart widget using tv.js library
   - Left-side drawing toolbar (fibonacci, trend lines, shapes, text)
   - Top toolbar with timeframes (1m-1w), chart types, and 100+ indicators
-  - Real-time candlestick data from Binance
+  - Real-time candlestick data from Binance (BINANCE:BTCUSDT.P format)
+  - Built-in indicators: RSI, Moving Averages
 - **Real-time Market Data**: Live prices, funding rates, 24h stats via WebSocket
-- **Order Book**: Real-time bid/ask depth with visualization
+- **Order Book**: Real-time bid/ask depth with DM Mono monospace font for numbers
 - **Trading Form**: Leverage (1-125x), order types, quantity presets
 - **Order Management**: Create, cancel, view active orders and positions
 - **Multi-Source Fallback**: Binance → OKX → Bybit → Bitget → CoinGecko
-- **Responsive Design**: Desktop (3-col), Tablet (2-col), Mobile (tabs)
+- **Fully Responsive Design**: 
+  - Desktop: 3-column layout (Chart+Orders | OrderBook | OrderForm+Account)
+  - Tablet: 2-column layout with adaptive components
+  - Mobile: Tab-based single column with iOS/Android-style bottom navigation
 
 ### Order Management
 - **Order Types**: Limit and Market orders
@@ -49,10 +53,15 @@ A professional cryptocurrency futures trading platform built with Django (backen
 - **Geo-Bypass**: Works even when primary exchanges are geo-blocked
 
 ### User Experience
-- **Dark Theme**: Professional trading interface with dark backgrounds
+- **SorooshX Dark Theme**: Professional trading interface with dark backgrounds (#0d0d0f) and orange accent (#ed7620)
 - **Multi-language**: English (LTR) and Persian (RTL) support
 - **Guest Sessions**: Trade without registration, upgrade anytime
 - **Real-time Updates**: WebSocket-powered live data streams
+- **Mobile-First Navigation**: 
+  - Bottom navigation with trading-specific icons (CandlestickChart, BookOpenText, ArrowRightLeft, ClipboardList)
+  - Larger touch targets (14px nav height) for mobile usability
+  - 100dvh viewport handling for proper mobile display
+  - Horizontal scrollable market stats with hidden scrollbar
 
 ## 🏗️ Architecture
 
@@ -68,7 +77,9 @@ sorooshx-exchange-web/
 ├── frontend/               # Next.js 15 + TypeScript
 │   ├── src/
 │   │   ├── app/           # App Router pages (i18n routes)
-│   │   ├── components/    # React components (trading, ui)
+│   │   ├── components/    # React components
+│   │   │   ├── trading/   # Trading components (TradingViewWidget, Orderbook, OrderForm, etc.)
+│   │   │   └── ui/        # Reusable UI components (shadcn/ui)
 │   │   ├── stores/        # Zustand state management
 │   │   ├── services/      # API & WebSocket services
 │   │   └── lib/           # Utilities and helpers
@@ -90,8 +101,10 @@ sorooshx-exchange-web/
 | TypeScript | 5.7 | Type safety |
 | Tailwind CSS | 4.0 | Utility-first styling |
 | Zustand | 5.0 | State management |
-| TradingView | - | Lightweight Charts |
+| TradingView | tv.js | Professional charting library |
 | next-intl | 4.1 | Internationalization |
+| Lucide React | - | Icon library (trading-specific icons) |
+| DM Mono | - | Monospace font for trading numbers |
 
 ### Backend
 | Technology | Version | Purpose |
@@ -468,9 +481,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - [Binance API](https://binance-docs.github.io/apidocs/) for market data
-- [TradingView](https://tradingview.github.io/lightweight-charts/) for charting library
+- [TradingView](https://www.tradingview.com/HTML5-stock-forex-bitcoin-charting-library/) for charting library (tv.js)
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
+- [Lucide Icons](https://lucide.dev/) for trading-specific icons
 - [next-intl](https://next-intl-docs.vercel.app/) for internationalization
+- [DM Mono](https://fonts.google.com/specimen/DM+Mono) for trading number typography
 
 ---
 
