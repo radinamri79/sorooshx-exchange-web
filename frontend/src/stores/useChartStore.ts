@@ -6,6 +6,7 @@ export type ChartType = 'candlestick' | 'line' | 'bar' | 'heikin-ashi';
 export interface IndicatorSettings {
   enabled: boolean;
   period?: number;
+  value?: number;
   fastPeriod?: number;
   slowPeriod?: number;
   signalPeriod?: number;

@@ -8,9 +8,6 @@ import { useChartStore } from '@/stores/useChartStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchKlines } from '@/services/api';
 import type { KlineData } from '@/types';
-import { ChartToolbar } from './ChartToolbar';
-import { ChartSettingsModal } from './ChartSettingsModal';
-import { PriceAlertsModal } from './PriceAlertsModal';
 import {
   calculateSMA,
   calculateEMA,
@@ -67,8 +64,6 @@ export function TradingChart({ className }: TradingChartProps) {
   
   const [timeframe, setTimeframe] = useState<TimeframeValue>('15m');
   const [isLoading, setIsLoading] = useState(true);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [alertsOpen, setAlertsOpen] = useState(false);
   const [klineData, setKlineData] = useState<KlineData[]>([]);
 
   // Initialize chart
@@ -397,12 +392,6 @@ export function TradingChart({ className }: TradingChartProps) {
 
   return (
     <div className={cn('flex flex-col bg-black overflow-hidden', className)}>
-      {/* Chart Toolbar */}
-      <ChartToolbar
-        onSettingsClick={() => setSettingsOpen(true)}
-        onAlertsClick={() => setAlertsOpen(true)}
-      />
-
       {/* Timeframe Selector */}
       <div className="flex items-center gap-1 px-3 py-2 border-b border-[#1e2329] overflow-x-auto">
         {TIMEFRAMES.map(({ value, label }) => (
@@ -430,12 +419,6 @@ export function TradingChart({ className }: TradingChartProps) {
         )}
         <div ref={chartContainerRef} className="w-full h-full" />
       </div>
-
-      {/* Settings Modal */}
-      <ChartSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
-
-      {/* Alerts Modal */}
-      <PriceAlertsModal open={alertsOpen} onOpenChange={setAlertsOpen} />
     </div>
   );
 }
