@@ -34,7 +34,7 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
     <button
       type="button"
       onClick={() => onClick?.(price)}
-      className="grid grid-cols-3 gap-1 px-2 py-[2px] text-[10px] tabular-nums hover:bg-[#1e1f23] transition-colors relative w-full text-left focus:outline-none"
+      className="grid grid-cols-3 gap-1 px-2 py-[2px] text-[10px] hover:bg-[#1e1f23] transition-colors relative w-full text-left focus:outline-none"
     >
       {/* Depth bar background */}
       <div
@@ -49,17 +49,17 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
       />
       
       {/* Price */}
-      <span className={cn('relative z-10 font-mono', isBid ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
+      <span className={cn('relative z-10 trading-font', isBid ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
         {formatPrice(price)}
       </span>
       
       {/* Quantity */}
-      <span className="relative z-10 text-[#f5f5f5] text-right font-mono">
+      <span className="relative z-10 text-[#f5f5f5] text-right trading-font">
         {formatNumber(quantity, { decimals: 4 })}
       </span>
       
       {/* Total */}
-      <span className="relative z-10 text-[#6b6b6b] text-right font-mono">
+      <span className="relative z-10 text-[#6b6b6b] text-right trading-font">
         {formatNumber(total, { decimals: 2 })}
       </span>
     </button>
@@ -241,7 +241,7 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
       <div className="flex items-center justify-between px-2 py-1.5 bg-[#17181b] border-y border-[#2a2a2d]">
         <div className="flex items-center gap-1.5">
           <span className={cn(
-            'text-sm font-bold tabular-nums',
+            'text-sm font-bold trading-font',
             isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
           )}>
             {formatPrice(lastPrice)}
@@ -252,7 +252,7 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
             <ArrowDown className="w-3 h-3 text-[#ef5350]" />
           )}
         </div>
-        <span className="text-[9px] text-[#6b6b6b] tabular-nums">
+        <span className="text-[9px] text-[#6b6b6b] trading-font">
           {formatNumber(spread.value, { decimals: 2 })} ({formatNumber(spread.percent, { decimals: 3 })}%)
         </span>
       </div>
