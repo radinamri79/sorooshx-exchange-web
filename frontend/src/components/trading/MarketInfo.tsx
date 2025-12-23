@@ -71,80 +71,70 @@ export function MarketInfo({ className }: MarketInfoProps) {
   return (
     <div
       className={cn(
-        'flex items-center bg-black border-b border-[#1e2329] px-4 py-2',
+        'flex items-center gap-6 px-0 py-0 bg-transparent border-0',
         className
       )}
     >
       {/* Symbol and Price */}
-      <div className="flex items-center gap-6 mr-8">
+      <div className="flex items-center gap-3 min-w-fit">
         {/* Main Price */}
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-0">
           <span
             className={cn(
-              'text-2xl font-bold tabular-nums',
+              'text-base font-bold tabular-nums',
               isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
             )}
           >
             {stats.lastPrice}
           </span>
           <span className={cn(
-            'text-xs tabular-nums',
+            'text-[10px] tabular-nums',
             isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
           )}>
-            ≈${stats.lastPrice}
+            {isPositive ? '+' : ''}{stats.priceChangePercent}
           </span>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="flex items-center gap-6 overflow-x-auto">
-        {/* 24h Change */}
-        <div className="flex flex-col gap-0.5 min-w-fit">
-          <span className="text-[10px] text-[#5e6673]">24h Change</span>
-          <span
-            className={cn(
-              'text-xs font-medium tabular-nums',
-              isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
-            )}
-          >
-            {isPositive ? '+' : ''}{stats.priceChangePercent}
-          </span>
-        </div>
+      {/* Divider */}
+      <div className="w-px h-8 bg-[#1e2329]" />
 
+      {/* Compact Stats - All in one row */}
+      <div className="flex items-center gap-4 overflow-x-auto">
         {/* 24h High */}
         <div className="flex flex-col gap-0.5 min-w-fit">
-          <span className="text-[10px] text-[#5e6673]">24h High</span>
-          <span className="text-xs text-white tabular-nums">{stats.high24h}</span>
+          <span className="text-[9px] text-[#5e6673]">24h high</span>
+          <span className="text-xs text-white tabular-nums font-medium">{stats.high24h}</span>
         </div>
 
         {/* 24h Low */}
         <div className="flex flex-col gap-0.5 min-w-fit">
-          <span className="text-[10px] text-[#5e6673]">24h Low</span>
-          <span className="text-xs text-white tabular-nums">{stats.low24h}</span>
+          <span className="text-[9px] text-[#5e6673]">24h low</span>
+          <span className="text-xs text-white tabular-nums font-medium">{stats.low24h}</span>
         </div>
 
         {/* 24h Volume (base) */}
         <div className="flex flex-col gap-0.5 min-w-fit">
-          <span className="text-[10px] text-[#5e6673]">24h Volume({currentSymbol.replace('USDT', '')})</span>
-          <span className="text-xs text-white tabular-nums">{stats.volume24h}</span>
+          <span className="text-[9px] text-[#5e6673]">24h Volume({currentSymbol.replace('USDT', '')})</span>
+          <span className="text-xs text-white tabular-nums font-medium">{stats.volume24h}</span>
         </div>
 
         {/* 24h Volume (quote) */}
         <div className="flex flex-col gap-0.5 min-w-fit">
-          <span className="text-[10px] text-[#5e6673]">24h Volume(USDT)</span>
-          <span className="text-xs text-white tabular-nums">{stats.quoteVolume24h}</span>
+          <span className="text-[9px] text-[#5e6673]">24h Volume(USDT)</span>
+          <span className="text-xs text-white tabular-nums font-medium">{stats.quoteVolume24h}</span>
         </div>
 
         {/* Funding Rate */}
         <div className="flex flex-col gap-0.5 min-w-fit">
-          <span className="text-[10px] text-[#5e6673]">Funding / Countdown</span>
-          <span className="text-xs text-[#26a69a] tabular-nums">0.0100% / 02:15:32</span>
+          <span className="text-[9px] text-[#5e6673]">Funding / Countdown</span>
+          <span className="text-xs text-[#26a69a] tabular-nums font-medium">0.0100% / 02:15:32</span>
         </div>
 
         {/* Open Interest */}
         <div className="flex flex-col gap-0.5 min-w-fit">
-          <span className="text-[10px] text-[#5e6673]">Open Interest(USDT)</span>
-          <span className="text-xs text-white tabular-nums">4,521,891,234</span>
+          <span className="text-[9px] text-[#5e6673]">Open Interest(USDT)</span>
+          <span className="text-xs text-white tabular-nums font-medium">4,521,891,234</span>
         </div>
       </div>
     </div>

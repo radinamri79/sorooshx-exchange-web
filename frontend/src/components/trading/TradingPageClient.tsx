@@ -20,7 +20,6 @@ interface TradingPageClientProps {
 }
 
 export function TradingPageClient({ locale }: TradingPageClientProps) {
-  // Translation hook ready for future localization
   useTranslations('nav');
   const isRTL = locale === 'fa';
   const [isMobile, setIsMobile] = useState(false);
@@ -28,7 +27,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const [activeTab, setActiveTab] = useState<'chart' | 'orderbook' | 'order' | 'positions'>('chart');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Check screen size
   useEffect(() => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
@@ -40,7 +38,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Connect WebSocket on mount
   useEffect(() => {
     binanceWS.connect();
     return () => binanceWS.disconnect();
@@ -50,7 +47,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   if (isMobile) {
     return (
       <div className="flex flex-col h-screen bg-black" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Mobile Header */}
         <header className="flex items-center justify-between px-3 py-2 bg-black border-b border-[#1e2329]">
           <div className="flex items-center gap-2">
             <Image src="/logo.svg" alt="SorooshX" width={28} height={28} className="rounded" />
@@ -64,7 +60,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           </button>
         </header>
 
-        {/* Market Info - Compact */}
         <div className="bg-black border-b border-[#1e2329]">
           <div className="flex items-center gap-2 px-3 py-2">
             <TickerSwitcher className="shrink-0" />
@@ -72,7 +67,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <MarketInfo className="bg-black border-0 px-3 py-2" />
         </div>
 
-        {/* Mobile Content */}
         <div className="flex-1 overflow-auto bg-black">
           {activeTab === 'chart' && (
             <TradingChart className="h-[calc(100vh-280px)] min-h-[300px] bg-black border-0 rounded-none" />
@@ -88,7 +82,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           )}
         </div>
 
-        {/* Mobile Tab Bar */}
         <div className="flex items-center justify-around bg-black border-t border-[#1e2329] py-2 safe-area-bottom">
           <button
             onClick={() => setActiveTab('chart')}
@@ -139,82 +132,95 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   if (isTablet) {
     return (
       <div className="flex flex-col h-screen bg-black" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Market Info Header */}
-        <header className="bg-black border-b border-[#1e2329]">
-          <div className="flex items-center gap-3 px-4 py-2">
-            <div className="flex items-center gap-2">
-              <Image src="/logo.svg" alt="SorooshX" width={32} height={32} className="rounded" />
-              <span className="font-bold text-white">SOROOSHX</span>
+        {/* Compact Header - Bitget Style */}
+        <header className="bg-black border-b border-[#1e2329] px-3 py-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
+              <Image src="/logo.svg" alt="SorooshX" width={28} height={28} className="rounded" />
+              <span className="font-bold text-white text-sm">SOROOSHX</span>
             </div>
             <TickerSwitcher />
+            <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0" />
           </div>
-          <MarketInfo className="bg-black border-0" />
         </header>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Left: Chart */}
+          {/* Left: Chart (Takes most space) */}
           <main className="flex-1 flex flex-col overflow-hidden">
             <TradingChart className="flex-1 min-h-[300px] bg-black border-0 rounded-none border-r border-[#1e2329]" />
-            <OrdersPanel className="h-[200px] bg-black border-0 rounded-none border-t border-[#1e2329]" />
+            <OrdersPanel className="h-[180px] bg-black border-0 rounded-none border-t border-[#1e2329]" />
           </main>
 
-          {/* Right: Orderbook + Order Form stacked */}
-          <aside className="w-[320px] flex flex-col border-l border-[#1e2329]">
-            <Orderbook className="flex-1 bg-black border-0 rounded-none" maxRows={12} />
-            <OrderForm className="bg-black border-0 rounded-none border-t border-[#1e2329]" />
+          {/* Right: Order Book + Order Form */}
+          <aside className="w-80 flex flex-col border-l border-[#1e2329]">
+            <Orderbook className="flex-1 bg-black border-0 rounded-none border-b border-[#1e2329]" maxRows={14} />
+            <OrderForm className="h-auto bg-black border-0 rounded-none overflow-auto flex-shrink-0" />
           </aside>
         </div>
       </div>
     );
   }
 
-  // Desktop Layout (1024px+) - Matching the example screenshot exactly
+  // Desktop Layout (1024px+) - BITGET STYLE
   return (
     <div className="flex flex-col h-screen bg-black" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Market Info Header - Zone 3 */}
-      <header className="bg-black border-b border-[#1e2329]">
-        <div className="flex items-center gap-4 px-4 py-2">
-          {/* Logo */}
+      {/* HEADER: Compact single line with all info */}
+      <header className="bg-[#0a0e27] border-b border-[#1e2329] px-4 py-2.5 h-16 flex items-center">
+        <div className="flex items-center gap-4 w-full">
+          {/* Logo + Symbol */}
           <div className="flex items-center gap-2 shrink-0">
             <Image src="/logo.svg" alt="SorooshX" width={32} height={32} className="rounded" />
-            <span className="font-bold text-white text-lg">SOROOSHX</span>
+            <span className="font-bold text-white text-base">SOROOSHX</span>
           </div>
-          
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-[#1e2329]" />
+
           {/* Ticker Switcher */}
-          <TickerSwitcher />
-          
-          {/* Market Info fills remaining space */}
-          <MarketInfo className="flex-1 bg-transparent border-0 py-0" />
+          <div className="shrink-0">
+            <TickerSwitcher />
+          </div>
+
+          {/* Market Stats (Compact inline) */}
+          <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0 h-full" />
         </div>
       </header>
 
-      {/* Main Trading Interface */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Section: Chart + Orders Panel */}
-        <main className={cn('flex-1 flex flex-col overflow-hidden', isRTL && 'order-2')}>
-          {/* Zone 4: Trading Chart */}
-          <TradingChart className="flex-1 min-h-[400px] bg-black border-0 rounded-none" />
-          
-          {/* Zone 5: Orders/Positions Panel */}
-          <OrdersPanel className="h-[240px] bg-black border-0 rounded-none border-t border-[#1e2329]" />
+      {/* MAIN TRADING AREA: 2 Column Layout */}
+      <div className="flex-1 flex overflow-hidden bg-black">
+        {/* LEFT COLUMN: Chart (Large) */}
+        <main className={cn('flex-1 flex flex-col overflow-hidden border-r border-[#1e2329]', isRTL && 'order-2')}>
+          {/* TradingView Chart with left toolbar */}
+          <div className="flex-1 overflow-hidden">
+            <TradingChart className="w-full h-full bg-black border-0 rounded-none" />
+          </div>
+
+          {/* Orders & Positions Panel */}
+          <div className="h-[220px] border-t border-[#1e2329] bg-black overflow-hidden">
+            <OrdersPanel className="h-full bg-black border-0 rounded-none" />
+          </div>
         </main>
 
-        {/* Right Section: Orderbook + Order Form */}
-        <aside
-          className={cn(
-            'w-[560px] xl:w-[640px] 2xl:w-[720px] flex border-l border-[#1e2329] bg-black',
-            isRTL && 'order-1 border-l-0 border-r'
-          )}
-        >
-          {/* Zone 2: Orderbook */}
-          <div className="w-[280px] xl:w-[320px] 2xl:w-[360px] flex flex-col border-r border-[#1e2329]">
-            <Orderbook className="flex-1 bg-black border-0 rounded-none" maxRows={22} />
+        {/* RIGHT COLUMN: Order Book + Order Form */}
+        <aside className={cn(
+          'w-96 flex flex-col bg-black border-l border-[#1e2329] overflow-hidden',
+          isRTL && 'order-1 border-l-0 border-r border-[#1e2329]'
+        )}>
+          {/* Order Book Section */}
+          <div className="flex-1 border-b border-[#1e2329] overflow-hidden flex flex-col">
+            <div className="px-3 py-2 border-b border-[#1e2329] bg-[#0a0e27]">
+              <h3 className="text-xs font-semibold text-white">Order book</h3>
+            </div>
+            <Orderbook 
+              className="flex-1 bg-black border-0 rounded-none overflow-auto" 
+              maxRows={20}
+            />
           </div>
-          
-          {/* Zone 1: Order Form */}
-          <div className="flex-1 flex flex-col overflow-auto">
-            <OrderForm className="flex-none bg-black border-0 rounded-none" />
+
+          {/* Order Form Section */}
+          <div className="flex-1 bg-black overflow-auto flex flex-col">
+            <OrderForm className="flex-1 bg-black border-0 rounded-none" />
           </div>
         </aside>
       </div>
