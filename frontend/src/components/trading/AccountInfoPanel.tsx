@@ -12,20 +12,16 @@ export function AccountInfoPanel({ className }: AccountInfoPanelProps) {
   const { wallet, positions } = useTradeStore();
 
   // Calculate total position value and margin
-  const { totalPositionValue, totalMarginUsed, unrealizedPnL } = (() => {
-    let totalValue = 0;
+  const { totalMarginUsed, unrealizedPnL } = (() => {
     let totalMargin = 0;
     let pnl = 0;
 
     positions.forEach((position) => {
-      const posValue = parseFloat(position.quantity) * parseFloat(position.entryPrice);
-      totalValue += posValue;
       totalMargin += parseFloat(position.margin);
       pnl += parseFloat(position.unrealizedPnl || '0');
     });
 
     return {
-      totalPositionValue: totalValue,
       totalMarginUsed: totalMargin,
       unrealizedPnL: pnl,
     };
