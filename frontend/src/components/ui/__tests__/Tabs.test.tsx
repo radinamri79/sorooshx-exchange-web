@@ -1,16 +1,16 @@
-import { render, screen } from '@testing-library/react';
-import { Tabs } from '../Tabs';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../Tabs';
 
 describe('Tabs Component', () => {
   it('should render tabs with content', () => {
     render(
       <Tabs defaultValue="tab1">
-        <Tabs.List>
-          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
-          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="tab1">Content 1</Tabs.Content>
-        <Tabs.Content value="tab2">Content 2</Tabs.Content>
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
       </Tabs>
     );
 
@@ -22,12 +22,12 @@ describe('Tabs Component', () => {
   it('should show default tab content', () => {
     render(
       <Tabs defaultValue="tab1">
-        <Tabs.List>
-          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
-          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="tab1">Content 1</Tabs.Content>
-        <Tabs.Content value="tab2">Content 2</Tabs.Content>
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
       </Tabs>
     );
 
@@ -35,19 +35,19 @@ describe('Tabs Component', () => {
   });
 
   it('should switch tabs on click', () => {
-    const { container } = render(
+    render(
       <Tabs defaultValue="tab1">
-        <Tabs.List>
-          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
-          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="tab1">Content 1</Tabs.Content>
-        <Tabs.Content value="tab2">Content 2</Tabs.Content>
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
       </Tabs>
     );
 
     const tab2Trigger = screen.getByText('Tab 2');
-    tab2Trigger.click();
+    fireEvent.click(tab2Trigger);
 
     expect(screen.getByText('Content 2')).toBeInTheDocument();
   });

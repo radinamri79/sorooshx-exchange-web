@@ -21,12 +21,12 @@ describe('Button Component', () => {
   });
 
   it('should apply variant styles', () => {
-    const { container } = render(<Button variant="primary">Primary</Button>);
+    const { container } = render(<Button variant="default">Default</Button>);
     expect(container.querySelector('button')).toBeInTheDocument();
   });
 
   it('should apply size styles', () => {
-    const { container } = render(<Button size="lg">Large</Button>);
+    render(<Button size="lg">Large</Button>);
     expect(screen.getByText('Large')).toBeInTheDocument();
   });
 

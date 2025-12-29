@@ -4,72 +4,98 @@ import { useChartStore } from '../useChartStore';
 describe('useChartStore', () => {
   beforeEach(() => {
     useChartStore.setState({
-      symbol: 'BTCUSDT',
-      interval: '1h',
-      indicatorType: 'RSI',
-      enabledIndicators: [],
+      chartType: 'candlestick',
+      showVolume: true,
+      showGrid: true,
+      showCrosshair: true,
+      indicators: {},
+      alerts: [],
     });
   });
 
   it('should initialize with default state', () => {
     const { result } = renderHook(() => useChartStore());
-    expect(result.current.symbol).toBeDefined();
-    expect(result.current.interval).toBeDefined();
+    expect(result.current.chartType).toBeDefined();
+    expect(result.current.indicators).toBeDefined();
   });
 
-  it('should update symbol', () => {
+  it('should update chart type', () => {
     const { result } = renderHook(() => useChartStore());
     
     act(() => {
-      result.current.setSymbol('ETHUSDT');
+      result.current.setChartType('line');
     });
 
-    expect(result.current.symbol).toBe('ETHUSDT');
+    expect(result.current.chartType).toBe('line');
   });
 
-  it('should update interval', () => {
+  it('should toggle volume', () => {
     const { result } = renderHook(() => useChartStore());
     
     act(() => {
-      result.current.setInterval('4h');
+      result.current.setShowVolume(!result.current.showVolume);
     });
 
-    expect(result.current.interval).toBe('4h');
+    expect(result.current.showVolume).toBe(false);
   });
 
-  it('should add enabled indicator', () => {
+  it('should toggle grid', () => {
     const { result } = renderHook(() => useChartStore());
     
     act(() => {
-      result.current.addEnabledIndicator('RSI');
+      result.current.setShowGrid(!result.current.showGrid);
     });
 
-    expect(result.current.enabledIndicators).toContain('RSI');
+    expect(result.current.showGrid).toBe(false);
   });
 
-  it('should remove enabled indicator', () => {
+  it('should toggle crosshair', () => {
     const { result } = renderHook(() => useChartStore());
     
     act(() => {
-      result.current.addEnabledIndicator('RSI');
-      result.current.addEnabledIndicator('MACD');
+      result.current.setShowCrosshair(!result.current.showCrosshair);
     });
 
-    act(() => {
-      result.current.removeEnabledIndicator('RSI');
-    });
-
-    expect(result.current.enabledIndicators).not.toContain('RSI');
-    expect(result.current.enabledIndicators).toContain('MACD');
+    expect(result.current.showCrosshair).toBe(false);
   });
 
-  it('should toggle indicator type', () => {
+  it('should toggle indicator', () => {
     const { result } = renderHook(() => useChartStore());
     
     act(() => {
-      result.current.setIndicatorType('MACD');
+      result.current.toggleIndicator('rsi');
     });
 
-    expect(result.current.indicatorType).toBe('MACD');
+    expect(result.current.indicators.rsi).toBeDefined();
+  });
+
+  it('should update indicator settings', () => {
+    const { result } = renderHook(() => useChartStore());
+    
+    act(() => {
+      result.current.updateIndicatorSettings('rsi', { period: 20 });
+    });
+
+    expect(result.current.indicators.rsi).toBeDefined();
+  });
+
+  it('should add price alert', () => {
+    const { result } = renderHook(() => useChartStore());
+    
+    act(() => {
+      result.current.addAlert(95000, 'above');
+    });
+
+    expect(result.current.alerts.length).toBeGreaterThan(0);
+  });
+
+  it('should set drawing mode', () => {
+    const { result } = renderHook(() => useChartStore());
+    
+    act(() => {
+      result.current.setDrawingMode('line');
+    });
+
+    expect(result.current.drawingMode).toBe('line');
   });
 });

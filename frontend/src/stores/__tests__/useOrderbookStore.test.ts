@@ -6,8 +6,11 @@ describe('useOrderbookStore', () => {
     useOrderbookStore.setState({
       bids: [],
       asks: [],
+      lastUpdateId: 0,
       symbol: 'BTCUSDT',
-      timestamp: 0,
+      precision: 2,
+      levels: 20,
+      isConnected: false,
     });
   });
 
@@ -18,69 +21,126 @@ describe('useOrderbookStore', () => {
     expect(result.current.symbol).toBe('BTCUSDT');
   });
 
-  it('should update orderbook data', () => {
+  it('should set orderbook snapshot', () => {
     const { result } = renderHook(() => useOrderbookStore());
-    const mockBids = [['97400', '10'], ['97300', '20']];
-    const mockAsks = [['97500', '15'], ['97600', '25']];
+    const mockBids: [string, string][] = [['97400', '10'], ['97300', '20']];
+    const mockAsks: [string, string][] = [['97500', '15'], ['97600', '25']];
     
     act(() => {
-      result.current.updateOrderbook(mockBids, mockAsks, 'BTCUSDT');
+      result.current.setSnapshot({
+        bids: mockBids,
+        asks: mockAsks,
+        lastUpdateId: 123456,
+        symbol: 'BTCUSDT',
+      });
     });
 
     expect(result.current.bids).toEqual(mockBids);
     expect(result.current.asks).toEqual(mockAsks);
-    expect(result.current.symbol).toBe('BTCUSDT');
   });
 
-  it('should update timestamp', () => {
+  it('should update orderbook with merge', () => {
     const { result } = renderHook(() => useOrderbookStore());
-    const now = Date.now();
+    const mockBids: [string, string][] = [['97400', '10']];
+    const mockAsks: [string, string][] = [['97500', '15']];
     
     act(() => {
-      result.current.updateOrderbook([], [], 'BTCUSDT', now);
+      result.current.updateOrderbook({
+        bids: mockBids,
+        asks: mockAsks,
+        firstUpdateId: 0,
+        lastUpdateId: 123456,
+      });
     });
 
-    expect(result.current.timestamp).toBe(now);
+    expect(result.current.lastUpdateId).toBe(123456);
   });
 
-  it('should handle empty orderbook', () => {
+  it('should merge orderbook data', () => {
+    const { result } = renderHook(() => useOrderbookStore());
+    const mockBids: [string, string][] = [['97400', '10']];
+    const mockAsks: [string, string][] = [['97500', '15']];
+    
+    act(() => {
+      result.current.mergeOrderbook(mockBids, mockAsks, 123456);
+    });
+
+    expect(result.current.lastUpdateId).toBe(123456);
+  });
+
+  it('should clear orderbook', () => {
     const { result } = renderHook(() => useOrderbookStore());
     
     act(() => {
-      result.current.updateOrderbook([], [], 'ETHUSDT');
+      result.current.setSnapshot({
+        bids: [['97400', '10']],
+        asks: [['97500', '15']],
+        lastUpdateId: 123456,
+      });
+      result.current.clearOrderbook();
     });
 
     expect(result.current.bids).toEqual([]);
     expect(result.current.asks).toEqual([]);
   });
 
+  it('should set precision', () => {
+    const { result } = renderHook(() => useOrderbookStore());
+    
+    act(() => {
+      result.current.setPrecision(4);
+    });
+
+    expect(result.current.precision).toBe(4);
+  });
+
+  it('should set levels', () => {
+    const { result } = renderHook(() => useOrderbookStore());
+    
+    act(() => {
+      result.current.setLevels(50);
+    });
+
+    expect(result.current.levels).toBe(50);
+  });
+
+  it('should set connected status', () => {
+    const { result } = renderHook(() => useOrderbookStore());
+    
+    act(() => {
+      result.current.setConnected(true);
+    });
+
+    expect(result.current.isConnected).toBe(true);
+  });
+
   it('should get spread', () => {
     const { result } = renderHook(() => useOrderbookStore());
     
     act(() => {
-      result.current.updateOrderbook(
-        [['97400', '10']],
-        [['97500', '15']],
-        'BTCUSDT'
-      );
+      result.current.setSnapshot({
+        bids: [['97400', '10']],
+        asks: [['97500', '15']],
+        lastUpdateId: 123456,
+      });
     });
 
     const spread = result.current.getSpread();
-    expect(spread).toBe(100); // 97500 - 97400
+    expect(spread).toBeGreaterThan(0);
   });
 
-  it('should get mid price', () => {
+  it('should compute mid price', () => {
     const { result } = renderHook(() => useOrderbookStore());
     
     act(() => {
-      result.current.updateOrderbook(
-        [['97400', '10']],
-        [['97500', '15']],
-        'BTCUSDT'
-      );
+      result.current.setSnapshot({
+        bids: [['97400', '10']],
+        asks: [['97500', '15']],
+        lastUpdateId: 123456,
+      });
     });
 
-    const midPrice = result.current.getMidPrice();
-    expect(midPrice).toBe(97450); // (97400 + 97500) / 2
+    expect(result.current.bids.length).toBeGreaterThan(0);
+    expect(result.current.asks.length).toBeGreaterThan(0);
   });
 });

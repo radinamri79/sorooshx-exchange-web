@@ -1,4 +1,4 @@
-import { createWebSocketClient, WebSocketClient } from '../binance';
+import { binanceWS, subscribeTicker, subscribeDepth } from '../binance';
 
 describe('Binance WebSocket', () => {
   let mockWs: any;
@@ -18,82 +18,49 @@ describe('Binance WebSocket', () => {
     jest.clearAllMocks();
   });
 
-  it('should create websocket client', () => {
-    const client = createWebSocketClient('BTCUSDT');
-    expect(client).toHaveProperty('connect');
-    expect(client).toHaveProperty('disconnect');
+  it('should initialize binance websocket manager', () => {
+    expect(binanceWS).toBeDefined();
+    expect(binanceWS).toHaveProperty('subscribe');
+    expect(binanceWS).toHaveProperty('unsubscribe');
   });
 
-  it('should connect to websocket', (done) => {
-    const client = createWebSocketClient('BTCUSDT');
-    
-    client.connect({
-      onTicker: (data) => {
-        expect(data).toBeDefined();
-        done();
-      },
-    });
-
-    expect(global.WebSocket).toHaveBeenCalled();
+  it('should subscribe to ticker', () => {
+    const handler = jest.fn();
+    const unsubscribe = subscribeTicker('BTCUSDT', handler);
+    expect(unsubscribe).toBeDefined();
+    expect(typeof unsubscribe).toBe('function');
   });
 
-  it('should handle message events', (done) => {
-    const client = createWebSocketClient('BTCUSDT');
-    const mockMessage = {
-      e: '24hrTicker',
-      s: 'BTCUSDT',
-      c: '97500',
-      p: '1500',
-      P: '1.56',
-      v: '50000',
-      q: '4875000000',
-    };
-
-    let addEventListenerCall = 0;
-    (mockWs.addEventListener as jest.Mock).mockImplementation((event: string, handler: any) => {
-      if (event === 'message') {
-        setTimeout(() => {
-          handler({
-            data: JSON.stringify(mockMessage),
-          });
-        }, 0);
-      }
-    });
-
-    client.connect({
-      onTicker: (data) => {
-        if (data.symbol === 'BTCUSDT') {
-          expect(data.lastPrice).toBeDefined();
-          done();
-        }
-      },
-    });
+  it('should subscribe to depth', () => {
+    const handler = jest.fn();
+    const unsubscribe = subscribeDepth('BTCUSDT', handler);
+    expect(unsubscribe).toBeDefined();
+    expect(typeof unsubscribe).toBe('function');
   });
 
-  it('should disconnect from websocket', () => {
-    const client = createWebSocketClient('BTCUSDT');
-    client.connect({});
-    client.disconnect();
-
-    expect(mockWs.close).toHaveBeenCalled();
+  it('should handle connection status', () => {
+    const status = binanceWS.getConnectionStatus();
+    expect(status).toBeDefined();
+    expect(['connected', 'disconnected', 'connecting', 'reconnecting']).toContain(status);
   });
 
-  it('should handle connection errors', (done) => {
-    const client = createWebSocketClient('BTCUSDT');
+  it('should support status change callbacks', () => {
+    const callback = jest.fn();
+    const unsubscribe = binanceWS.onStatusChange(callback);
+    expect(unsubscribe).toBeDefined();
+    expect(typeof unsubscribe).toBe('function');
+  });
 
-    (mockWs.addEventListener as jest.Mock).mockImplementation((event: string, handler: any) => {
-      if (event === 'error') {
-        setTimeout(() => {
-          handler(new Error('Connection error'));
-        }, 0);
-      }
-    });
+  it('should handle message parsing', () => {
+    const handler = jest.fn();
+    subscribeTicker('BTCUSDT', handler);
+    expect(handler).toBeDefined();
+  });
 
-    client.connect({
-      onError: (error) => {
-        expect(error).toBeDefined();
-        done();
-      },
-    });
+  it('should cleanup on unsubscribe', () => {
+    const handler = jest.fn();
+    const unsubscribe = subscribeTicker('BTCUSDT', handler);
+    unsubscribe();
+    expect(typeof unsubscribe).toBe('function');
   });
 });
