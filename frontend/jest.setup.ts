@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom';
 
+// Mock uuid
+jest.mock('uuid', () => ({
+  v4: () => 'test-uuid-' + Math.random().toString(36).substring(7),
+}));
+
 // Mock next-intl
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
