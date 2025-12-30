@@ -6,7 +6,9 @@ import { X, ChevronDown, FileText } from 'lucide-react';
 import { cn, formatPrice, formatNumber, formatCurrency } from '@/lib/utils';
 import { useTradeStore } from '@/stores/useTradeStore';
 import { useMarketStore } from '@/stores/useMarketStore';
+import { TradingService } from '@/services/trading/TradingService';
 import type { Position, OrderStatus } from '@/types';
+import Decimal from 'decimal.js';
 
 interface OrdersPanelProps {
   className?: string;
@@ -43,26 +45,25 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
     return history.filter((o) => o.symbol === currentSymbol);
   }, [orders, currentSymbol, showAllSymbols]);
 
-  // Calculate unrealized PnL for positions
+  // Calculate unrealized PnL for positions using TradingService
   const getUnrealizedPnl = useCallback((position: Position) => {
     const ticker = tickers[position.symbol];
     if (!ticker) return { pnl: 0, roe: 0 };
     
-    const currentPrice = parseFloat(ticker.c);
-    const entryPrice = parseFloat(position.entryPrice);
-    const quantity = parseFloat(position.quantity);
-    const margin = parseFloat(position.margin);
-    
-    let pnl = 0;
-    if (position.side === 'long') {
-      pnl = (currentPrice - entryPrice) * quantity;
-    } else {
-      pnl = (entryPrice - currentPrice) * quantity;
+    try {
+      const currentPrice = new Decimal(ticker.c);
+      
+      // Use TradingService for accurate PnL calculation
+      const pnl = TradingService.calculateUnrealizedPnL(position, currentPrice);
+      const roe = TradingService.calculateROE(position, currentPrice);
+      
+      return { 
+        pnl: parseFloat(pnl.toString()), 
+        roe: parseFloat(roe.toString()) 
+      };
+    } catch {
+      return { pnl: 0, roe: 0 };
     }
-    
-    const roe = margin > 0 ? (pnl / margin) * 100 : 0;
-    
-    return { pnl, roe };
   }, [tickers]);
 
   // Handle cancel order

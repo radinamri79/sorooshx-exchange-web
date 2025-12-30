@@ -9,23 +9,16 @@ interface AccountInfoPanelProps {
 }
 
 export function AccountInfoPanel({ className }: AccountInfoPanelProps) {
-  const { wallet, positions } = useTradeStore();
+  const { wallet, positions, getTotalMarginUsed } = useTradeStore();
 
-  // Calculate total position value and margin
-  const { totalMarginUsed, unrealizedPnL } = (() => {
-    let totalMargin = 0;
-    let pnl = 0;
-
-    positions.forEach((position) => {
-      totalMargin += parseFloat(position.margin);
-      pnl += parseFloat(position.unrealizedPnl || '0');
-    });
-
-    return {
-      totalMarginUsed: totalMargin,
-      unrealizedPnL: pnl,
-    };
-  })();
+  // Calculate total position value and margin using store selector
+  const totalMarginUsedDecimal = getTotalMarginUsed();
+  const totalMarginUsed = parseFloat(totalMarginUsedDecimal.toString());
+  
+  // Calculate unrealized PnL
+  const unrealizedPnL = positions.reduce((total, position) => {
+    return total + parseFloat(position.unrealizedPnl || '0');
+  }, 0);
 
   const availableBalance = parseFloat(wallet.availableBalance);
   const totalBalance = parseFloat(wallet.balance);

@@ -5,12 +5,14 @@ import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Info, ChevronDown, ChevronUp, Wallet } from 'lucide-react';
+import { Info, ChevronDown, ChevronUp, Wallet, AlertCircle } from 'lucide-react';
 import { cn, formatNumber, formatPrice, formatCurrency } from '@/lib/utils';
 import { Slider } from '@/components/ui';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { useTradeStore } from '@/stores/useTradeStore';
+import { TradingService } from '@/services/trading/TradingService';
 import type { OrderSide, OrderType, MarginMode } from '@/types';
+import Decimal from 'decimal.js';
 
 const orderSchema = z.object({
   price: z.string().optional(),
@@ -39,6 +41,7 @@ export function OrderForm({ className }: OrderFormProps) {
   const [showLeverageSlider, setShowLeverageSlider] = useState(false);
   const [quantityPercent, setQuantityPercent] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const currentTicker = tickers[currentSymbol];
   const lastPrice = currentTicker ? parseFloat(currentTicker.c) : 0;
@@ -71,10 +74,21 @@ export function OrderForm({ className }: OrderFormProps) {
   }, [availableBalance, leverage, lastPrice, orderType, price]);
 
   const marginRequired = useMemo(() => {
-    const qty = parseFloat(quantity || '0');
-    if (!qty || qty === 0) return 0;
-    const effectivePrice = orderType === 'market' ? lastPrice : parseFloat(price || '0') || lastPrice;
-    return (qty * effectivePrice) / leverage;
+    try {
+      const qty = parseFloat(quantity || '0');
+      if (!qty || qty === 0) return 0;
+      const effectivePrice = orderType === 'market' ? lastPrice : parseFloat(price || '0') || lastPrice;
+      
+      // Use TradingService calculation for precision
+      const marginUsed = TradingService.calculateMarginRequired(
+        new Decimal(qty),
+        new Decimal(effectivePrice),
+        leverage
+      );
+      return parseFloat(marginUsed.toString());
+    } catch {
+      return 0;
+    }
   }, [quantity, leverage, lastPrice, orderType, price]);
 
   const orderValue = useMemo(() => {
@@ -100,8 +114,25 @@ export function OrderForm({ className }: OrderFormProps) {
 
   const onSubmit = useCallback(async (data: OrderFormData) => {
     setIsSubmitting(true);
+    setValidationError(null);
     
     try {
+      // Use TradingService for validation
+      TradingService.createOrder(
+        {
+          symbol: currentSymbol,
+          side,
+          orderType,
+          price: orderType === 'limit' || orderType === 'stop_limit' ? data.price : undefined,
+          stopPrice: orderType === 'stop_limit' || orderType === 'stop_market' ? data.stopPrice : undefined,
+          quantity: data.quantity,
+          leverage,
+          marginMode,
+        },
+        wallet
+      );
+      
+      // If validation passed, create the order
       createOrder({
         symbol: currentSymbol,
         side,
@@ -116,11 +147,13 @@ export function OrderForm({ className }: OrderFormProps) {
       reset();
       setQuantityPercent(null);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Order creation failed';
+      setValidationError(errorMessage);
       console.error('Order failed:', error);
     } finally {
       setIsSubmitting(false);
     }
-  }, [currentSymbol, side, orderType, leverage, marginMode, createOrder, reset]);
+  }, [currentSymbol, side, orderType, leverage, marginMode, createOrder, wallet, reset]);
 
   const handleSetLastPrice = useCallback(() => {
     if (lastPrice) {
@@ -228,6 +261,14 @@ export function OrderForm({ className }: OrderFormProps) {
 
       {/* Order Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="p-3 space-y-2.5">
+        {/* Validation Error Alert */}
+        {validationError && (
+          <div className="flex items-start gap-2 p-2 bg-red-900/20 border border-red-600/50 rounded text-[9px]">
+            <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-red-500" />
+            <span className="text-red-400">{validationError}</span>
+          </div>
+        )}
+
         {/* Stop Price (for stop orders) */}
         {(orderType === 'stop_limit' || orderType === 'stop_market') && (
           <div>
