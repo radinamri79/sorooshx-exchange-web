@@ -1,21 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "projectName": "sorooshx-exchange",
   "framework": "nextjs",
-  "rootDirectory": "frontend",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "outputDirectory": ".next",
-  "env": {
-    "NEXT_PUBLIC_API_URL": {
-      "description": "Backend API URL for data and trading operations",
-      "placeholder": "http://localhost:8000/api/v1"
-    },
-    "NEXT_PUBLIC_WS_URL": {
-      "description": "WebSocket URL for real-time updates from backend",
-      "placeholder": "ws://localhost:8000/ws"
-    }
-  },
+  "regions": ["fra1"],
   "headers": [
     {
       "source": "/(.*)",
@@ -25,34 +14,35 @@
           "value": "on"
         },
         {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000; includeSubDomains"
-        },
-        {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
         },
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
         },
         {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.tradingview.com https://*.tradingview.com; frame-src https://www.tradingview.com https://*.tradingview.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline';"
+          "key": "Referrer-Policy",
+          "value": "origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
         }
       ]
     }
   ],
   "functions": {
-    "api/**": {
-      "memory": 1024,
+    "src/app/api/**/*.ts": {
       "maxDuration": 30
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/binance/:path*",
-      "destination": "https://api.binance.com/api/:path*"
-    }
-  ]
+  }
 }
