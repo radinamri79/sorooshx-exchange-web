@@ -3,4 +3,6 @@ export { TickerSwitcher } from './TickerSwitcher';
 export { OrderForm } from './OrderForm';
 export { Orderbook } from './Orderbook';
 export { TradingChart } from './TradingChart';
-export { OrdersPanel } from './OrdersPanel';export { AccountInfoPanel } from './AccountInfoPanel';
+export { OrdersPanel } from './OrdersPanel';
+export { AccountInfoPanel } from './AccountInfoPanel';
+export { DataExport } from './DataExport';
