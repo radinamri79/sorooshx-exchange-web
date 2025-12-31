@@ -1,430 +1,594 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Info, ChevronDown, ChevronUp, Wallet, AlertCircle } from 'lucide-react';
-import { cn, formatNumber, formatPrice, formatCurrency } from '@/lib/utils';
-import { Slider } from '@/components/ui';
-import { useMarketStore } from '@/stores/useMarketStore';
-import { useTradeStore } from '@/stores/useTradeStore';
-import { TradingService } from '@/services/trading/TradingService';
-import type { OrderSide, OrderType, MarginMode } from '@/types';
+import { useState, useMemo } from 'react';
 import Decimal from 'decimal.js';
-
-const orderSchema = z.object({
-  price: z.string().optional(),
-  quantity: z.string().min(1, 'Required'),
-  stopPrice: z.string().optional(),
-});
-
-type OrderFormData = z.infer<typeof orderSchema>;
+import { cn } from '@/lib/utils';
+import { useLeverageStore } from '@/stores/useLeverageStore';
+import { FuturesUnitSettingsModal } from './modals/FuturesUnitSettingsModal';
+import { AdjustLeverageModal } from './modals/AdjustLeverageModal';
+import { TPSLSection } from './sections/TPSLSection';
+import {
+  OrderFormState,
+  OrderFormType,
+  OrderSide,
+  OrderFormErrors,
+  OrderCostEstimate,
+  OrderFormUIState,
+} from '@/types/orderForm';
+import { Settings } from 'lucide-react';
 
 interface OrderFormProps {
   className?: string;
+  currentPrice?: string;
+  availableBalance?: string;
+  onSubmit?: (formData: OrderFormState) => Promise<void>;
 }
 
-const LEVERAGE_PRESETS = [1, 5, 10, 25, 50, 75, 100, 125];
-const QUANTITY_PRESETS = [25, 50, 75, 100];
+const INITIAL_STATE: OrderFormState = {
+  action: 'OPEN',
+  side: 'LONG',
+  marginMode: 'ISOLATED',
+  orderType: 'LIMIT',
+  price: '',
+  quantity: '',
+  quantityPercent: 0,
+  tpsl: {
+    enabled: false,
+    advancedMode: false,
+  },
+  postOnly: false,
+  reduceOnly: false,
+};
 
-export function OrderForm({ className }: OrderFormProps) {
-  const t = useTranslations('trading.orderForm');
-  const { currentSymbol, tickers } = useMarketStore();
-  const { wallet, createOrder } = useTradeStore();
-  
-  const [orderType, setOrderType] = useState<OrderType>('limit');
-  const [side, setSide] = useState<OrderSide>('buy');
-  const [marginMode, setMarginMode] = useState<MarginMode>('cross');
-  const [leverage, setLeverage] = useState(10);
-  const [showLeverageSlider, setShowLeverageSlider] = useState(false);
-  const [quantityPercent, setQuantityPercent] = useState<number | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
+const INITIAL_UI_STATE: OrderFormUIState = {
+  showAdvancedTP: false,
+  showLeverageModal: false,
+  showUnitSettingsModal: false,
+  isSubmitting: false,
+};
 
-  const currentTicker = tickers[currentSymbol];
-  const lastPrice = currentTicker ? parseFloat(currentTicker.c) : 0;
-  const availableBalance = parseFloat(wallet.availableBalance);
+export function OrderForm({
+  className,
+  currentPrice = '88750.00',
+  availableBalance = '10000.00',
+  onSubmit,
+}: OrderFormProps) {
+  const [formData, setFormData] = useState<OrderFormState>(INITIAL_STATE);
+  const [uiState, setUiState] = useState<OrderFormUIState>(INITIAL_UI_STATE);
+  const [errors, setErrors] = useState<OrderFormErrors>({});
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-    reset,
-  } = useForm<OrderFormData>({
-    resolver: zodResolver(orderSchema),
-    defaultValues: {
-      price: '',
-      quantity: '',
-      stopPrice: '',
-    },
-  });
+  const { longLeverage, shortLeverage } = useLeverageStore();
 
-  const price = watch('price');
-  const quantity = watch('quantity');
+  const currentLeverage =
+    formData.side === 'LONG' ? longLeverage : shortLeverage;
 
-  const maxQuantity = useMemo(() => {
-    if (!lastPrice || lastPrice === 0) return 0;
-    const effectivePrice = orderType === 'market' ? lastPrice : parseFloat(price || '0') || lastPrice;
-    if (effectivePrice === 0) return 0;
-    return (availableBalance * leverage) / effectivePrice;
-  }, [availableBalance, leverage, lastPrice, orderType, price]);
+  // Calculate order cost and estimates
+  const costEstimate = useMemo((): OrderCostEstimate => {
+    if (!formData.price || !formData.quantity) {
+      return {
+        cost: '0',
+        maxQuantity: '0',
+        maintenanceMargin: '0',
+      };
+    }
 
-  const marginRequired = useMemo(() => {
     try {
-      const qty = parseFloat(quantity || '0');
-      if (!qty || qty === 0) return 0;
-      const effectivePrice = orderType === 'market' ? lastPrice : parseFloat(price || '0') || lastPrice;
-      
-      // Use TradingService calculation for precision
-      const marginUsed = TradingService.calculateMarginRequired(
-        new Decimal(qty),
-        new Decimal(effectivePrice),
-        leverage
-      );
-      return parseFloat(marginUsed.toString());
+      const price = new Decimal(formData.price);
+      const quantity = new Decimal(formData.quantity);
+      const leverage = new Decimal(currentLeverage);
+
+      const totalValue = price.times(quantity);
+      const cost = totalValue.dividedBy(leverage);
+      const maintenanceMargin = totalValue.times(new Decimal('0.005')); // 0.5% MMR
+
+      // Max quantity based on available balance and leverage
+      const availableForOrder = new Decimal(availableBalance).times(leverage);
+      const maxQty = availableForOrder.dividedBy(price);
+
+      return {
+        cost: cost.toFixed(2),
+        maxQuantity: maxQty.toFixed(8),
+        maintenanceMargin: maintenanceMargin.toFixed(2),
+        estimatedPnL: '0',
+        liquidationPrice: calculateLiquidationPrice(
+          price,
+          formData.side,
+          leverage
+        ),
+      };
     } catch {
-      return 0;
+      return {
+        cost: '0',
+        maxQuantity: '0',
+        maintenanceMargin: '0',
+      };
     }
-  }, [quantity, leverage, lastPrice, orderType, price]);
+  }, [formData.price, formData.quantity, currentLeverage, availableBalance]);
 
-  const orderValue = useMemo(() => {
-    const qty = parseFloat(quantity || '0');
-    if (!qty) return 0;
-    const effectivePrice = orderType === 'market' ? lastPrice : parseFloat(price || '0') || lastPrice;
-    return qty * effectivePrice;
-  }, [quantity, orderType, price, lastPrice]);
+  // Handle form field changes
+  const handleOrderTypeChange = (type: OrderFormType) => {
+    setFormData((prev) => ({
+      ...prev,
+      orderType: type,
+      price: '',
+      triggerPrice: '',
+      trailingAmount: '',
+    }));
+    setErrors({});
+  };
 
-  const handleQuantityPercent = useCallback((percent: number) => {
-    setQuantityPercent(percent);
-    const qty = (maxQuantity * percent) / 100;
-    const formattedQty = qty.toFixed(3);
-    setValue('quantity', formattedQty);
-  }, [maxQuantity, setValue]);
+  const handlePriceChange = (price: string) => {
+    setFormData((prev) => ({ ...prev, price }));
+    if (errors.price) setErrors((prev) => ({ ...prev, price: undefined }));
+  };
 
-  const handleLeverageChange = useCallback((values: number[]) => {
-    if (values[0] !== undefined) {
-      setLeverage(values[0]);
-    }
-    setQuantityPercent(null);
-  }, []);
+  const handleQuantityChange = (quantity: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      quantity,
+      quantityPercent: 0,
+    }));
+    if (errors.quantity) setErrors((prev) => ({ ...prev, quantity: undefined }));
+  };
 
-  const onSubmit = useCallback(async (data: OrderFormData) => {
-    setIsSubmitting(true);
-    setValidationError(null);
-    
+  const handleQuantityPercentChange = (percent: number) => {
     try {
-      // Use TradingService for validation
-      TradingService.createOrder(
-        {
-          symbol: currentSymbol,
-          side,
-          orderType,
-          price: orderType === 'limit' || orderType === 'stop_limit' ? data.price : undefined,
-          stopPrice: orderType === 'stop_limit' || orderType === 'stop_market' ? data.stopPrice : undefined,
-          quantity: data.quantity,
-          leverage,
-          marginMode,
-        },
-        wallet
-      );
-      
-      // If validation passed, create the order
-      createOrder({
-        symbol: currentSymbol,
-        side,
-        orderType,
-        price: orderType === 'limit' || orderType === 'stop_limit' ? data.price : undefined,
-        stopPrice: orderType === 'stop_limit' || orderType === 'stop_market' ? data.stopPrice : undefined,
-        quantity: data.quantity,
-        leverage,
-        marginMode,
-      });
-      
-      reset();
-      setQuantityPercent(null);
+      const maxQty = new Decimal(costEstimate.maxQuantity);
+      const newQty = maxQty.times(new Decimal(percent)).dividedBy(100);
+      setFormData((prev) => ({
+        ...prev,
+        quantity: newQty.toFixed(8),
+        quantityPercent: percent,
+      }));
+    } catch {
+      // Handle calculation error silently
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!formData.price && formData.orderType !== 'MARKET') {
+      setErrors({ price: 'Price is required' });
+      return;
+    }
+    if (!formData.quantity) {
+      setErrors({ quantity: 'Quantity is required' });
+      return;
+    }
+
+    setUiState((prev) => ({ ...prev, isSubmitting: true }));
+    try {
+      await onSubmit?.(formData);
+      setUiState((prev) => ({
+        ...prev,
+        successMessage: 'Order placed successfully!',
+      }));
+      setTimeout(() => {
+        setFormData(INITIAL_STATE);
+        setUiState(INITIAL_UI_STATE);
+      }, 2000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Order creation failed';
-      setValidationError(errorMessage);
-      console.error('Order failed:', error);
+      setUiState((prev) => ({
+        ...prev,
+        errorMessage: error instanceof Error ? error.message : 'Order failed',
+      }));
     } finally {
-      setIsSubmitting(false);
+      setUiState((prev) => ({ ...prev, isSubmitting: false }));
     }
-  }, [currentSymbol, side, orderType, leverage, marginMode, createOrder, wallet, reset]);
-
-  const handleSetLastPrice = useCallback(() => {
-    if (lastPrice) {
-      setValue('price', formatPrice(lastPrice, 2));
-    }
-  }, [lastPrice, setValue]);
-
-  const baseAsset = currentSymbol.replace('USDT', '');
+  };
 
   return (
-    <div className={cn('flex flex-col bg-transparent', className)}>
-      {/* Header with Margin Mode and Leverage - Compact */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-[#2a2a2d]">
-        <div className="flex items-center gap-2">
+    <form onSubmit={handleSubmit} className={cn("space-y-4 rounded-lg bg-gray-900 p-6", className)}>
+      {/* Modals */}
+      <FuturesUnitSettingsModal
+        isOpen={uiState.showUnitSettingsModal}
+        onClose={() =>
+          setUiState((prev) => ({ ...prev, showUnitSettingsModal: false }))
+        }
+      />
+      <AdjustLeverageModal
+        isOpen={uiState.showLeverageModal}
+        onClose={() =>
+          setUiState((prev) => ({ ...prev, showLeverageModal: false }))
+        }
+        maxNominalValue={costEstimate.maxQuantity}
+      />
+
+      {/* Header: Margin Mode and Leverage */}
+      <div className="flex items-center justify-between border-b border-gray-700 pb-4">
+        <div className="flex items-center gap-4">
           {/* Margin Mode Toggle */}
-          <div className="flex items-center bg-[#17181b] rounded p-0.5">
-            <button
-              onClick={() => setMarginMode('cross')}
-              className={cn(
-                'px-2.5 py-1 text-[10px] md:text-[11px] font-medium rounded transition-colors',
-                marginMode === 'cross'
-                  ? 'bg-[#2a2a2d] text-[#f5f5f5]'
-                  : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
-              )}
-            >
-              {t('cross')}
-            </button>
-            <button
-              onClick={() => setMarginMode('isolated')}
-              className={cn(
-                'px-2.5 py-1 text-[10px] md:text-[11px] font-medium rounded transition-colors',
-                marginMode === 'isolated'
-                  ? 'bg-[#2a2a2d] text-[#f5f5f5]'
-                  : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
-              )}
-            >
-              {t('isolated')}
-            </button>
-          </div>
-
-          {/* Leverage Selector */}
-          <button
-            onClick={() => setShowLeverageSlider(!showLeverageSlider)}
-            className="flex items-center gap-0.5 px-2.5 py-1 text-[10px] md:text-[11px] font-semibold bg-[#17181b] rounded text-[#ed7620] hover:bg-[#1e1f23] transition-colors"
-          >
-            {leverage}x
-            {showLeverageSlider ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Leverage Slider (Collapsible) */}
-      {showLeverageSlider && (
-        <div className="px-2 py-2 border-b border-[#2a2a2d] bg-[#121214]">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[9px] text-[#6b6b6b]">{t('leverage')}</span>
-            <span className="text-xs font-bold text-[#ed7620]">{leverage}x</span>
-          </div>
-          <Slider
-            value={[leverage]}
-            min={1}
-            max={125}
-            step={1}
-            onValueChange={handleLeverageChange}
-            className="mb-2"
-          />
-          <div className="flex items-center gap-0.5 flex-wrap">
-            {LEVERAGE_PRESETS.map((preset) => (
+          <div className="flex gap-2 rounded-lg bg-gray-800 p-1">
+            {(['ISOLATED', 'CROSS'] as const).map((mode) => (
               <button
-                key={preset}
-                onClick={() => setLeverage(preset)}
-                className={cn(
-                  'px-1.5 py-0.5 text-[9px] font-medium rounded transition-colors',
-                  leverage === preset
-                    ? 'bg-[#ed7620] text-white'
-                    : 'bg-[#17181b] text-[#6b6b6b] hover:text-[#a1a1a1] border border-[#2a2a2d]'
-                )}
+                key={mode}
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, marginMode: mode }))
+                }
+                className={`rounded px-3 py-1 text-sm font-semibold transition ${
+                  formData.marginMode === mode
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
               >
-                {preset}x
+                {mode}
               </button>
             ))}
           </div>
-        </div>
-      )}
 
-      {/* Order Type Tabs - Compact */}
-      <div className="px-3 pt-2">
-        <div className="flex items-center gap-0.5 bg-[#17181b] rounded p-0.5">
-          {(['limit', 'market', 'stop_limit', 'stop_market'] as OrderType[]).map((type) => (
-            <button
-              key={type}
-              onClick={() => setOrderType(type)}
-              className={cn(
-                'flex-1 py-1.5 text-[10px] md:text-[11px] font-medium rounded transition-colors capitalize',
-                orderType === type
-                  ? 'bg-[#2a2a2d] text-[#f5f5f5]'
-                  : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
-              )}
-            >
-              {type === 'stop_limit' ? 'Stop' : type === 'stop_market' ? 'StopMkt' : type}
-            </button>
-          ))}
+          {/* Leverage Display */}
+          <button
+            type="button"
+            onClick={() =>
+              setUiState((prev) => ({ ...prev, showLeverageModal: true }))
+            }
+            className="flex items-center gap-2 rounded-lg bg-gray-800 px-3 py-1 text-sm font-semibold text-orange-400 transition hover:bg-gray-700"
+          >
+            <span>{currentLeverage}x</span>
+            <span className="text-xs text-gray-400">{currentLeverage}x</span>
+          </button>
         </div>
+
+        {/* Futures Unit Settings Button */}
+        <button
+          type="button"
+          onClick={() =>
+            setUiState((prev) => ({ ...prev, showUnitSettingsModal: true }))
+          }
+          className="rounded-lg bg-gray-800 p-2 transition hover:bg-gray-700"
+          title="Futures Unit Settings"
+        >
+          <Settings size={18} className="text-gray-400" />
+        </button>
       </div>
 
-      {/* Order Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="p-3 space-y-2.5">
-        {/* Validation Error Alert */}
-        {validationError && (
-          <div className="flex items-start gap-2 p-2 bg-red-900/20 border border-red-600/50 rounded text-[9px]">
-            <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-red-500" />
-            <span className="text-red-400">{validationError}</span>
-          </div>
-        )}
+      {/* Position Action Tabs */}
+      <div className="flex gap-3">
+        {(['OPEN', 'CLOSE'] as const).map((action) => (
+          <button
+            key={action}
+            type="button"
+            onClick={() => setFormData((prev) => ({ ...prev, action }))}
+            className={`flex-1 rounded-lg py-2 font-semibold transition ${
+              formData.action === action
+                ? 'bg-orange-500 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            {action}
+          </button>
+        ))}
+      </div>
 
-        {/* Stop Price (for stop orders) */}
-        {(orderType === 'stop_limit' || orderType === 'stop_market') && (
+      {/* Order Type Tabs */}
+      <div className="flex gap-2 border-b border-gray-700">
+        {(['LIMIT', 'MARKET', 'TRIGGER', 'TRAILING_STOP'] as const).map(
+          (type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => handleOrderTypeChange(type)}
+              className={`px-3 py-2 text-sm font-semibold transition ${
+                formData.orderType === type
+                  ? 'border-b-2 border-orange-500 text-orange-400'
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              {type.replace('_', ' ')}
+            </button>
+          )
+        )}
+      </div>
+
+      {/* Available Balance */}
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-gray-400">Available</span>
+        <span className="text-white">{availableBalance}</span>
+      </div>
+
+      {/* Order Type Specific Inputs */}
+      <div className="space-y-3">
+        {/* Price Input (LIMIT) */}
+        {formData.orderType === 'LIMIT' && (
           <div>
-            <label className="text-[9px] text-[#6b6b6b] mb-1 block">{t('stopPrice')}</label>
-            <div className="relative">
+            <label className="mb-1 block text-xs text-gray-400">
+              Order Price
+            </label>
+            <div className="flex gap-2">
               <input
-                {...register('stopPrice')}
                 type="number"
-                step="any"
+                value={formData.price}
+                onChange={(e) => handlePriceChange(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-[#17181b] border border-[#2a2a2d] rounded px-2 py-1.5 pr-12 text-[#f5f5f5] placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#ed7620] text-xs"
+                step="0.01"
+                className={`flex-1 rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 ${
+                  errors.price
+                    ? 'ring-2 ring-red-500'
+                    : 'focus:ring-orange-500'
+                }`}
               />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-[#6b6b6b]">USDT</span>
+              <div className="flex items-center gap-2 rounded-lg bg-gray-800 px-3">
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-gray-400 transition hover:text-white"
+                >
+                  +
+                </button>
+                <span className="text-sm text-gray-300">USDT</span>
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-gray-400 transition hover:text-white"
+                >
+                  −
+                </button>
+              </div>
             </div>
+            {errors.price && (
+              <p className="mt-1 text-xs text-red-400">{errors.price}</p>
+            )}
           </div>
         )}
 
-        {/* Price Input (for limit orders) */}
-        {(orderType === 'limit' || orderType === 'stop_limit') && (
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-[9px] text-[#6b6b6b]">{t('price')}</label>
-              <button
-                type="button"
-                onClick={handleSetLastPrice}
-                className="text-[9px] text-[#ed7620] hover:text-[#ff8c3a]"
-              >
-                {t('lastPrice')}
-              </button>
-            </div>
-            <div className="relative">
+        {/* Trigger Price (TRIGGER) */}
+        {formData.orderType === 'TRIGGER' && (
+          <>
+            <div>
+              <label className="mb-1 block text-xs text-gray-400">
+                Trigger Price
+              </label>
               <input
-                {...register('price')}
                 type="number"
-                step="any"
+                value={formData.triggerPrice || ''}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    triggerPrice: e.target.value,
+                  }))
+                }
                 placeholder="0.00"
-                className="w-full bg-[#17181b] border border-[#2a2a2d] rounded px-2 py-1.5 pr-12 text-[#f5f5f5] placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#ed7620] text-xs"
+                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 focus:ring-orange-500"
               />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-[#6b6b6b]">USDT</span>
             </div>
-          </div>
+            <div>
+              <label className="mb-1 block text-xs text-gray-400">
+                Price
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value="Best market"
+                  disabled
+                  className="flex-1 rounded-lg bg-gray-800 px-3 py-2 text-gray-400"
+                />
+                <span className="flex items-center rounded-lg bg-gray-800 px-3 text-sm text-gray-300">
+                  Market
+                </span>
+              </div>
+            </div>
+          </>
         )}
 
-        {/* Market Price Display (for market orders) */}
-        {orderType === 'market' && (
-          <div className="p-2 bg-[#17181b] rounded border border-[#2a2a2d]">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-[#6b6b6b] text-[9px]">{t('marketPrice')}</span>
-              <span className="text-[#f5f5f5] tabular-nums text-xs font-medium">
-                {lastPrice ? formatPrice(lastPrice) : '--'}
-              </span>
+        {/* Trailing Stop Inputs (TRAILING_STOP) */}
+        {formData.orderType === 'TRAILING_STOP' && (
+          <>
+            <div>
+              <label className="mb-1 block text-xs text-gray-400">
+                Trailing Amount
+              </label>
+              <input
+                type="number"
+                value={formData.trailingAmount || ''}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    trailingAmount: e.target.value,
+                  }))
+                }
+                placeholder="0.00"
+                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 focus:ring-orange-500"
+              />
             </div>
-          </div>
+            <div>
+              <label className="mb-1 block text-xs text-gray-400">
+                Base Price
+              </label>
+              <input
+                type="text"
+                value={currentPrice}
+                disabled
+                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-gray-400"
+              />
+            </div>
+          </>
         )}
 
         {/* Quantity Input */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[9px] text-[#6b6b6b]">{t('amount')}</label>
-            <span className="text-[9px] text-[#6b6b6b]">
-              Max: <span className="text-[#a1a1a1]">{formatNumber(maxQuantity, { decimals: 3 })}</span>
-            </span>
-          </div>
-          <div className="relative">
-            <input
-              {...register('quantity')}
-              type="number"
-              step="any"
-              placeholder="0.000"
-              className="w-full bg-[#17181b] border border-[#2a2a2d] rounded px-2 py-1.5 pr-12 text-[#f5f5f5] placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#ed7620] text-xs"
-            />
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-[#6b6b6b]">{baseAsset}</span>
-          </div>
+          <label className="mb-1 block text-xs text-gray-400">Quantity</label>
+          <input
+            type="number"
+            value={formData.quantity}
+            onChange={(e) => handleQuantityChange(e.target.value)}
+            placeholder="0"
+            step="0.00000001"
+            className={`w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 ${
+              errors.quantity ? 'ring-2 ring-red-500' : 'focus:ring-orange-500'
+            }`}
+          />
           {errors.quantity && (
-            <p className="text-[9px] text-[#ef5350] mt-0.5">{errors.quantity.message}</p>
+            <p className="mt-1 text-xs text-red-400">{errors.quantity}</p>
           )}
         </div>
 
-        {/* Quantity Percentage Buttons */}
-        <div className="flex items-center gap-1">
-          {QUANTITY_PRESETS.map((percent) => (
+        {/* Quantity Percentage Selector */}
+        <div className="grid grid-cols-5 gap-2">
+          {[0, 25, 50, 75, 100].map((percent) => (
             <button
               key={percent}
               type="button"
-              onClick={() => handleQuantityPercent(percent)}
-              className={cn(
-                'flex-1 py-1 text-[9px] font-medium rounded transition-colors',
-                quantityPercent === percent
-                  ? 'bg-[#ed7620] text-white'
-                  : 'bg-[#17181b] text-[#6b6b6b] hover:text-[#a1a1a1] border border-[#2a2a2d]'
-              )}
+              onClick={() => handleQuantityPercentChange(percent)}
+              className={`rounded-lg py-2 text-xs font-semibold transition ${
+                formData.quantityPercent === percent
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
             >
               {percent}%
             </button>
           ))}
         </div>
 
-        {/* Order Summary - Compact */}
-        <div className="space-y-1 py-1.5 border-t border-[#2a2a2d]">
-          <div className="flex items-center justify-between text-[9px]">
-            <span className="text-[#6b6b6b]">Order Value</span>
-            <span className="text-[#f5f5f5] tabular-nums">{formatCurrency(orderValue)}</span>
-          </div>
-          <div className="flex items-center justify-between text-[9px]">
-            <span className="text-[#6b6b6b] flex items-center gap-0.5">
-              Margin <Info className="w-2.5 h-2.5" />
-            </span>
-            <span className="text-[#f5f5f5] tabular-nums">{formatCurrency(marginRequired)}</span>
-          </div>
-        </div>
+        {/* TP/SL Section */}
+        <TPSLSection
+          tpsl={formData.tpsl}
+          onToggle={(enabled) =>
+            setFormData((prev) => ({
+              ...prev,
+              tpsl: { ...prev.tpsl, enabled },
+            }))
+          }
+          onTPChange={(price) =>
+            setFormData((prev) => ({
+              ...prev,
+              tpsl: { ...prev.tpsl, takeProfitPrice: price },
+            }))
+          }
+          onSLChange={(price) =>
+            setFormData((prev) => ({
+              ...prev,
+              tpsl: { ...prev.tpsl, stopLossPrice: price },
+            }))
+          }
+          onAdvancedToggle={(advanced) =>
+            setFormData((prev) => ({
+              ...prev,
+              tpsl: { ...prev.tpsl, advancedMode: advanced },
+            }))
+          }
+          errors={errors}
+        />
 
-        {/* Buy/Sell Buttons */}
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="submit"
-            disabled={isSubmitting || marginRequired > availableBalance}
-            onClick={() => setSide('buy')}
-            className="py-2.5 md:py-2 rounded font-semibold text-xs bg-[#26a69a] hover:bg-[#2db8ab] active:bg-[#239285] text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Buy/Long
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting || marginRequired > availableBalance}
-            onClick={() => setSide('sell')}
-            className="py-2.5 md:py-2 rounded font-semibold text-xs bg-[#ef5350] hover:bg-[#ff6361] active:bg-[#d94743] text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Sell/Short
-          </button>
-        </div>
+        {/* Post-Only Option */}
+        <label className="flex cursor-pointer items-center gap-3 rounded-lg bg-gray-800/30 px-3 py-2">
+          <input
+            type="checkbox"
+            checked={formData.postOnly}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, postOnly: e.target.checked }))
+            }
+            className="h-4 w-4 accent-orange-500"
+          />
+          <span className="text-sm text-gray-300">Post only</span>
+        </label>
+      </div>
 
-        {/* Available Funds Footer */}
-        <div className="flex items-center justify-between pt-1.5 border-t border-[#2a2a2d]">
-          <span className="text-[9px] text-[#6b6b6b] flex items-center gap-0.5">
-            <Wallet className="w-3 h-3" />
-            Available
+      {/* Cost & Fee Information */}
+      <div className="space-y-2 rounded-lg bg-gray-800/30 p-3">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Cost</span>
+          <span className="text-white">{costEstimate.cost} USDT</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Max</span>
+          <span className="text-white">
+            {costEstimate.maxQuantity} BTC
           </span>
-          <span className="text-xs text-[#f5f5f5] font-medium">{formatCurrency(wallet.availableBalance)}</span>
         </div>
+        <div className="border-t border-gray-700 pt-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">Maintenance Margin</span>
+            <span className="text-white">
+              {costEstimate.maintenanceMargin} USDT
+            </span>
+          </div>
+        </div>
+      </div>
 
-        {/* Deposit / Transfer Buttons */}
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            className="flex-1 py-1.5 text-[9px] font-medium rounded border border-[#2a2a2d] text-[#6b6b6b] hover:text-[#a1a1a1] hover:border-[#363639] transition-colors bg-[#17181b]"
-          >
-            Deposit
-          </button>
-          <button
-            type="button"
-            className="flex-1 py-1.5 text-[9px] font-medium rounded border border-[#2a2a2d] text-[#6b6b6b] hover:text-[#a1a1a1] hover:border-[#363639] transition-colors bg-[#17181b]"
-          >
-            Transfer
-          </button>
+      {/* VIP & Fee Info */}
+      <div className="flex items-center justify-between rounded-lg bg-gray-800 px-3 py-2 text-sm">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-white">VIP 0</span>
+          <span className="text-gray-400">|</span>
+          <span className="text-gray-400">Maker 0.0200%</span>
+          <span className="text-gray-400">Taker 0.0600%</span>
         </div>
-      </form>
-    </div>
+      </div>
+
+      {/* Error/Success Messages */}
+      {uiState.errorMessage && (
+        <div className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">
+          {uiState.errorMessage}
+        </div>
+      )}
+      {uiState.successMessage && (
+        <div className="rounded-lg bg-green-500/10 px-3 py-2 text-sm text-green-400">
+          {uiState.successMessage}
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="grid grid-cols-2 gap-3 pt-4">
+        <button
+          type="submit"
+          disabled={uiState.isSubmitting}
+          className={`rounded-lg py-3 font-semibold transition ${
+            formData.side === 'LONG'
+              ? 'bg-green-500 text-white hover:bg-green-600 disabled:bg-green-500/50'
+              : 'bg-red-500 text-white hover:bg-red-600 disabled:bg-red-500/50'
+          }`}
+          onClick={() =>
+            setFormData((prev) => ({ ...prev, side: 'LONG' }))
+          }
+        >
+          {formData.action === 'OPEN' ? 'Open long' : 'Close short'}
+        </button>
+        <button
+          type="submit"
+          disabled={uiState.isSubmitting}
+          className={`rounded-lg py-3 font-semibold transition ${
+            formData.side === 'SHORT'
+              ? 'bg-red-500 text-white hover:bg-red-600 disabled:bg-red-500/50'
+              : 'bg-red-500 text-white hover:bg-red-600 disabled:bg-red-500/50'
+          }`}
+          onClick={() =>
+            setFormData((prev) => ({ ...prev, side: 'SHORT' }))
+          }
+        >
+          {formData.action === 'OPEN' ? 'Open short' : 'Close long'}
+        </button>
+      </div>
+    </form>
   );
+}
+
+/**
+ * Calculate liquidation price based on entry price, side, and leverage
+ */
+function calculateLiquidationPrice(
+  entryPrice: Decimal,
+  side: OrderSide,
+  leverage: Decimal
+): string {
+  try {
+    const maintenanceMarginRatio = new Decimal('0.005'); // 0.5%
+    
+    if (side === 'LONG') {
+      // For long: liquidation = entry * (1 - MMR / leverage)
+      const denominator = new Decimal(1).minus(
+        maintenanceMarginRatio.dividedBy(leverage)
+      );
+      return entryPrice.times(denominator).toFixed(2);
+    } else {
+      // For short: liquidation = entry * (1 + MMR / leverage)
+      const numerator = new Decimal(1).plus(
+        maintenanceMarginRatio.dividedBy(leverage)
+      );
+      return entryPrice.times(numerator).toFixed(2);
+    }
+  } catch {
+    return '0';
+  }
 }
