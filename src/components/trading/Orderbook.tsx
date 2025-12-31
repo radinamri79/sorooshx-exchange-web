@@ -2,21 +2,21 @@
 
 import { useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { cn, formatPrice, formatNumber } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { useOrderbookStore } from '@/stores/useOrderbookStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchOrderbook } from '@/services/api';
 import type { OrderbookEntry } from '@/types';
 import * as React from 'react';
-import { ArrowUp, ArrowDown, Settings2 } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface OrderbookProps {
   className?: string;
   maxRows?: number;
 }
 
-type DisplayMode = 'both' | 'bids' | 'asks';
+type DisplayMode = 'both' | 'buyOnly' | 'sellOnly';
 
 interface OrderbookRowProps {
   entry: OrderbookEntry;
@@ -30,37 +30,38 @@ function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
   const total = parseFloat(price) * parseFloat(quantity);
   const depthPercentage = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
 
+  const color = isBid ? '#0D9D5F' : '#C8102E';
+  const bgColor = isBid ? 'rgba(13, 157, 95, 0.15)' : 'rgba(200, 16, 46, 0.15)';
+
   return (
     <button
       type="button"
       onClick={() => onClick?.(price)}
-      className="grid grid-cols-3 gap-1 px-2 py-[2px] text-[10px] hover:bg-[#1e1f23] transition-colors relative w-full text-left focus:outline-none"
+      className="grid grid-cols-3 gap-2 px-3 py-[6px] text-xs hover:brightness-110 transition-all duration-150 relative w-full text-left focus:outline-none font-mono"
     >
-      {/* Depth bar background */}
+      {/* Depth bar background - fills from right for bids, left for asks */}
       <div
-        className={cn(
-          'absolute top-0 bottom-0 opacity-10',
-          isBid ? 'bg-[#26a69a] right-0' : 'bg-[#ef5350] left-0'
-        )}
+        className="absolute top-0 bottom-0 transition-all duration-300"
         style={{
+          backgroundColor: bgColor,
           width: `${Math.min(depthPercentage, 100)}%`,
           [isBid ? 'right' : 'left']: 0,
         }}
       />
       
       {/* Price */}
-      <span className={cn('relative z-10 trading-font', isBid ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
-        {formatPrice(price)}
+      <span className="relative z-10 font-bold" style={{ color }}>
+        {parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
       </span>
       
       {/* Quantity */}
-      <span className="relative z-10 text-[#f5f5f5] text-right trading-font">
-        {formatNumber(quantity, { decimals: 4 })}
+      <span className="relative z-10 text-right text-[#EAECEF]">
+        {parseFloat(quantity).toFixed(4)}
       </span>
       
       {/* Total */}
-      <span className="relative z-10 text-[#6b6b6b] text-right trading-font">
-        {formatNumber(total, { decimals: 2 })}
+      <span className="relative z-10 text-right text-[#848E9C]">
+        {total.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
       </span>
     </button>
   );
@@ -77,8 +78,6 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
 
   const currentTicker = tickers[currentSymbol];
   const lastPrice = currentTicker ? currentTicker.c : '--';
-  const priceChangePercent = currentTicker ? parseFloat(currentTicker.P) : 0;
-  const isPositive = priceChangePercent >= 0;
 
   useEffect(() => {
     const loadSnapshot = async () => {
@@ -130,11 +129,11 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     };
   }, [currentSymbol, lastUpdateId, mergeOrderbook]);
 
-  const { displayedBids, displayedAsks, maxTotal } = useMemo(() => {
+  const { displayedBids, displayedAsks, maxTotal, buyPercentage, sellPercentage } = useMemo(() => {
     const rowCount = displayMode === 'both' ? maxRows : maxRows * 2;
     
-    const displayedBids = bids.slice(0, rowCount);
-    const displayedAsks = asks.slice(0, rowCount);
+    const displayedBids = displayMode === 'sellOnly' ? [] : bids.slice(0, rowCount);
+    const displayedAsks = displayMode === 'buyOnly' ? [] : asks.slice(0, rowCount);
 
     let maxTotal = 0;
     [...displayedBids, ...displayedAsks].forEach(([price, quantity]) => {
@@ -142,89 +141,91 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
       if (total > maxTotal) maxTotal = total;
     });
 
-    return { displayedBids, displayedAsks, maxTotal };
-  }, [bids, asks, maxRows, displayMode]);
+    // Calculate buy/sell percentages
+    const totalBidVolume = displayedBids.reduce((sum, [p, q]) => sum + (parseFloat(p) * parseFloat(q)), 0);
+    const totalAskVolume = displayedAsks.reduce((sum, [p, q]) => sum + (parseFloat(p) * parseFloat(q)), 0);
+    const total = totalBidVolume + totalAskVolume;
+    const buyPercentage = total > 0 ? ((totalBidVolume / total) * 100).toFixed(2) : '0.00';
+    const sellPercentage = total > 0 ? ((totalAskVolume / total) * 100).toFixed(2) : '0.00';
 
-  const spread = useMemo(() => {
-    if (asks.length === 0 || bids.length === 0) return { value: 0, percent: 0 };
-    
-    const bestAskEntry = asks[0];
-    const bestBidEntry = bids[0];
-    if (!bestAskEntry || !bestBidEntry) return { value: 0, percent: 0 };
-    
-    const bestAsk = parseFloat(bestAskEntry[0]);
-    const bestBid = parseFloat(bestBidEntry[0]);
-    const spreadValue = bestAsk - bestBid;
-    const spreadPercent = (spreadValue / bestAsk) * 100;
-    
-    return { value: spreadValue, percent: spreadPercent };
-  }, [asks, bids]);
+    return { displayedBids, displayedAsks, maxTotal, buyPercentage, sellPercentage };
+  }, [bids, asks, maxRows, displayMode]);
 
   const handlePriceClick = useCallback((_price: string) => {
     // Dispatch to order form
   }, []);
 
   return (
-    <div className={cn('flex flex-col bg-transparent overflow-hidden', className)}>
-      {/* Header - Compact */}
-      <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#2a2a2d]">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-[#f5f5f5]">Order Book</span>
-          <span className="text-xs text-[#6b6b6b] hover:text-[#a1a1a1] cursor-pointer">Trades</span>
+    <div className={cn('flex flex-col h-full bg-[#0B0E11] border border-[#2B3139] rounded-lg overflow-hidden', className)}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b border-[#2B3139]">
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-semibold text-[#EAECEF]">Orderbook</h3>
+          <button className="text-xs text-[#848E9C] hover:text-[#EAECEF] transition-colors">Trades</button>
         </div>
         
-        {/* Display Mode Toggle */}
-        <div className="flex items-center gap-0.5">
+        {/* Display Mode Toggle - 3 Icons */}
+        <div className="flex items-center gap-1.5">
+          {/* Both Buy & Sell */}
           <button
             onClick={() => setDisplayMode('both')}
             className={cn(
-              'p-1 rounded transition-colors',
-              displayMode === 'both' ? 'bg-[#17181b]' : 'hover:bg-[#17181b]'
+              'w-6 h-6 rounded flex items-center justify-center transition-all duration-200',
+              displayMode === 'both' ? 'bg-[#1E2329] ring-1 ring-[#3D4450]' : 'hover:bg-[#1E2329]'
             )}
+            title="Buy and Sell"
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
-              <rect x="2" y="2" width="12" height="5" rx="1" fill="#ef5350" />
-              <rect x="2" y="9" width="12" height="5" rx="1" fill="#26a69a" />
-            </svg>
+            <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
+              <div className="bg-[#C8102E] rounded-sm" />
+              <div className="bg-[#C8102E] rounded-sm" />
+              <div className="bg-[#0D9D5F] rounded-sm" />
+              <div className="bg-[#0D9D5F] rounded-sm" />
+            </div>
           </button>
+
+          {/* Buy Only */}
           <button
-            onClick={() => setDisplayMode('bids')}
+            onClick={() => setDisplayMode('buyOnly')}
             className={cn(
-              'p-1 rounded transition-colors',
-              displayMode === 'bids' ? 'bg-[#17181b]' : 'hover:bg-[#17181b]'
+              'w-6 h-6 rounded flex items-center justify-center transition-all duration-200',
+              displayMode === 'buyOnly' ? 'bg-[#1E2329] ring-1 ring-[#3D4450]' : 'hover:bg-[#1E2329]'
             )}
+            title="Only Buy"
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
-              <rect x="2" y="2" width="12" height="12" rx="1" fill="#26a69a" />
-            </svg>
+            <div className="w-4 h-4 bg-[#0D9D5F] rounded-sm" />
           </button>
+
+          {/* Sell Only */}
           <button
-            onClick={() => setDisplayMode('asks')}
+            onClick={() => setDisplayMode('sellOnly')}
             className={cn(
-              'p-1 rounded transition-colors',
-              displayMode === 'asks' ? 'bg-[#17181b]' : 'hover:bg-[#17181b]'
+              'w-6 h-6 rounded flex items-center justify-center transition-all duration-200',
+              displayMode === 'sellOnly' ? 'bg-[#1E2329] ring-1 ring-[#3D4450]' : 'hover:bg-[#1E2329]'
             )}
+            title="Only Sell"
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
-              <rect x="2" y="2" width="12" height="12" rx="1" fill="#ef5350" />
-            </svg>
+            <div className="w-4 h-4 bg-[#C8102E] rounded-sm" />
           </button>
-          <button className="p-1 rounded hover:bg-[#17181b] transition-colors">
-            <Settings2 className="w-3.5 h-3.5 text-[#6b6b6b]" />
+
+          {/* Hamburger Menu */}
+          <button className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#EAECEF]">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M3 5a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V5zM3 10a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3 15a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" />
+            </svg>
           </button>
         </div>
       </div>
 
       {/* Column Headers */}
-      <div className="grid grid-cols-3 gap-1 px-2 py-1 text-[9px] text-[#6b6b6b] border-b border-[#2a2a2d]">
-        <span>Price(USDT)</span>
-        <span className="text-right">Amount</span>
-        <span className="text-right">Total</span>
+      <div className="grid grid-cols-3 gap-2 px-3 py-1.5 text-[10px] text-[#848E9C] border-b border-[#2B3139]">
+        <span>Price (USDT)</span>
+        <span className="text-right">Qty. (BTC)</span>
+        <span className="text-right">Sum (BTC)</span>
       </div>
 
-      {/* Asks (Sell Orders) */}
-      {(displayMode === 'both' || displayMode === 'asks') && (
-        <div className="flex flex-col-reverse overflow-hidden flex-1">
+      {/* Asks (Sell Orders) - Top Section */}
+      {(displayMode === 'both' || displayMode === 'sellOnly') && (
+        <div className="flex flex-col-reverse flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#2B3139] scrollbar-track-[#0B0E11]">
           {displayedAsks.map((entry, index) => (
             <OrderbookRow
               key={`ask-${entry[0]}-${index}`}
@@ -237,29 +238,20 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
         </div>
       )}
 
-      {/* Current Price / Spread - Compact */}
-      <div className="flex items-center justify-between px-2 py-1.5 bg-[#17181b] border-y border-[#2a2a2d]">
-        <div className="flex items-center gap-1.5">
-          <span className={cn(
-            'text-sm font-bold trading-font',
-            isPositive ? 'text-[#26a69a]' : 'text-[#ef5350]'
-          )}>
-            {formatPrice(lastPrice)}
+      {/* Current Price - Center */}
+      <div className="flex items-center justify-between px-3 py-2.5 bg-[#0B0E11] border-y border-[#2B3139]">
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-bold font-mono" style={{ color: '#C8102E' }}>
+            {parseFloat(lastPrice).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
           </span>
-          {isPositive ? (
-            <ArrowUp className="w-3 h-3 text-[#26a69a]" />
-          ) : (
-            <ArrowDown className="w-3 h-3 text-[#ef5350]" />
-          )}
+          <ChevronDown size={16} className="text-[#C8102E]" />
         </div>
-        <span className="text-[9px] text-[#6b6b6b] trading-font">
-          {formatNumber(spread.value, { decimals: 2 })} ({formatNumber(spread.percent, { decimals: 3 })}%)
-        </span>
+        <span className="text-xs text-[#848E9C] font-mono">M {parseFloat(lastPrice).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
       </div>
 
-      {/* Bids (Buy Orders) */}
-      {(displayMode === 'both' || displayMode === 'bids') && (
-        <div className="flex flex-col overflow-hidden flex-1">
+      {/* Bids (Buy Orders) - Bottom Section */}
+      {(displayMode === 'both' || displayMode === 'buyOnly') && (
+        <div className="flex flex-col flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#2B3139] scrollbar-track-[#0B0E11]">
           {displayedBids.map((entry, index) => (
             <OrderbookRow
               key={`bid-${entry[0]}-${index}`}
@@ -272,15 +264,11 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
         </div>
       )}
 
-      {/* Bottom depth indicator */}
-      <div className="flex items-center h-5 px-2 border-t border-[#2a2a2d] bg-[#121214]">
-        <div className="flex-1 h-0.5 bg-[#17181b] rounded-full overflow-hidden flex">
-          <div className="h-full bg-[#26a69a]" style={{ width: '72%' }} />
-          <div className="h-full bg-[#ef5350]" style={{ width: '28%' }} />
-        </div>
-        <div className="flex items-center gap-2 ml-2 text-[9px] font-medium">
-          <span className="text-[#26a69a]">B 72%</span>
-          <span className="text-[#ef5350]">S 28%</span>
+      {/* Footer - Buy/Sell Ratio */}
+      <div className="flex items-center justify-between px-3 py-2 border-t border-[#2B3139] bg-[#0B0E11]">
+        <div className="flex items-center gap-2 text-xs font-mono">
+          <span style={{ color: '#0D9D5F' }}>B {buyPercentage}%</span>
+          <span style={{ color: '#C8102E' }}>S {sellPercentage}%</span>
         </div>
       </div>
     </div>
