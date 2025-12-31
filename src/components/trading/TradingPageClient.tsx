@@ -277,15 +277,20 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           </div>
         </main>
 
-        {/* MIDDLE COLUMN: Order Book - Bitunix Style Width */}
+        {/* MIDDLE COLUMN: Order Book - Bitunix Style Width, Height matches chart */}
         <aside className={cn(
           'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d]',
           isRTL && 'order-1 border-l-0 border-r'
         )}>
-          <Orderbook 
-            className="flex-1 bg-[#0d0d0f] border-0" 
-            maxRows={10}
-          />
+          {/* Orderbook only spans chart height (flex-1 minus bottom panel) */}
+          <div className="flex-1 overflow-hidden">
+            <Orderbook 
+              className="h-full bg-[#0d0d0f] border-0" 
+              maxRows={10}
+            />
+          </div>
+          {/* Empty space below to align with bottom panel */}
+          <div className="h-[180px] bg-[#0d0d0f] border-t border-[#2a2a2d]" />
         </aside>
 
         {/* RIGHT COLUMN: Order Form + Account Info */}

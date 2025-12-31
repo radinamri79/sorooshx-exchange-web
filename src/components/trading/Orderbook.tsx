@@ -7,7 +7,7 @@ import { useOrderbookStore } from '@/stores/useOrderbookStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchOrderbook } from '@/services/api';
 import type { OrderbookEntry } from '@/types';
-import { ChevronDown, ChevronUp, Settings } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 // ============================================================================
 // BITUNIX-STYLE ORDERBOOK COMPONENT
@@ -117,7 +117,6 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>('both');
   const [precision, setPrecision] = useState<DecimalPrecision>('0.1');
   const [showPrecisionDropdown, setShowPrecisionDropdown] = useState(false);
-  const [activeTab, setActiveTab] = useState<'orderbook' | 'trades'>('orderbook');
   const [flashingPrices, setFlashingPrices] = useState<Map<string, 'up' | 'down'>>(new Map());
   
   const snapshotFetchedRef = useRef(false);
@@ -284,33 +283,10 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
       'border-0 rounded-none',
       className
     )}>
-      {/* Header - Tabs + Controls */}
+      {/* Header - Title + Controls */}
       <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#1E2329]">
-        {/* Tabs */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setActiveTab('orderbook')}
-            className={cn(
-              'text-xs font-medium pb-1 border-b-2 transition-colors',
-              activeTab === 'orderbook'
-                ? 'text-[#EAECEF] border-[#FF7A00]'
-                : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
-            )}
-          >
-            Orderbook
-          </button>
-          <button
-            onClick={() => setActiveTab('trades')}
-            className={cn(
-              'text-xs font-medium pb-1 border-b-2 transition-colors',
-              activeTab === 'trades'
-                ? 'text-[#EAECEF] border-[#FF7A00]'
-                : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
-            )}
-          >
-            Trades
-          </button>
-        </div>
+        {/* Title */}
+        <span className="text-xs font-medium text-[#EAECEF]">Orderbook</span>
 
         {/* Controls - Bitunix Style */}
         <div className="flex items-center gap-1.5">
@@ -395,14 +371,6 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
               </div>
             )}
           </div>
-
-          {/* Settings Icon */}
-          <button
-            className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#EAECEF]"
-            title="Settings"
-          >
-            <Settings size={14} />
-          </button>
         </div>
       </div>
 
@@ -413,32 +381,26 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
         <span className="text-right">Sum (BTC)</span>
       </div>
 
-      {/* Orderbook Content */}
-      {activeTab === 'orderbook' ? (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Asks (Sell Orders) - Top Section */}
-          {(displayMode === 'both' || displayMode === 'sellOnly') && (
-            <div className={cn(
-              'overflow-y-auto overflow-x-hidden scrollbar-none',
-              displayMode === 'both' ? 'flex-1' : 'flex-1'
-            )}>
-              <div className="flex flex-col">
-                {displayedAsks.map(({ entry, cumSum }, index) => (
-                  <OrderbookRow
-                    key={`ask-${entry[0]}-${index}`}
-                    entry={entry}
-                    cumulativeSum={cumSum}
-                    maxSum={maxSum}
-                    isBid={false}
-                    isFlashing={flashingPrices.has(entry[0])}
-                    flashDirection={flashingPrices.get(entry[0])}
-                    onClick={handlePriceClick}
-                    precision={precision}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Orderbook Content - Compact layout with no empty space */}
+      <div className="flex flex-col">
+        {/* Asks (Sell Orders) - Top Section */}
+        {(displayMode === 'both' || displayMode === 'sellOnly') && (
+          <div className="flex flex-col">
+            {displayedAsks.map(({ entry, cumSum }, index) => (
+              <OrderbookRow
+                key={`ask-${entry[0]}-${index}`}
+                entry={entry}
+                cumulativeSum={cumSum}
+                maxSum={maxSum}
+                isBid={false}
+                isFlashing={flashingPrices.has(entry[0])}
+                flashDirection={flashingPrices.get(entry[0])}
+                onClick={handlePriceClick}
+                precision={precision}
+              />
+            ))}
+          </div>
+        )}
 
           {/* Current Price - Center Separator */}
           <div className="flex items-center justify-between px-2 py-1.5 bg-[#0B0E11] border-y border-[#1E2329]">
@@ -466,36 +428,25 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
             </span>
           </div>
 
-          {/* Bids (Buy Orders) - Bottom Section */}
-          {(displayMode === 'both' || displayMode === 'buyOnly') && (
-            <div className={cn(
-              'overflow-y-auto overflow-x-hidden scrollbar-none',
-              displayMode === 'both' ? 'flex-1' : 'flex-1'
-            )}>
-              <div className="flex flex-col">
-                {displayedBids.map(({ entry, cumSum }, index) => (
-                  <OrderbookRow
-                    key={`bid-${entry[0]}-${index}`}
-                    entry={entry}
-                    cumulativeSum={cumSum}
-                    maxSum={maxSum}
-                    isBid={true}
-                    isFlashing={flashingPrices.has(entry[0])}
-                    flashDirection={flashingPrices.get(entry[0])}
-                    onClick={handlePriceClick}
-                    precision={precision}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        // Trades tab placeholder
-        <div className="flex-1 flex items-center justify-center text-[#5E6673] text-xs">
-          Trades coming soon
-        </div>
-      )}
+        {/* Bids (Buy Orders) - Bottom Section */}
+        {(displayMode === 'both' || displayMode === 'buyOnly') && (
+          <div className="flex flex-col">
+            {displayedBids.map(({ entry, cumSum }, index) => (
+              <OrderbookRow
+                key={`bid-${entry[0]}-${index}`}
+                entry={entry}
+                cumulativeSum={cumSum}
+                maxSum={maxSum}
+                isBid={true}
+                isFlashing={flashingPrices.has(entry[0])}
+                flashDirection={flashingPrices.get(entry[0])}
+                onClick={handlePriceClick}
+                precision={precision}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Footer - Buy/Sell Ratio Bar - Bitunix Style */}
       <div 
