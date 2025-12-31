@@ -1,5 +1,5 @@
 /**
- * Futures Unit Settings Modal - Allows users to select unit type for position sizing
+ * Compact Futures Unit Settings Modal
  */
 'use client';
 
@@ -18,20 +18,18 @@ const UNIT_OPTIONS: Array<{
 }> = [
   {
     id: 'BTC_QUANTITY',
-    label: 'BTC (Quantity Unit)',
-    description: 'Price will be based on BTC quantity',
+    label: 'BTC Quantity',
+    description: 'Quantity in BTC',
   },
   {
     id: 'USDT_COST',
-    label: 'USDT (Cost Value)',
-    description:
-      'When placing orders based on the cost value, adjusting the leverage will not affect the cost.',
+    label: 'USDT Cost',
+    description: 'Cost value in USDT',
   },
   {
     id: 'USDT_NOMINAL',
-    label: 'USDT (Nominal Value)',
-    description:
-      'The position opening cost varies with leverage when using the underlying asset\'s market value.',
+    label: 'USDT Nominal',
+    description: 'Nominal value in USDT',
   },
 ];
 
@@ -44,26 +42,25 @@ export function FuturesUnitSettingsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-gray-900 p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-lg border border-gray-800 bg-[#0d0d0f] p-4 shadow-2xl">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Futures Unit Setting</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-white">Futures Unit</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 transition hover:text-white"
-            aria-label="Close"
+            className="text-gray-500 hover:text-gray-300 transition"
           >
-            <X size={24} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Unit Options */}
-        <div className="space-y-4">
+        <div className="space-y-1.5 mb-3">
           {UNIT_OPTIONS.map((option) => (
             <label
               key={option.id}
-              className="flex cursor-pointer items-start space-x-4 rounded-lg border border-gray-700 p-4 transition hover:border-orange-500 hover:bg-gray-800/50"
+              className="flex items-center gap-2.5 rounded-lg border border-gray-800 bg-gray-900 p-2 cursor-pointer hover:border-orange-500/50 transition"
             >
               <input
                 type="radio"
@@ -71,11 +68,13 @@ export function FuturesUnitSettingsModal({
                 value={option.id}
                 checked={unit === option.id}
                 onChange={() => setUnit(option.id)}
-                className="mt-1 h-5 w-5 text-orange-500 accent-orange-500"
+                className="w-3.5 h-3.5 accent-orange-500"
               />
-              <div className="flex-1">
-                <div className="font-semibold text-white">{option.label}</div>
-                <div className="mt-1 text-sm text-gray-400">
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-semibold text-white">
+                  {option.label}
+                </div>
+                <div className="text-[9px] text-gray-500 truncate">
                   {option.description}
                 </div>
               </div>
@@ -83,21 +82,13 @@ export function FuturesUnitSettingsModal({
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 rounded-lg border border-gray-700 bg-gray-800 py-3 font-semibold text-white transition hover:bg-gray-700"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 rounded-lg bg-orange-500 py-3 font-semibold text-white transition hover:bg-orange-600"
-          >
-            Confirm
-          </button>
-        </div>
+        {/* Confirm Button */}
+        <button
+          onClick={onClose}
+          className="w-full rounded bg-orange-500 py-1.5 text-[12px] font-bold text-white hover:bg-orange-600 transition"
+        >
+          Done
+        </button>
       </div>
     </div>
   );

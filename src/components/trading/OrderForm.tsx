@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { useLeverageStore } from '@/stores/useLeverageStore';
 import { FuturesUnitSettingsModal } from './modals/FuturesUnitSettingsModal';
 import { AdjustLeverageModal } from './modals/AdjustLeverageModal';
-import { TPSLSection } from './sections/TPSLSection';
 import {
   OrderFormState,
   OrderFormType,
@@ -180,7 +179,7 @@ export function OrderForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={cn("space-y-4 rounded-lg bg-gray-900 p-6", className)}>
+    <form onSubmit={handleSubmit} className={cn("flex flex-col bg-[#0d0d0f] border border-gray-800 rounded-lg overflow-hidden", className)}>
       {/* Modals */}
       <FuturesUnitSettingsModal
         isOpen={uiState.showUnitSettingsModal}
@@ -193,14 +192,13 @@ export function OrderForm({
         onClose={() =>
           setUiState((prev) => ({ ...prev, showLeverageModal: false }))
         }
-        maxNominalValue={costEstimate.maxQuantity}
       />
 
-      {/* Header: Margin Mode and Leverage */}
-      <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-        <div className="flex items-center gap-4">
-          {/* Margin Mode Toggle */}
-          <div className="flex gap-2 rounded-lg bg-gray-800 p-1">
+      {/* Compact Header: Margin Mode and Leverage */}
+      <div className="flex items-center justify-between gap-2 border-b border-gray-800 px-3 py-2">
+        <div className="flex items-center gap-1.5">
+          {/* Margin Mode Toggle - Compact */}
+          <div className="flex gap-0.5 rounded bg-gray-900 p-0.5">
             {(['ISOLATED', 'CROSS'] as const).map((mode) => (
               <button
                 key={mode}
@@ -208,232 +206,166 @@ export function OrderForm({
                 onClick={() =>
                   setFormData((prev) => ({ ...prev, marginMode: mode }))
                 }
-                className={`rounded px-3 py-1 text-sm font-semibold transition ${
+                className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${
                   formData.marginMode === mode
                     ? 'bg-orange-500 text-white'
-                    : 'text-gray-400 hover:text-gray-200'
+                    : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
-                {mode}
+                {mode === 'ISOLATED' ? 'ISO' : 'CRS'}
               </button>
             ))}
           </div>
 
-          {/* Leverage Display */}
+          {/* Leverage Display - Compact */}
           <button
             type="button"
             onClick={() =>
               setUiState((prev) => ({ ...prev, showLeverageModal: true }))
             }
-            className="flex items-center gap-2 rounded-lg bg-gray-800 px-3 py-1 text-sm font-semibold text-orange-400 transition hover:bg-gray-700"
+            className="rounded px-2 py-0.5 text-[11px] font-bold bg-gray-900 text-orange-500 hover:bg-gray-800 transition"
           >
-            <span>{currentLeverage}x</span>
-            <span className="text-xs text-gray-400">{currentLeverage}x</span>
+            {currentLeverage}x
           </button>
         </div>
 
-        {/* Futures Unit Settings Button */}
+        {/* Settings Button */}
         <button
           type="button"
           onClick={() =>
             setUiState((prev) => ({ ...prev, showUnitSettingsModal: true }))
           }
-          className="rounded-lg bg-gray-800 p-2 transition hover:bg-gray-700"
-          title="Futures Unit Settings"
+          className="text-gray-500 hover:text-gray-300 transition"
+          title="Settings"
         >
-          <Settings size={18} className="text-gray-400" />
+          <Settings size={14} />
         </button>
       </div>
 
-      {/* Position Action Tabs */}
-      <div className="flex gap-3">
-        {(['OPEN', 'CLOSE'] as const).map((action) => (
-          <button
-            key={action}
-            type="button"
-            onClick={() => setFormData((prev) => ({ ...prev, action }))}
-            className={`flex-1 rounded-lg py-2 font-semibold transition ${
-              formData.action === action
-                ? 'bg-orange-500 text-white'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            {action}
-          </button>
-        ))}
-      </div>
+      {/* Position & Order Type Tabs - Two rows for better fit */}
+      <div className="px-2 py-1.5 border-b border-gray-800 space-y-1.5">
+        {/* Action Tabs (Open/Close) */}
+        <div className="flex gap-1">
+          {(['OPEN', 'CLOSE'] as const).map((action) => (
+            <button
+              key={action}
+              type="button"
+              onClick={() => setFormData((prev) => ({ ...prev, action }))}
+              className={`flex-1 rounded px-2 py-1 text-[10px] font-semibold transition ${
+                formData.action === action
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-900 text-gray-500 hover:bg-gray-800'
+              }`}
+            >
+              {action}
+            </button>
+          ))}
+        </div>
 
-      {/* Order Type Tabs */}
-      <div className="flex gap-2 border-b border-gray-700">
-        {(['LIMIT', 'MARKET', 'TRIGGER', 'TRAILING_STOP'] as const).map(
-          (type) => (
+        {/* Order Type Tabs */}
+        <div className="flex gap-0.5 bg-gray-900 rounded p-0.5">
+          {(['LIMIT', 'MARKET', 'TRIGGER'] as const).map((type) => (
             <button
               key={type}
               type="button"
               onClick={() => handleOrderTypeChange(type)}
-              className={`px-3 py-2 text-sm font-semibold transition ${
+              className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-semibold transition ${
                 formData.orderType === type
-                  ? 'border-b-2 border-orange-500 text-orange-400'
-                  : 'text-gray-400 hover:text-gray-300'
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-500 hover:text-gray-300'
               }`}
             >
-              {type.replace('_', ' ')}
+              {type}
             </button>
-          )
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Available Balance */}
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-gray-400">Available</span>
-        <span className="text-white">{availableBalance}</span>
-      </div>
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto px-3 py-2.5 space-y-2.5">
+        {/* Available Balance */}
+        <div className="flex items-center justify-between text-[11px] bg-gray-900 rounded px-2 py-1.5">
+          <span className="text-gray-500">Available:</span>
+          <span className="text-white font-semibold">{availableBalance} USDT</span>
+        </div>
 
-      {/* Order Type Specific Inputs */}
-      <div className="space-y-3">
         {/* Price Input (LIMIT) */}
         {formData.orderType === 'LIMIT' && (
           <div>
-            <label className="mb-1 block text-xs text-gray-400">
-              Order Price
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                value={formData.price}
-                onChange={(e) => handlePriceChange(e.target.value)}
-                placeholder="0.00"
-                step="0.01"
-                className={`flex-1 rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 ${
-                  errors.price
-                    ? 'ring-2 ring-red-500'
-                    : 'focus:ring-orange-500'
-                }`}
-              />
-              <div className="flex items-center gap-2 rounded-lg bg-gray-800 px-3">
-                <button
-                  type="button"
-                  className="text-xs font-semibold text-gray-400 transition hover:text-white"
-                >
-                  +
-                </button>
-                <span className="text-sm text-gray-300">USDT</span>
-                <button
-                  type="button"
-                  className="text-xs font-semibold text-gray-400 transition hover:text-white"
-                >
-                  −
-                </button>
-              </div>
+            <label className="text-[10px] text-gray-500 block mb-0.5">Price</label>
+            <input
+              type="number"
+              value={formData.price}
+              onChange={(e) => handlePriceChange(e.target.value)}
+              placeholder="0.00"
+              step="0.01"
+              className={`w-full rounded px-2 py-1 text-[12px] bg-gray-900 text-white outline-none border transition ${
+                errors.price
+                  ? 'border-red-500 focus:border-red-600'
+                  : 'border-gray-800 focus:border-orange-500'
+              }`}
+            />
+          </div>
+        )}
+
+        {/* Market Price (MARKET) */}
+        {formData.orderType === 'MARKET' && (
+          <div className="bg-gray-900 rounded px-2 py-1.5">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-gray-500">Market Price</span>
+              <span className="text-white font-semibold">{currentPrice}</span>
             </div>
-            {errors.price && (
-              <p className="mt-1 text-xs text-red-400">{errors.price}</p>
-            )}
           </div>
         )}
 
         {/* Trigger Price (TRIGGER) */}
         {formData.orderType === 'TRIGGER' && (
-          <>
-            <div>
-              <label className="mb-1 block text-xs text-gray-400">
-                Trigger Price
-              </label>
-              <input
-                type="number"
-                value={formData.triggerPrice || ''}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    triggerPrice: e.target.value,
-                  }))
-                }
-                placeholder="0.00"
-                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-gray-400">
-                Price
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value="Best market"
-                  disabled
-                  className="flex-1 rounded-lg bg-gray-800 px-3 py-2 text-gray-400"
-                />
-                <span className="flex items-center rounded-lg bg-gray-800 px-3 text-sm text-gray-300">
-                  Market
-                </span>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Trailing Stop Inputs (TRAILING_STOP) */}
-        {formData.orderType === 'TRAILING_STOP' && (
-          <>
-            <div>
-              <label className="mb-1 block text-xs text-gray-400">
-                Trailing Amount
-              </label>
-              <input
-                type="number"
-                value={formData.trailingAmount || ''}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    trailingAmount: e.target.value,
-                  }))
-                }
-                placeholder="0.00"
-                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-gray-400">
-                Base Price
-              </label>
-              <input
-                type="text"
-                value={currentPrice}
-                disabled
-                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-gray-400"
-              />
-            </div>
-          </>
+          <div>
+            <label className="text-[10px] text-gray-500 block mb-0.5">Trigger Price</label>
+            <input
+              type="number"
+              value={formData.triggerPrice || ''}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  triggerPrice: e.target.value,
+                }))
+              }
+              placeholder="0.00"
+              className="w-full rounded px-2 py-1 text-[12px] bg-gray-900 text-white outline-none border border-gray-800 focus:border-orange-500 transition"
+            />
+          </div>
         )}
 
         {/* Quantity Input */}
         <div>
-          <label className="mb-1 block text-xs text-gray-400">Quantity</label>
+          <div className="flex items-center justify-between mb-0.5">
+            <label className="text-[10px] text-gray-500">Quantity</label>
+            <span className="text-[10px] text-gray-500">Max: {costEstimate.maxQuantity}</span>
+          </div>
           <input
             type="number"
             value={formData.quantity}
             onChange={(e) => handleQuantityChange(e.target.value)}
             placeholder="0"
             step="0.00000001"
-            className={`w-full rounded-lg bg-gray-800 px-3 py-2 text-white outline-none transition focus:ring-2 ${
-              errors.quantity ? 'ring-2 ring-red-500' : 'focus:ring-orange-500'
+            className={`w-full rounded px-2 py-1 text-[12px] bg-gray-900 text-white outline-none border transition ${
+              errors.quantity ? 'border-red-500 focus:border-red-600' : 'border-gray-800 focus:border-orange-500'
             }`}
           />
-          {errors.quantity && (
-            <p className="mt-1 text-xs text-red-400">{errors.quantity}</p>
-          )}
         </div>
 
-        {/* Quantity Percentage Selector */}
-        <div className="grid grid-cols-5 gap-2">
+        {/* Quantity Percentage Selector - Compact */}
+        <div className="grid grid-cols-5 gap-0.5">
           {[0, 25, 50, 75, 100].map((percent) => (
             <button
               key={percent}
               type="button"
               onClick={() => handleQuantityPercentChange(percent)}
-              className={`rounded-lg py-2 text-xs font-semibold transition ${
+              className={`rounded px-1 py-1 text-[10px] font-semibold transition ${
                 formData.quantityPercent === percent
                   ? 'bg-orange-500 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-gray-900 text-gray-500 hover:bg-gray-800'
               }`}
             >
               {percent}%
@@ -441,125 +373,115 @@ export function OrderForm({
           ))}
         </div>
 
-        {/* TP/SL Section */}
-        <TPSLSection
-          tpsl={formData.tpsl}
-          onToggle={(enabled) =>
-            setFormData((prev) => ({
-              ...prev,
-              tpsl: { ...prev.tpsl, enabled },
-            }))
-          }
-          onTPChange={(price) =>
-            setFormData((prev) => ({
-              ...prev,
-              tpsl: { ...prev.tpsl, takeProfitPrice: price },
-            }))
-          }
-          onSLChange={(price) =>
-            setFormData((prev) => ({
-              ...prev,
-              tpsl: { ...prev.tpsl, stopLossPrice: price },
-            }))
-          }
-          onAdvancedToggle={(advanced) =>
-            setFormData((prev) => ({
-              ...prev,
-              tpsl: { ...prev.tpsl, advancedMode: advanced },
-            }))
-          }
-          errors={errors}
-        />
+        {/* TP/SL - Compact Version */}
+        <div className="border-t border-gray-800 pt-2">
+          <label className="flex items-center gap-2 cursor-pointer mb-1.5">
+            <input
+              type="checkbox"
+              checked={formData.tpsl.enabled}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  tpsl: { ...prev.tpsl, enabled: e.target.checked },
+                }))
+              }
+              className="w-3.5 h-3.5 accent-orange-500"
+            />
+            <span className="text-[11px] font-semibold text-white">TP / SL</span>
+          </label>
 
-        {/* Post-Only Option */}
-        <label className="flex cursor-pointer items-center gap-3 rounded-lg bg-gray-800/30 px-3 py-2">
+          {formData.tpsl.enabled && (
+            <div className="space-y-1.5">
+              <div>
+                <label className="text-[10px] text-gray-500 block mb-0.5">TP Price</label>
+                <input
+                  type="number"
+                  value={formData.tpsl.takeProfitPrice || ''}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tpsl: { ...prev.tpsl, takeProfitPrice: e.target.value },
+                    }))
+                  }
+                  placeholder="TP"
+                  className="w-full rounded px-2 py-1 text-[11px] bg-gray-900 text-white outline-none border border-gray-800 focus:border-orange-500"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-500 block mb-0.5">SL Price</label>
+                <input
+                  type="number"
+                  value={formData.tpsl.stopLossPrice || ''}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tpsl: { ...prev.tpsl, stopLossPrice: e.target.value },
+                    }))
+                  }
+                  placeholder="SL"
+                  className="w-full rounded px-2 py-1 text-[11px] bg-gray-900 text-white outline-none border border-gray-800 focus:border-orange-500"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Post-Only Option - Compact */}
+        <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             checked={formData.postOnly}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, postOnly: e.target.checked }))
             }
-            className="h-4 w-4 accent-orange-500"
+            className="w-3.5 h-3.5 accent-orange-500"
           />
-          <span className="text-sm text-gray-300">Post only</span>
+          <span className="text-[11px] text-gray-400">Post only</span>
         </label>
-      </div>
 
-      {/* Cost & Fee Information */}
-      <div className="space-y-2 rounded-lg bg-gray-800/30 p-3">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-400">Cost</span>
-          <span className="text-white">{costEstimate.cost} USDT</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-400">Max</span>
-          <span className="text-white">
-            {costEstimate.maxQuantity} BTC
-          </span>
-        </div>
-        <div className="border-t border-gray-700 pt-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Maintenance Margin</span>
-            <span className="text-white">
-              {costEstimate.maintenanceMargin} USDT
-            </span>
+        {/* Cost Summary - Compact */}
+        <div className="border-t border-gray-800 pt-1.5 space-y-1">
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-gray-500">Cost:</span>
+            <span className="text-white font-semibold">{costEstimate.cost} USDT</span>
+          </div>
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-gray-500">MMR:</span>
+            <span className="text-white font-semibold">{costEstimate.maintenanceMargin} USDT</span>
+          </div>
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-gray-500">VIP 0 Fee:</span>
+            <span className="text-white font-semibold">0.02% / 0.06%</span>
           </div>
         </div>
       </div>
 
-      {/* VIP & Fee Info */}
-      <div className="flex items-center justify-between rounded-lg bg-gray-800 px-3 py-2 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-white">VIP 0</span>
-          <span className="text-gray-400">|</span>
-          <span className="text-gray-400">Maker 0.0200%</span>
-          <span className="text-gray-400">Taker 0.0600%</span>
-        </div>
+      {/* Action Buttons - Fixed Bottom */}
+      <div className="border-t border-gray-800 grid grid-cols-2 gap-1.5 p-2.5">
+        <button
+          type="submit"
+          disabled={uiState.isSubmitting}
+          onClick={() => setFormData((prev) => ({ ...prev, side: 'LONG' }))}
+          className="rounded py-2 text-[12px] font-bold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white transition disabled:opacity-50"
+        >
+          {formData.action === 'OPEN' ? 'Open Long' : 'Close Short'}
+        </button>
+        <button
+          type="submit"
+          disabled={uiState.isSubmitting}
+          onClick={() => setFormData((prev) => ({ ...prev, side: 'SHORT' }))}
+          className="rounded py-2 text-[12px] font-bold bg-red-600 hover:bg-red-700 active:bg-red-800 text-white transition disabled:opacity-50"
+        >
+          {formData.action === 'OPEN' ? 'Open Short' : 'Close Long'}
+        </button>
       </div>
 
-      {/* Error/Success Messages */}
+      {/* Error Message */}
       {uiState.errorMessage && (
-        <div className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">
+        <div className="px-2.5 py-1.5 bg-red-500/10 border-t border-red-500/30 text-red-400 text-[11px]">
           {uiState.errorMessage}
         </div>
       )}
-      {uiState.successMessage && (
-        <div className="rounded-lg bg-green-500/10 px-3 py-2 text-sm text-green-400">
-          {uiState.successMessage}
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-3 pt-4">
-        <button
-          type="submit"
-          disabled={uiState.isSubmitting}
-          className={`rounded-lg py-3 font-semibold transition ${
-            formData.side === 'LONG'
-              ? 'bg-green-500 text-white hover:bg-green-600 disabled:bg-green-500/50'
-              : 'bg-red-500 text-white hover:bg-red-600 disabled:bg-red-500/50'
-          }`}
-          onClick={() =>
-            setFormData((prev) => ({ ...prev, side: 'LONG' }))
-          }
-        >
-          {formData.action === 'OPEN' ? 'Open long' : 'Close short'}
-        </button>
-        <button
-          type="submit"
-          disabled={uiState.isSubmitting}
-          className={`rounded-lg py-3 font-semibold transition ${
-            formData.side === 'SHORT'
-              ? 'bg-red-500 text-white hover:bg-red-600 disabled:bg-red-500/50'
-              : 'bg-red-500 text-white hover:bg-red-600 disabled:bg-red-500/50'
-          }`}
-          onClick={() =>
-            setFormData((prev) => ({ ...prev, side: 'SHORT' }))
-          }
-        >
-          {formData.action === 'OPEN' ? 'Open short' : 'Close long'}
-        </button>
-      </div>
     </form>
   );
 }
