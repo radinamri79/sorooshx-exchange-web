@@ -89,17 +89,86 @@ function MarketInfoModal({ symbol, isOpen, onClose }: { symbol: string; isOpen: 
 
 // Calculator Modal
 function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { currentSymbol } = useMarketStore();
   const [tab, setTab] = useState<'pnl' | 'target' | 'liquidation'>('pnl');
   const [quantity, setQuantity] = useState('0');
   const [openPrice, setOpenPrice] = useState('0');
   const [leverage, setLeverage] = useState('20');
   const [closePrice, setClosePrice] = useState('0');
+  const [roi, setRoi] = useState('0');
+  const [positionType, setPositionType] = useState<'cross' | 'isolated'>('cross');
+  const [availableMargin, setAvailableMargin] = useState('0');
+  const [isLong, setIsLong] = useState(true);
+
+  // Calculate PnL results
+  const pnlResults = useMemo(() => {
+    const qty = parseFloat(quantity) || 0;
+    const open = parseFloat(openPrice) || 0;
+    const close = parseFloat(closePrice) || 0;
+    const lev = parseFloat(leverage) || 1;
+
+    if (qty === 0 || open === 0) {
+      return { margin: '0.0000', profit: '0.0000' };
+    }
+
+    const margin = (qty * open) / lev;
+    const priceDiff = isLong ? (close - open) : (open - close);
+    const profit = qty * priceDiff;
+
+    return {
+      margin: margin.toFixed(4),
+      profit: profit.toFixed(4),
+    };
+  }, [quantity, openPrice, closePrice, leverage, isLong]);
+
+  // Calculate Target Price results
+  const targetResults = useMemo(() => {
+    const qty = parseFloat(quantity) || 0;
+    const open = parseFloat(openPrice) || 0;
+    const roiValue = parseFloat(roi) || 0;
+    const lev = parseFloat(leverage) || 1;
+
+    if (qty === 0 || open === 0) {
+      return { targetPrice: '0.0', margin: '0.0000', profit: '0.0000' };
+    }
+
+    const margin = (qty * open) / lev;
+    const targetPrice = isLong ? open * (1 + roiValue / 100) : open * (1 - roiValue / 100);
+    const priceDiff = isLong ? (targetPrice - open) : (open - targetPrice);
+    const profit = qty * priceDiff;
+
+    return {
+      targetPrice: targetPrice.toFixed(1),
+      margin: margin.toFixed(4),
+      profit: profit.toFixed(4),
+    };
+  }, [quantity, openPrice, roi, leverage, isLong]);
+
+  // Calculate Liquidation Price
+  const liquidationResults = useMemo(() => {
+    const qty = parseFloat(quantity) || 0;
+    const open = parseFloat(openPrice) || 0;
+    const lev = parseFloat(leverage) || 1;
+    const margin = parseFloat(availableMargin) || 0;
+
+    if (qty === 0 || open === 0 || lev === 0) {
+      return { liquidationPrice: '--' };
+    }
+
+    const liquidationPrice = isLong
+      ? open - (margin / qty)
+      : open + (margin / qty);
+
+    return {
+      liquidationPrice: liquidationPrice > 0 ? liquidationPrice.toFixed(2) : '--',
+    };
+  }, [quantity, openPrice, availableMargin, leverage, isLong]);
 
   return isOpen ? (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#121214] rounded-lg max-w-md w-full border border-[#2a2a2d]">
+      <div className="bg-[#121214] rounded-lg max-w-md w-full border border-[#2a2a2d] max-h-[90vh] overflow-y-auto">
         {/* Header with Tabs */}
-        <div className="border-b border-[#2a2a2d]">
+        <div className="border-b border-[#2a2a2d] sticky top-0 bg-[#121214] z-10">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex gap-4">
               <button
@@ -136,7 +205,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 Liquidation Price
               </button>
             </div>
-            <button onClick={onClose} className="text-[#848E9C] hover:text-[#EAECEF]">
+            <button onClick={onClose} className="text-[#848E9C] hover:text-[#EAECEF] flex-shrink-0">
               <X size={20} />
             </button>
           </div>
@@ -144,214 +213,213 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          {/* Currency Selector */}
+          {/* Symbol */}
           <div>
-            <label className="text-xs text-[#848E9C] block mb-2">BTCUSDT</label>
+            <label className="text-xs text-[#848E9C] block mb-2">Symbol</label>
+            <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+              <span className="text-sm font-medium text-[#EAECEF]">{currentSymbol}</span>
+            </div>
+          </div>
+
+          {/* Long/Short Selector */}
+          <div>
+            <label className="text-xs text-[#848E9C] block mb-2">Position Type</label>
             <div className="flex gap-2">
-              <button className="flex-1 py-2 px-3 bg-[#0D9D5F] text-white rounded text-sm font-medium hover:bg-[#0a7a48]">
+              <button
+                onClick={() => setIsLong(true)}
+                className={cn(
+                  'flex-1 py-2 px-3 rounded text-sm font-medium transition-colors',
+                  isLong
+                    ? 'bg-[#0D9D5F] text-white'
+                    : 'bg-[#1E2329] text-[#848E9C] hover:bg-[#2a3035]'
+                )}
+              >
                 Long
               </button>
-              <button className="flex-1 py-2 px-3 bg-[#1E2329] text-[#848E9C] rounded text-sm font-medium hover:bg-[#2a3035]">
+              <button
+                onClick={() => setIsLong(false)}
+                className={cn(
+                  'flex-1 py-2 px-3 rounded text-sm font-medium transition-colors',
+                  !isLong
+                    ? 'bg-[#C8102E] text-white'
+                    : 'bg-[#1E2329] text-[#848E9C] hover:bg-[#2a3035]'
+                )}
+              >
                 Short
               </button>
             </div>
           </div>
 
-          {/* Input Fields based on Tab */}
+          {/* Leverage */}
+          <div>
+            <label className="text-xs text-[#848E9C] block mb-2">Leverage</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min="1"
+                max="125"
+                value={leverage}
+                onChange={(e) => setLeverage(e.target.value)}
+                className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#FF7A00]"
+              />
+              <span className="text-sm font-medium text-[#EAECEF] min-w-[50px]">{leverage}X</span>
+            </div>
+          </div>
+
+          {/* Quantity */}
+          <div>
+            <label className="text-xs text-[#848E9C] block mb-2">Quantity</label>
+            <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="0"
+                className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
+              />
+              <span className="text-xs text-[#848E9C]">BTC</span>
+            </div>
+          </div>
+
+          {/* Open Price */}
+          <div>
+            <label className="text-xs text-[#848E9C] block mb-2">Open Price</label>
+            <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+              <input
+                type="number"
+                value={openPrice}
+                onChange={(e) => setOpenPrice(e.target.value)}
+                placeholder="0"
+                className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
+              />
+              <span className="text-xs text-[#848E9C]">USDT</span>
+            </div>
+          </div>
+
+          {/* Tab-specific inputs */}
           {tab === 'pnl' && (
-            <>
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Leverage</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="range"
-                    min="1"
-                    max="125"
-                    value={leverage}
-                    onChange={(e) => setLeverage(e.target.value)}
-                    className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#FF7A00]"
-                  />
-                  <span className="text-sm font-medium text-[#EAECEF] min-w-[50px]">{leverage} X</span>
-                </div>
+            <div>
+              <label className="text-xs text-[#848E9C] block mb-2">Close Price</label>
+              <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+                <input
+                  type="number"
+                  value={closePrice}
+                  onChange={(e) => setClosePrice(e.target.value)}
+                  placeholder="0"
+                  className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
+                />
+                <span className="text-xs text-[#848E9C]">USDT</span>
               </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Quantity</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    placeholder="0"
-                    className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
-                  />
-                  <span className="text-xs text-[#848E9C]">BTC</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Open price</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input
-                    type="number"
-                    value={openPrice}
-                    onChange={(e) => setOpenPrice(e.target.value)}
-                    placeholder="0"
-                    className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
-                  />
-                  <span className="text-xs text-[#848E9C]">USDT</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Close Price</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input
-                    type="number"
-                    value={closePrice}
-                    onChange={(e) => setClosePrice(e.target.value)}
-                    placeholder="0"
-                    className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
-                  />
-                  <span className="text-xs text-[#848E9C]">USDT</span>
-                </div>
-              </div>
-
-              {/* Results */}
-              <div className="bg-[#1E2329] rounded p-4 space-y-2 mt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Margin</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">0.0000 USDT</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Profit</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">0.0000 USDT</span>
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
           {tab === 'target' && (
-            <>
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Leverage</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="range"
-                    min="1"
-                    max="125"
-                    value={leverage}
-                    onChange={(e) => setLeverage(e.target.value)}
-                    className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#FF7A00]"
-                  />
-                  <span className="text-sm font-medium text-[#EAECEF] min-w-[50px]">{leverage} X</span>
-                </div>
+            <div>
+              <label className="text-xs text-[#848E9C] block mb-2">ROI</label>
+              <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+                <input
+                  type="number"
+                  value={roi}
+                  onChange={(e) => setRoi(e.target.value)}
+                  placeholder="0"
+                  className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
+                />
+                <span className="text-xs text-[#848E9C]">%</span>
               </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Quantity</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input type="number" placeholder="0" className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none" />
-                  <span className="text-xs text-[#848E9C]">BTC</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Open price</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input type="number" placeholder="0" className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none" />
-                  <span className="text-xs text-[#848E9C]">USDT</span>
-                </div>
-              </div>
-
-              {/* Results */}
-              <div className="bg-[#1E2329] rounded p-4 space-y-2 mt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Target Price</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">0.0</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Margin</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">0.0000 USDT</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Profit</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">0.0000 USDT</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">ROI</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">0.00 %</span>
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
           {tab === 'liquidation' && (
             <>
               <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Position type</label>
-                <div className="bg-[#1E2329] rounded px-3 py-2">
-                  <select className="bg-transparent text-[#EAECEF] text-sm w-full outline-none">
-                    <option>Cross</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Leverage</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="range"
-                    min="1"
-                    max="125"
-                    value={leverage}
-                    onChange={(e) => setLeverage(e.target.value)}
-                    className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#FF7A00]"
-                  />
-                  <span className="text-sm font-medium text-[#EAECEF] min-w-[50px]">{leverage} X</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Quantity</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input type="number" placeholder="0" className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none" />
-                  <span className="text-xs text-[#848E9C]">BTC</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Open price</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input type="number" placeholder="0" className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none" />
-                  <span className="text-xs text-[#848E9C]">USDT</span>
-                </div>
+                <label className="text-xs text-[#848E9C] block mb-2">Position Type</label>
+                <select
+                  value={positionType}
+                  onChange={(e) => setPositionType(e.target.value as 'cross' | 'isolated')}
+                  className="w-full bg-[#1E2329] text-[#EAECEF] text-sm rounded px-3 py-2 border border-[#2a2a2d] outline-none"
+                >
+                  <option value="cross">Cross</option>
+                  <option value="isolated">Isolated</option>
+                </select>
               </div>
 
               <div>
                 <label className="text-xs text-[#848E9C] block mb-2">Available Margin</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2">
-                  <input type="number" placeholder="0" className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none" />
+                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+                  <input
+                    type="number"
+                    value={availableMargin}
+                    onChange={(e) => setAvailableMargin(e.target.value)}
+                    placeholder="0"
+                    className="bg-transparent text-[#EAECEF] text-sm flex-1 outline-none"
+                  />
                   <span className="text-xs text-[#848E9C]">USDT</span>
                 </div>
               </div>
-
-              {/* Results */}
-              <div className="bg-[#1E2329] rounded p-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Liquidation Price</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">--</span>
-                </div>
-              </div>
-
-              <p className="text-xs text-[#ef5350] mt-4">
-                Results are for reference only. Deviations may occur in actual operations due to fees and funding rates.
-              </p>
             </>
           )}
 
+          {/* Results Section */}
+          <div className="bg-[#1E2329] rounded p-4 border border-[#2a2a2d] mt-4">
+            <div className="text-xs font-medium text-[#EAECEF] mb-3">Results</div>
+
+            {tab === 'pnl' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#848E9C]">Margin</span>
+                  <span className="text-sm font-medium text-[#EAECEF]">{pnlResults.margin} USDT</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#848E9C]">Profit</span>
+                  <span className={cn(
+                    'text-sm font-medium',
+                    parseFloat(pnlResults.profit) >= 0 ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
+                  )}>
+                    {parseFloat(pnlResults.profit) >= 0 ? '+' : ''}{pnlResults.profit} USDT
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {tab === 'target' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#848E9C]">Target Price</span>
+                  <span className="text-sm font-medium text-[#EAECEF]">{targetResults.targetPrice}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#848E9C]">Margin</span>
+                  <span className="text-sm font-medium text-[#EAECEF]">{targetResults.margin} USDT</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#848E9C]">Profit</span>
+                  <span className={cn(
+                    'text-sm font-medium',
+                    parseFloat(targetResults.profit) >= 0 ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
+                  )}>
+                    {parseFloat(targetResults.profit) >= 0 ? '+' : ''}{targetResults.profit} USDT
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {tab === 'liquidation' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#848E9C]">Liquidation Price</span>
+                  <span className="text-sm font-medium text-[#EAECEF]">{liquidationResults.liquidationPrice}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Warning Message */}
+          <p className="text-xs text-[#C8102E]">
+            Results are for reference only. Deviations may occur in actual operations due to fees and funding rates.
+          </p>
+
           {/* Calculate Button */}
-          <button className="w-full py-3 px-4 bg-[#FF7A00] text-black rounded-lg font-semibold hover:bg-[#ff8c3a] transition-colors mt-6">
+          <button className="w-full py-3 px-4 bg-[#FF7A00] text-black rounded-lg font-semibold hover:bg-[#ff8c3a] transition-colors">
             Calculate
           </button>
         </div>
