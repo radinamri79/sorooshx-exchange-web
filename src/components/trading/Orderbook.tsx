@@ -7,7 +7,7 @@ import { useOrderbookStore } from '@/stores/useOrderbookStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchOrderbook } from '@/services/api';
 import type { OrderbookEntry } from '@/types';
-import { ChevronDown, ChevronUp, Menu } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 // ============================================================================
 // BITUNIX-STYLE ORDERBOOK COMPONENT
@@ -20,7 +20,7 @@ interface OrderbookProps {
 }
 
 type DisplayMode = 'both' | 'buyOnly' | 'sellOnly';
-type DecimalPrecision = '0.1' | '0.01' | '1' | '10';
+type DecimalPrecision = '0.1' | '1' | '10';
 
 interface OrderbookRowProps {
   entry: OrderbookEntry;
@@ -73,12 +73,11 @@ function OrderbookRow({
     <div
       onClick={() => onClick?.(price)}
       className={cn(
-        'grid grid-cols-3 gap-1 px-2 py-1 text-sm cursor-pointer relative w-full',
+        'grid grid-cols-3 gap-1 px-2 py-1 text-xs cursor-pointer relative w-full',
         'transition-colors duration-75 hover:bg-[#1E2329]',
-        'tabular-nums tracking-tight',
+        'tabular-nums',
         flashClass
       )}
-      style={{ fontFamily: "'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace", letterSpacing: '0.5px' }}
     >
       {/* Depth bar - fills from RIGHT for both bids and asks like Bitunix */}
       <div
@@ -117,7 +116,6 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>('both');
   const [precision, setPrecision] = useState<DecimalPrecision>('0.1');
   const [showPrecisionDropdown, setShowPrecisionDropdown] = useState(false);
-  const [activeTab, setActiveTab] = useState<'orderbook' | 'trades'>('orderbook');
   const [flashingPrices, setFlashingPrices] = useState<Map<string, 'up' | 'down'>>(new Map());
   
   const snapshotFetchedRef = useRef(false);
@@ -276,7 +274,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
     console.log('Price clicked:', price);
   }, []);
 
-  const precisionOptions: DecimalPrecision[] = ['0.01', '0.1', '1', '10'];
+  const precisionOptions: DecimalPrecision[] = ['0.1', '1', '10'];
 
   return (
     <div className={cn(
@@ -284,33 +282,10 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
       'border-0 rounded-none',
       className
     )}>
-      {/* Header - Tabs + Controls */}
+      {/* Header - Orderbook Title + Controls */}
       <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#1E2329]">
-        {/* Tabs */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setActiveTab('orderbook')}
-            className={cn(
-              'text-xs font-medium pb-1 border-b-2 transition-colors',
-              activeTab === 'orderbook'
-                ? 'text-[#EAECEF] border-[#FF7A00]'
-                : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
-            )}
-          >
-            Orderbook
-          </button>
-          <button
-            onClick={() => setActiveTab('trades')}
-            className={cn(
-              'text-xs font-medium pb-1 border-b-2 transition-colors',
-              activeTab === 'trades'
-                ? 'text-[#EAECEF] border-[#FF7A00]'
-                : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
-            )}
-          >
-            Trades
-          </button>
-        </div>
+        {/* Title */}
+        <span className="text-xs font-medium text-[#EAECEF]">Orderbook</span>
 
         {/* Controls - Bitunix Style */}
         <div className="flex items-center gap-1.5">
@@ -367,7 +342,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setShowPrecisionDropdown(!showPrecisionDropdown)}
-              className="flex items-center gap-0.5 px-2 py-1 text-xs text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329] rounded transition-colors font-mono"
+              className="flex items-center gap-0.5 px-2 py-1 text-xs text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329] rounded transition-colors"
             >
               {precision}
               <ChevronDown size={14} />
@@ -383,7 +358,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
                       setShowPrecisionDropdown(false);
                     }}
                     className={cn(
-                      'w-full px-2 py-1 text-[10px] text-left font-mono transition-colors',
+                      'w-full px-2 py-1 text-[10px] text-left transition-colors',
                       precision === opt
                         ? 'text-[#FF7A00] bg-[#2B3139]'
                         : 'text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#2B3139]'
@@ -395,27 +370,18 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
               </div>
             )}
           </div>
-
-          {/* Menu Icon */}
-          <button
-            className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#EAECEF]"
-            title="Settings"
-          >
-            <Menu size={16} />
-          </button>
         </div>
       </div>
 
       {/* Column Headers */}
-      <div className="grid grid-cols-3 gap-1 px-2 py-2 text-xs text-[#848E9C] font-medium border-b border-[#1E2329]" style={{ fontFamily: "'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace" }}>
+      <div className="grid grid-cols-3 gap-1 px-2 py-1.5 text-[10px] text-[#5E6673] font-medium border-b border-[#1E2329]">
         <span>Price (USDT)</span>
         <span className="text-right">Qty. (BTC)</span>
         <span className="text-right">Sum (BTC)</span>
       </div>
 
       {/* Orderbook Content - Compact layout with no empty space */}
-      {activeTab === 'orderbook' ? (
-        <div className="flex flex-col">
+      <div className="flex flex-col">
         {/* Asks (Sell Orders) - Top Section */}
         {(displayMode === 'both' || displayMode === 'sellOnly') && (
           <div className="flex flex-col">
@@ -435,31 +401,31 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
           </div>
         )}
 
-          {/* Current Price - Center Separator */}
-          <div className="flex items-center justify-between px-2 py-2 bg-[#0B0E11] border-y border-[#1E2329]">
-            <div className="flex items-center gap-1">
-              <span 
-                className="text-lg font-bold tabular-nums"
-                style={{ 
-                  color: priceDirection === 'up' ? '#0D9D5F' : '#C8102E',
-                  fontFamily: "'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace"
-                }}
-              >
-                {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : precision === '0.1' ? 1 : 2)}
-              </span>
-              {priceDirection === 'up' ? (
-                <ChevronUp size={16} className="text-[#0D9D5F]" />
-              ) : (
-                <ChevronDown size={16} className="text-[#C8102E]" />
-              )}
-            </div>
+        {/* Current Price - Center Separator */}
+        <div className="flex items-center justify-between px-2 py-1.5 bg-[#0B0E11] border-y border-[#1E2329]">
+          <div className="flex items-center gap-1">
             <span 
-              className="text-xs text-[#848E9C] tabular-nums"
-              style={{ fontFamily: "'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace" }}
+              className="text-sm font-bold tabular-nums"
+              style={{ color: priceDirection === 'up' ? '#0D9D5F' : '#C8102E' }}
             >
-              <span className="text-[#848E9C]">M</span> {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : precision === '0.1' ? 1 : 2)}
+              {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : 1)}
+            </span>
+            {priceDirection === 'up' ? (
+              <ChevronUp size={14} className="text-[#0D9D5F]" />
+            ) : (
+              <ChevronDown size={14} className="text-[#C8102E]" />
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-[#848E9C]">M</span>
+            <span 
+              className="text-xs font-medium tabular-nums"
+              style={{ color: '#848E9C' }}
+            >
+              {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : 1)}
             </span>
           </div>
+        </div>
 
         {/* Bids (Buy Orders) - Bottom Section */}
         {(displayMode === 'both' || displayMode === 'buyOnly') && (
@@ -479,47 +445,44 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
             ))}
           </div>
         )}
-        </div>
-      ) : (
-        // Trades tab placeholder
-        <div className="flex items-center justify-center text-[#5E6673] text-xs py-8">
-          Trades coming soon
-        </div>
-      )}
+      </div>
 
-      {/* Footer - Buy/Sell Ratio Bar - Bitunix Style */}
-      <div 
-        className="flex items-center justify-between px-2 py-2 border-t border-[#1E2329] bg-[#0B0E11]"
-        style={{ fontFamily: "'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace" }}
-      >
+      {/* Footer - Buy/Sell Ratio Bar - Professional Bitunix Style */}
+      <div className="flex items-center justify-between px-2 py-2 border-t border-[#1E2329] bg-[#0B0E11]">
         {/* Buy Percentage */}
-        <div className="flex items-center gap-1 text-sm font-mono">
-          <span className="px-1.5 py-0.5 bg-[#0D9D5F]/20 text-[#0D9D5F] rounded text-xs font-medium">B</span>
-          <span className="text-[#0D9D5F]">{buyPercentage}%</span>
+        <div className="flex items-center gap-1 text-xs">
+          <div className="flex items-center gap-0.5">
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#0D9D5F' }} />
+            <span className="text-[#0D9D5F] font-medium" style={{ minWidth: '40px' }}>{buyPercentage}%</span>
+          </div>
         </div>
 
-        {/* Ratio Bar */}
-        <div className="flex-1 h-2 mx-3 bg-[#1E2329] rounded overflow-hidden flex">
+        {/* Ratio Bar - Enhanced Bitunix Style */}
+        <div className="flex-1 h-2.5 mx-2 bg-[#1E2329] rounded-full overflow-hidden flex shadow-sm" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
           <div 
             className="h-full transition-all duration-300"
             style={{ 
               width: `${buyPercentage}%`,
-              backgroundColor: '#0D9D5F'
+              backgroundColor: '#0D9D5F',
+              boxShadow: '0 0 8px rgba(13, 157, 95, 0.5)'
             }} 
           />
           <div 
             className="h-full transition-all duration-300"
             style={{ 
               width: `${sellPercentage}%`,
-              backgroundColor: '#C8102E'
+              backgroundColor: '#C8102E',
+              boxShadow: '0 0 8px rgba(200, 16, 46, 0.5)'
             }} 
           />
         </div>
         
         {/* Sell Percentage */}
-        <div className="flex items-center gap-1 text-sm font-mono">
-          <span className="text-[#C8102E]">{sellPercentage}%</span>
-          <span className="px-1.5 py-0.5 bg-[#C8102E]/20 text-[#C8102E] rounded text-xs font-medium">S</span>
+        <div className="flex items-center gap-1 text-xs">
+          <div className="flex items-center gap-0.5">
+            <span className="text-[#C8102E] font-medium" style={{ minWidth: '40px', textAlign: 'right' }}>{sellPercentage}%</span>
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#C8102E' }} />
+          </div>
         </div>
       </div>
 
