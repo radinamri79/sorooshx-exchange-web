@@ -20,18 +20,18 @@ import { Settings, ChevronDown } from 'lucide-react';
 // SOROOSHX BRAND COLORS - Professional Trading Theme
 // ============================================================================
 const COLORS = {
-  // Primary Brand - Orange Accent
-  orange: '#FF6B35',
-  orangeHover: '#FF8555',
-  orangeActive: '#E55A25',
+  // Primary Brand - Orange Accent (SOROOSHX Official)
+  orange: '#FF7A00',
+  orangeHover: '#FF8A20',
+  orangeActive: '#E66A00',
   
-  // Candlestick Colors (Professional Trading)
-  longGreen: '#0ECB81',       // Bullish - Professional green
-  longGreenHover: '#1AD991',
-  longGreenDark: '#0A8F5A',
-  shortRed: '#F6465D',        // Bearish - Professional red
-  shortRedHover: '#FF5C72',
-  shortRedDark: '#C9354A',
+  // Candlestick Colors (Professional Trading - Dark Tones)
+  longGreen: '#0D9D5F',       // Dark Green - Bullish
+  longGreenHover: '#0FAD6F',
+  longGreenDark: '#0B7A4A',
+  shortRed: '#C8102E',        // Dark Red - Bearish
+  shortRedHover: '#D8203E',
+  shortRedDark: '#A80A24',
   
   // Backgrounds
   bgPrimary: '#0B0E11',       // Main background
@@ -266,9 +266,9 @@ export function OrderForm({
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, action }))}
             className={cn(
-              'flex-1 py-2.5 text-sm font-semibold transition-all duration-200',
+              'flex-1 py-2.5 text-sm font-semibold transition-all duration-200 rounded-lg mx-0.5 my-0.5',
               formData.action === action
-                ? 'text-white bg-[#FF6B35]'
+                ? 'text-white bg-[#FF7A00]'
                 : 'text-[#848E9C] bg-[#1E2329] hover:text-[#EAECEF] hover:bg-[#2B3139]'
             )}
           >
@@ -289,7 +289,7 @@ export function OrderForm({
             className={cn(
               'px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200',
               formData.orderType === type
-                ? 'text-white bg-[#FF6B35]'
+                ? 'text-white bg-[#FF7A00]'
                 : 'text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329]'
             )}
           >

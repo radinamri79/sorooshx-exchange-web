@@ -13,12 +13,12 @@ import { cn } from '@/lib/utils';
 // SOROOSHX BRAND COLORS
 // ============================================================================
 const COLORS = {
-  orange: '#FF6B35',
-  orangeHover: '#FF8555',
-  longGreen: '#0ECB81',
-  longGreenDark: '#0A8F5A',
-  shortRed: '#F6465D',
-  shortRedDark: '#C9354A',
+  orange: '#FF7A00',
+  orangeHover: '#FF8A20',
+  longGreen: '#0D9D5F',
+  longGreenDark: '#0B7A4A',
+  shortRed: '#C8102E',
+  shortRedDark: '#A80A24',
   bgPrimary: '#0B0E11',
   bgSecondary: '#1E2329',
   bgTertiary: '#2B3139',
