@@ -324,7 +324,7 @@ export function OrderForm({
                   'border outline-none transition-all duration-200',
                   errors.price 
                     ? 'border-[#F6465D] focus:border-[#F6465D]' 
-                    : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF7A00]'
+                    : 'border-[#2B3139] hover:border-[#FF7A00] focus:border-[#FF7A00]'
                 )}
               />
               <button
@@ -383,7 +383,9 @@ export function OrderForm({
                   : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF7A00]'
               )}
             />
-            <div className="absolute right-3 flex items-center gap-1 text-[11px] text-[#848E9C] cursor-pointer hover:text-[#EAECEF]">
+            <div className="absolute right-3 flex items-center gap-1 text-[11px] text-[#848E9C] cursor-pointer hover:text-[#EAECEF]"
+                 onClick={() => setUiState((prev) => ({ ...prev, showUnitSettingsModal: true }))}
+            >
               BTC
               <ChevronDown size={12} />
             </div>
@@ -454,21 +456,6 @@ export function OrderForm({
             </div>
             <span className="text-[11px] font-medium text-[#EAECEF]">TP / SL</span>
           </label>
-          
-          {formData.tpsl.enabled && (
-            <button
-              type="button"
-              onClick={() =>
-                setFormData((prev) => ({
-                  ...prev,
-                  tpsl: { ...prev.tpsl, advancedMode: !prev.tpsl.advancedMode },
-                }))
-              }
-              className="text-[10px] font-medium text-[#FF7A00] hover:text-[#FF8A20] transition-colors"
-            >
-              Advanced ▸
-            </button>
-          )}
         </div>
 
         {/* TP/SL Inputs - Inline */}
@@ -488,7 +475,7 @@ export function OrderForm({
                 placeholder="Price (USDT)"
                 className="w-full h-8 px-2.5 text-[11px] rounded
                            bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]
-                           border border-[#2B3139] focus:border-[#0ECB81]
+                           border border-[#2B3139] hover:border-[#0D9D5F] focus:border-[#0D9D5F]
                            outline-none transition-all duration-200"
               />
             </div>
@@ -506,7 +493,7 @@ export function OrderForm({
                 placeholder="Price (USDT)"
                 className="w-full h-8 px-2.5 text-[11px] rounded
                            bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]
-                           border border-[#2B3139] focus:border-[#F6465D]
+                           border border-[#2B3139] hover:border-[#C8102E] focus:border-[#C8102E]
                            outline-none transition-all duration-200"
               />
             </div>
