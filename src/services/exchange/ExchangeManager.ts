@@ -17,6 +17,7 @@ import {
   TickerData,
   FundingRateData,
   MarkPriceData,
+  Trade,
   TradeData,
   Account,
   AccountBalance,
@@ -25,8 +26,14 @@ import {
   PlaceOrderParams,
   ExchangeHealth,
   DataFreshness,
+  AccountUpdateEvent,
+  OrderUpdateEvent,
 } from '@/types/exchange';
 import { BinanceClient } from './BinanceClient';
+import { BybitClient } from './BybitClient';
+import { OKXClient } from './OKXClient';
+import { GateioClient } from './GateioClient';
+import { BitgetClient } from './BitgetClient';
 
 interface ExchangeCache {
   klines: Map<string, { data: KlineData[]; timestamp: number }>;
@@ -51,6 +58,7 @@ export class ExchangeManager {
   private currentExchange: ExchangeName = 'binance';
   private currentTradingExchange: ExchangeName = 'binance'; // User can switch to Bitget
   private health: Map<ExchangeName, ExchangeHealth> = new Map();
+  private subscriptions: Map<string, { unsubscribe: string | (() => void); type: string }> = new Map();
   private cache: ExchangeCache = {
     klines: new Map(),
     depth: new Map(),
@@ -83,11 +91,10 @@ export class ExchangeManager {
   private initializeExchanges(): void {
     // Initialize all supported exchanges
     this.exchanges.set('binance', new BinanceClient());
-    // TODO: Add other exchange clients
-    // this.exchanges.set('bybit', new BybitClient());
-    // this.exchanges.set('okx', new OKXClient());
-    // this.exchanges.set('gateio', new GateioClient());
-    // this.exchanges.set('bitget', new BitgetClient());
+    this.exchanges.set('bybit', new BybitClient());
+    this.exchanges.set('okx', new OKXClient());
+    this.exchanges.set('gateio', new GateioClient());
+    this.exchanges.set('bitget', new BitgetClient());
   }
 
   private initializeHealth(): void {
@@ -445,6 +452,42 @@ export class ExchangeManager {
     return account.positions;
   }
 
+  async getOrders(symbol?: string): Promise<Order[]> {
+    const client = this.exchanges.get(this.currentTradingExchange);
+    if (!client) throw new Error(`No client for ${this.currentTradingExchange}`);
+
+    try {
+      return await client.getOrders(symbol);
+    } catch (error) {
+      console.error(`Failed to get orders: ${error}`);
+      throw error;
+    }
+  }
+
+  async getOpenOrders(symbol?: string): Promise<Order[]> {
+    const client = this.exchanges.get(this.currentTradingExchange);
+    if (!client) throw new Error(`No client for ${this.currentTradingExchange}`);
+
+    try {
+      return await client.getOpenOrders(symbol);
+    } catch (error) {
+      console.error(`Failed to get open orders: ${error}`);
+      throw error;
+    }
+  }
+
+  async getTrades(symbol?: string): Promise<Trade[]> {
+    const client = this.exchanges.get(this.currentTradingExchange);
+    if (!client) throw new Error(`No client for ${this.currentTradingExchange}`);
+
+    try {
+      return await client.getTrades(symbol);
+    } catch (error) {
+      console.error(`Failed to get trades: ${error}`);
+      throw error;
+    }
+  }
+
   // ============================================================================
   // Order Management
   // ============================================================================
@@ -490,6 +533,37 @@ export class ExchangeManager {
     if (!client) throw new Error(`No client for ${this.currentExchange}`);
 
     return client.subscribeToTicker(symbol, callback);
+  }
+
+  subscribeToMarkPrice(symbol: string, callback: (data: MarkPriceData) => void): string {
+    const client = this.exchanges.get(this.currentExchange);
+    if (!client) throw new Error(`No client for ${this.currentExchange}`);
+
+    return client.subscribeToMarkPrice(symbol, callback);
+  }
+
+  subscribeToAccount(callback: (data: AccountUpdateEvent) => void): string {
+    const client = this.exchanges.get(this.currentTradingExchange);
+    if (!client) throw new Error(`No client for ${this.currentTradingExchange}`);
+
+    return client.subscribeToAccount(callback);
+  }
+
+  subscribeToOrders(callback: (data: OrderUpdateEvent) => void): string {
+    const client = this.exchanges.get(this.currentTradingExchange);
+    if (!client) throw new Error(`No client for ${this.currentTradingExchange}`);
+
+    return client.subscribeToOrders(callback);
+  }
+
+  unsubscribe(subscriptionId: string): void {
+    const sub = this.subscriptions.get(subscriptionId);
+    if (!sub) return;
+
+    if (typeof sub.unsubscribe === 'function') {
+      sub.unsubscribe();
+    }
+    this.subscriptions.delete(subscriptionId);
   }
 
   // ============================================================================

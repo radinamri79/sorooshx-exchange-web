@@ -26,8 +26,8 @@ interface MarketDataState {
   fundingRates: Map<string, FundingRateData>;
   // Mark prices by symbol
   markPrices: Map<string, MarkPriceData>;
-  // Active subscriptions
-  subscriptions: Map<string, { unsubscribe: () => void; type: string }>;
+  // Active subscriptions - store subscription IDs only
+  subscriptions: Map<string, string>;
   // Data freshness
   dataFreshness: DataFreshness | null;
   // Loading states
@@ -130,27 +130,33 @@ class MarketDataService {
           this.state.klines.set(symbol, new Map());
         }
 
-        const klines = this.state.klines.get(symbol)!.get(interval) || [];
+        const intervalMap = this.state.klines.get(symbol)!;
+        let klines = intervalMap.get(interval) || [];
 
         // If last candle is same time, update it; otherwise add new
-        if (klines.length > 0 && klines[klines.length - 1].timestamp === kline.timestamp) {
-          klines[klines.length - 1] = kline;
+        if (klines.length > 0) {
+          const lastKline = klines[klines.length - 1];
+          if (lastKline && lastKline.timestamp === kline.timestamp) {
+            klines[klines.length - 1] = kline;
+          } else if (kline.isFinal) {
+            klines.push(kline);
+            // Keep only last 500 candles in memory
+            if (klines.length > 500) {
+              klines.shift();
+            }
+          }
         } else if (kline.isFinal) {
           klines.push(kline);
-          // Keep only last 500 candles in memory
-          if (klines.length > 500) {
-            klines.shift();
-          }
         }
+
+        // Update the map with the modified klines
+        intervalMap.set(interval, klines);
 
         this.state.klines.get(symbol)!.set(interval, klines);
         callback(klines);
       });
 
-      this.state.subscriptions.set(subscriptionId, {
-        unsubscribe: unsub,
-        type: 'kline',
-      });
+      this.state.subscriptions.set(subscriptionId, unsub);
 
       this.symbols.add(symbol);
       this.activeIntervals.add(interval);
@@ -166,7 +172,7 @@ class MarketDataService {
   // Order Book Management
   // ============================================================================
 
-  async getOrderBook(symbol: string, limit?: number): Promise<OrderBook> {
+  async loadOrderBook(symbol: string, limit?: number): Promise<OrderBook> {
     const key = symbol;
     this.state.loading.set(key, true);
 
@@ -194,10 +200,7 @@ class MarketDataService {
         callback(depth);
       });
 
-      this.state.subscriptions.set(subscriptionId, {
-        unsubscribe: unsub,
-        type: 'depth',
-      });
+      this.state.subscriptions.set(subscriptionId, unsub);
 
       this.symbols.add(symbol);
       return subscriptionId;
@@ -211,7 +214,7 @@ class MarketDataService {
   // Ticker Data Management
   // ============================================================================
 
-  async getTicker(symbol: string): Promise<TickerData> {
+  async loadTicker(symbol: string): Promise<TickerData> {
     const key = symbol;
     this.state.loading.set(key, true);
 
@@ -239,10 +242,7 @@ class MarketDataService {
         callback(ticker);
       });
 
-      this.state.subscriptions.set(subscriptionId, {
-        unsubscribe: unsub,
-        type: 'ticker',
-      });
+      this.state.subscriptions.set(subscriptionId, unsub);
 
       this.symbols.add(symbol);
       return subscriptionId;
@@ -256,7 +256,7 @@ class MarketDataService {
   // Funding Rate Management
   // ============================================================================
 
-  async getFundingRate(symbol: string): Promise<FundingRateData> {
+  async loadFundingRate(symbol: string): Promise<FundingRateData> {
     const key = `fr_${symbol}`;
     this.state.loading.set(key, true);
 
@@ -279,7 +279,7 @@ class MarketDataService {
   // Mark Price Management
   // ============================================================================
 
-  async getMarkPrice(symbol: string): Promise<MarkPriceData> {
+  async loadMarkPrice(symbol: string): Promise<MarkPriceData> {
     const key = `mp_${symbol}`;
     this.state.loading.set(key, true);
 
@@ -300,17 +300,13 @@ class MarketDataService {
 
   subscribeToMarkPrice(symbol: string, callback: (data: MarkPriceData) => void): string {
     const subscriptionId = `markPrice_${symbol}_${Date.now()}`;
-
     try {
       const unsub = this.manager.subscribeToMarkPrice(symbol, (markPrice) => {
         this.state.markPrices.set(symbol, markPrice);
         callback(markPrice);
       });
 
-      this.state.subscriptions.set(subscriptionId, {
-        unsubscribe: unsub,
-        type: 'markPrice',
-      });
+      this.state.subscriptions.set(subscriptionId, unsub);
 
       this.symbols.add(symbol);
       return subscriptionId;
@@ -325,17 +321,10 @@ class MarketDataService {
   // ============================================================================
 
   unsubscribe(subscriptionId: string): void {
-    const subscription = this.state.subscriptions.get(subscriptionId);
-    if (subscription) {
-      subscription.unsubscribe();
-      this.state.subscriptions.delete(subscriptionId);
-    }
+    this.state.subscriptions.delete(subscriptionId);
   }
 
   unsubscribeAll(): void {
-    this.state.subscriptions.forEach((sub) => {
-      sub.unsubscribe();
-    });
     this.state.subscriptions.clear();
   }
 
@@ -383,10 +372,10 @@ class MarketDataService {
 
   getBidAsk(symbol: string): { bid: string; ask: string } | undefined {
     const orderBook = this.getOrderBook(symbol);
-    if (orderBook && orderBook.bids.length > 0 && orderBook.asks.length > 0) {
+    if (orderBook && orderBook.bids[0] && orderBook.asks[0]) {
       return {
-        bid: orderBook.bids[0].price,
-        ask: orderBook.asks[0].price,
+        bid: orderBook.bids[0]!.price,
+        ask: orderBook.asks[0]!.price,
       };
     }
 

@@ -3,4 +3,7 @@
  */
 
 export { BinanceClient } from './BinanceClient';
-export { ExchangeManager, getExchangeManager } from './ExchangeManager';
+export { BybitClient } from './BybitClient';
+export { OKXClient } from './OKXClient';
+export { GateioClient } from './GateioClient';
+export { BitgetClient } from './BitgetClient';

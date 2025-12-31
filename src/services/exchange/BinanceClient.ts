@@ -725,6 +725,7 @@ export class BinanceClient implements IExchangeClient {
         const message = JSON.parse(event.data);
         if (message.e === 'ACCOUNT_UPDATE') {
           callback({
+            type: 'ACCOUNT_UPDATE',
             balances: message.a.B.map((b: any) => ({
               asset: b.a,
               balance: b.wb,
@@ -769,24 +770,22 @@ export class BinanceClient implements IExchangeClient {
         if (message.e === 'ORDER_TRADE_UPDATE') {
           const o = message.o;
           callback({
-            order: {
-              orderId: o.i,
-              clientOrderId: o.c,
-              symbol: o.s,
-              side: o.S,
-              type: o.o,
-              quantity: o.q,
-              price: o.p,
-              stopPrice: o.sp,
-              executedQuantity: o.z,
-              cumulativeQuoteQuantity: o.Z,
-              status: o.X,
-              timeInForce: o.f,
-              updateTime: o.T,
-              createTime: o.T,
-            },
-            fills: o.l ? [{ price: o.L, quantity: o.l, commission: o.n, commissionAsset: o.N }] : undefined,
+            type: 'ORDER_TRADE_UPDATE',
+            orderId: String(o.i),
+            symbol: o.s,
+            side: o.S,
+            orderType: o.o,
+            quantity: o.q,
+            price: o.p,
+            filledQuantity: o.z,
+            status: o.X,
             timestamp: message.E,
+            fills: o.l ? [{ 
+              price: o.L, 
+              quantity: o.l, 
+              fee: o.n || '0',
+              timestamp: message.E,
+            }] : undefined,
           });
         }
       } catch (error) {

@@ -185,20 +185,29 @@ export interface WebSocketEvent {
 }
 
 export interface AccountUpdateEvent {
-  balances: AccountBalance[];
-  positions: Position[];
+  type: 'ACCOUNT_UPDATE';
+  balances?: AccountBalance[];
+  positions?: Position[];
   timestamp: number;
 }
 
 export interface OrderUpdateEvent {
-  order: Order;
+  type: 'ORDER_TRADE_UPDATE';
+  orderId: string;
+  symbol: string;
+  side: 'BUY' | 'SELL';
+  orderType: string;
+  quantity: string;
+  price: string;
+  filledQuantity: string;
+  status: string;
+  timestamp: number;
   fills?: Array<{
     price: string;
     quantity: string;
-    commission: string;
-    commissionAsset: string;
+    fee: string;
+    timestamp: number;
   }>;
-  timestamp: number;
 }
 
 // ============================================================================
@@ -259,6 +268,9 @@ export interface PlaceOrderParams {
   timeInForce?: 'GTC' | 'IOC' | 'FOK';
   positionSide?: 'LONG' | 'SHORT';
   closePosition?: boolean;
+  postOnly?: boolean;
+  reduceOnly?: boolean;
+  clientOrderId?: string;
 }
 
 // ============================================================================
