@@ -1,15 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { useOrderbookStore } from '@/stores/useOrderbookStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchOrderbook } from '@/services/api';
 import type { OrderbookEntry } from '@/types';
-import * as React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+
+// ============================================================================
+// BITUNIX-STYLE ORDERBOOK COMPONENT
+// Professional trading interface with real-time updates
+// ============================================================================
 
 interface OrderbookProps {
   className?: string;
@@ -17,68 +20,129 @@ interface OrderbookProps {
 }
 
 type DisplayMode = 'both' | 'buyOnly' | 'sellOnly';
+type DecimalPrecision = '0.1' | '0.01' | '1' | '10';
 
 interface OrderbookRowProps {
   entry: OrderbookEntry;
-  maxTotal: number;
+  cumulativeSum: number;
+  maxSum: number;
   isBid: boolean;
+  isFlashing?: boolean;
+  flashDirection?: 'up' | 'down';
   onClick?: (price: string) => void;
+  precision: DecimalPrecision;
 }
 
-function OrderbookRow({ entry, maxTotal, isBid, onClick }: OrderbookRowProps) {
-  const [price, quantity] = entry;
-  const total = parseFloat(price) * parseFloat(quantity);
-  const depthPercentage = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+// Format number with precision
+function formatWithPrecision(value: number | string, decimals: number): string {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
 
-  const color = isBid ? '#0D9D5F' : '#C8102E';
-  const bgColor = isBid ? 'rgba(13, 157, 95, 0.15)' : 'rgba(200, 16, 46, 0.15)';
+function OrderbookRow({ 
+  entry, 
+  cumulativeSum,
+  maxSum, 
+  isBid, 
+  isFlashing,
+  flashDirection,
+  onClick,
+  precision 
+}: OrderbookRowProps) {
+  const [price, quantity] = entry;
+  const depthPercentage = maxSum > 0 ? (cumulativeSum / maxSum) * 100 : 0;
+  
+  // Determine decimal places based on precision
+  const priceDecimals = precision === '10' ? 0 : precision === '1' ? 0 : precision === '0.1' ? 1 : 2;
+  const qtyDecimals = 4;
+  const sumDecimals = 4;
+
+  // Colors - Bitunix style
+  const priceColor = isBid ? '#0D9D5F' : '#C8102E';
+  const depthColor = isBid ? 'rgba(13, 157, 95, 0.12)' : 'rgba(200, 16, 46, 0.12)';
+  const flashClass = isFlashing 
+    ? flashDirection === 'up' 
+      ? 'animate-flash-green' 
+      : 'animate-flash-red'
+    : '';
 
   return (
-    <button
-      type="button"
+    <div
       onClick={() => onClick?.(price)}
-      className="grid grid-cols-3 gap-2 px-3 py-[6px] text-xs hover:brightness-110 transition-all duration-150 relative w-full text-left focus:outline-none font-mono"
+      className={cn(
+        'grid grid-cols-3 gap-1 px-2 py-[3px] text-[11px] cursor-pointer relative w-full',
+        'transition-colors duration-75 hover:bg-[#1E2329]',
+        'font-mono tabular-nums',
+        flashClass
+      )}
     >
-      {/* Depth bar background - fills from right for bids, left for asks */}
+      {/* Depth bar - fills from appropriate side */}
       <div
-        className="absolute top-0 bottom-0 transition-all duration-300"
+        className="absolute top-0 bottom-0 transition-all duration-200 pointer-events-none"
         style={{
-          backgroundColor: bgColor,
+          backgroundColor: depthColor,
           width: `${Math.min(depthPercentage, 100)}%`,
           [isBid ? 'right' : 'left']: 0,
         }}
       />
       
       {/* Price */}
-      <span className="relative z-10 font-bold" style={{ color }}>
-        {parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+      <span 
+        className="relative z-10 font-medium"
+        style={{ color: priceColor }}
+      >
+        {formatWithPrecision(price, priceDecimals)}
       </span>
       
       {/* Quantity */}
       <span className="relative z-10 text-right text-[#EAECEF]">
-        {parseFloat(quantity).toFixed(4)}
+        {formatWithPrecision(quantity, qtyDecimals)}
       </span>
       
-      {/* Total */}
+      {/* Cumulative Sum */}
       <span className="relative z-10 text-right text-[#848E9C]">
-        {total.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+        {formatWithPrecision(cumulativeSum, sumDecimals)}
       </span>
-    </button>
+    </div>
   );
 }
 
-export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
-  useTranslations('trading');
+export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
   const { currentSymbol, tickers } = useMarketStore();
   const { bids, asks, lastUpdateId, setOrderbook, mergeOrderbook, reset } = useOrderbookStore();
   
-  const [displayMode, setDisplayMode] = React.useState<DisplayMode>('both');
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('both');
+  const [precision, setPrecision] = useState<DecimalPrecision>('0.1');
+  const [showPrecisionDropdown, setShowPrecisionDropdown] = useState(false);
+  const [activeTab, setActiveTab] = useState<'orderbook' | 'trades'>('orderbook');
+  const [flashingPrices, setFlashingPrices] = useState<Map<string, 'up' | 'down'>>(new Map());
+  
   const snapshotFetchedRef = useRef(false);
   const symbolRef = useRef(currentSymbol);
+  const prevBidsRef = useRef<OrderbookEntry[]>([]);
+  const prevAsksRef = useRef<OrderbookEntry[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentTicker = tickers[currentSymbol];
-  const lastPrice = currentTicker ? currentTicker.c : '--';
+  const lastPrice = currentTicker ? parseFloat(currentTicker.c) : 0;
+  const prevClose = currentTicker ? parseFloat(currentTicker.p || currentTicker.c) : lastPrice;
+  const priceDirection = lastPrice >= prevClose ? 'up' : 'down';
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowPrecisionDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Load initial orderbook snapshot
   useEffect(() => {
     const loadSnapshot = async () => {
       if (symbolRef.current !== currentSymbol) {
@@ -101,6 +165,7 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     loadSnapshot();
   }, [currentSymbol, setOrderbook, reset]);
 
+  // Subscribe to WebSocket updates
   useEffect(() => {
     const streamName = `${currentSymbol.toLowerCase()}@depth@100ms`;
 
@@ -129,148 +194,340 @@ export function Orderbook({ className, maxRows = 15 }: OrderbookProps) {
     };
   }, [currentSymbol, lastUpdateId, mergeOrderbook]);
 
-  const { displayedBids, displayedAsks, maxTotal, buyPercentage, sellPercentage } = useMemo(() => {
-    const rowCount = displayMode === 'both' ? maxRows : maxRows * 2;
+  // Detect price changes for flash animation
+  useEffect(() => {
+    const newFlashing = new Map<string, 'up' | 'down'>();
     
-    const displayedBids = displayMode === 'sellOnly' ? [] : bids.slice(0, rowCount);
-    const displayedAsks = displayMode === 'buyOnly' ? [] : asks.slice(0, rowCount);
-
-    let maxTotal = 0;
-    [...displayedBids, ...displayedAsks].forEach(([price, quantity]) => {
-      const total = parseFloat(price) * parseFloat(quantity);
-      if (total > maxTotal) maxTotal = total;
+    // Check bids for changes
+    bids.forEach(([price, qty]) => {
+      const prevBid = prevBidsRef.current.find(([p]) => p === price);
+      if (prevBid) {
+        const prevQty = parseFloat(prevBid[1]);
+        const newQty = parseFloat(qty);
+        if (newQty > prevQty) {
+          newFlashing.set(price, 'up');
+        } else if (newQty < prevQty) {
+          newFlashing.set(price, 'down');
+        }
+      }
     });
 
-    // Calculate buy/sell percentages
-    const totalBidVolume = displayedBids.reduce((sum, [p, q]) => sum + (parseFloat(p) * parseFloat(q)), 0);
-    const totalAskVolume = displayedAsks.reduce((sum, [p, q]) => sum + (parseFloat(p) * parseFloat(q)), 0);
-    const total = totalBidVolume + totalAskVolume;
-    const buyPercentage = total > 0 ? ((totalBidVolume / total) * 100).toFixed(2) : '0.00';
-    const sellPercentage = total > 0 ? ((totalAskVolume / total) * 100).toFixed(2) : '0.00';
+    // Check asks for changes
+    asks.forEach(([price, qty]) => {
+      const prevAsk = prevAsksRef.current.find(([p]) => p === price);
+      if (prevAsk) {
+        const prevQty = parseFloat(prevAsk[1]);
+        const newQty = parseFloat(qty);
+        if (newQty > prevQty) {
+          newFlashing.set(price, 'up');
+        } else if (newQty < prevQty) {
+          newFlashing.set(price, 'down');
+        }
+      }
+    });
 
-    return { displayedBids, displayedAsks, maxTotal, buyPercentage, sellPercentage };
+    if (newFlashing.size > 0) {
+      setFlashingPrices(newFlashing);
+      // Clear flash after animation
+      setTimeout(() => setFlashingPrices(new Map()), 300);
+    }
+
+    prevBidsRef.current = [...bids];
+    prevAsksRef.current = [...asks];
+  }, [bids, asks]);
+
+  // Process orderbook data with cumulative sums
+  const { displayedBids, displayedAsks, maxSum, buyPercentage, sellPercentage } = useMemo(() => {
+    const rowCount = displayMode === 'both' ? maxRows : maxRows * 2;
+    
+    const slicedBids = displayMode === 'sellOnly' ? [] : bids.slice(0, rowCount);
+    const slicedAsks = displayMode === 'buyOnly' ? [] : asks.slice(0, rowCount);
+
+    // Calculate cumulative sums for depth visualization
+    let bidSum = 0;
+    const displayedBids = slicedBids.map(([price, qty]) => {
+      bidSum += parseFloat(qty);
+      return { entry: [price, qty] as OrderbookEntry, cumSum: bidSum };
+    });
+
+    let askSum = 0;
+    // For asks, we want to show cumulative from best ask (lowest price)
+    const asksWithSum = slicedAsks.map(([price, qty]) => {
+      askSum += parseFloat(qty);
+      return { entry: [price, qty] as OrderbookEntry, cumSum: askSum };
+    });
+    // Reverse for display (highest price at top)
+    const displayedAsks = [...asksWithSum].reverse();
+
+    const maxSum = Math.max(bidSum, askSum);
+
+    // Calculate buy/sell percentages based on total volume
+    const totalBidVolume = slicedBids.reduce((sum, [, q]) => sum + parseFloat(q), 0);
+    const totalAskVolume = slicedAsks.reduce((sum, [, q]) => sum + parseFloat(q), 0);
+    const total = totalBidVolume + totalAskVolume;
+    const buyPercentage = total > 0 ? ((totalBidVolume / total) * 100).toFixed(2) : '50.00';
+    const sellPercentage = total > 0 ? ((totalAskVolume / total) * 100).toFixed(2) : '50.00';
+
+    return { displayedBids, displayedAsks, maxSum, buyPercentage, sellPercentage };
   }, [bids, asks, maxRows, displayMode]);
 
-  const handlePriceClick = useCallback((_price: string) => {
-    // Dispatch to order form
+  const handlePriceClick = useCallback((price: string) => {
+    // TODO: Dispatch to order form
+    console.log('Price clicked:', price);
   }, []);
 
+  const precisionOptions: DecimalPrecision[] = ['0.01', '0.1', '1', '10'];
+
   return (
-    <div className={cn('flex flex-col h-full bg-[#0B0E11] border border-[#2B3139] rounded-lg overflow-hidden', className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-[#2B3139]">
+    <div className={cn(
+      'flex flex-col bg-[#0B0E11] overflow-hidden',
+      'border-0 rounded-none',
+      className
+    )}>
+      {/* Header - Tabs + Controls */}
+      <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#1E2329]">
+        {/* Tabs */}
         <div className="flex items-center gap-3">
-          <h3 className="text-sm font-semibold text-[#EAECEF]">Orderbook</h3>
-          <button className="text-xs text-[#848E9C] hover:text-[#EAECEF] transition-colors">Trades</button>
+          <button
+            onClick={() => setActiveTab('orderbook')}
+            className={cn(
+              'text-xs font-medium pb-1 border-b-2 transition-colors',
+              activeTab === 'orderbook'
+                ? 'text-[#EAECEF] border-[#FF7A00]'
+                : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
+            )}
+          >
+            Orderbook
+          </button>
+          <button
+            onClick={() => setActiveTab('trades')}
+            className={cn(
+              'text-xs font-medium pb-1 border-b-2 transition-colors',
+              activeTab === 'trades'
+                ? 'text-[#EAECEF] border-[#FF7A00]'
+                : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
+            )}
+          >
+            Trades
+          </button>
         </div>
-        
-        {/* Display Mode Toggle - 3 Icons */}
-        <div className="flex items-center gap-1.5">
-          {/* Both Buy & Sell */}
+
+        {/* Controls */}
+        <div className="flex items-center gap-1">
+          {/* Display Mode Icons - Bitunix Style */}
           <button
             onClick={() => setDisplayMode('both')}
             className={cn(
-              'w-6 h-6 rounded flex items-center justify-center transition-all duration-200',
-              displayMode === 'both' ? 'bg-[#1E2329] ring-1 ring-[#3D4450]' : 'hover:bg-[#1E2329]'
+              'w-5 h-5 rounded flex items-center justify-center transition-all',
+              displayMode === 'both' ? 'bg-[#2B3139]' : 'hover:bg-[#1E2329]'
             )}
             title="Buy and Sell"
           >
-            <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
-              <div className="bg-[#C8102E] rounded-sm" />
-              <div className="bg-[#C8102E] rounded-sm" />
-              <div className="bg-[#0D9D5F] rounded-sm" />
-              <div className="bg-[#0D9D5F] rounded-sm" />
+            <div className="w-3.5 h-3.5 flex flex-col gap-[1px]">
+              <div className="flex-1 bg-[#C8102E] rounded-[1px]" />
+              <div className="flex-1 bg-[#0D9D5F] rounded-[1px]" />
             </div>
           </button>
 
-          {/* Buy Only */}
           <button
             onClick={() => setDisplayMode('buyOnly')}
             className={cn(
-              'w-6 h-6 rounded flex items-center justify-center transition-all duration-200',
-              displayMode === 'buyOnly' ? 'bg-[#1E2329] ring-1 ring-[#3D4450]' : 'hover:bg-[#1E2329]'
+              'w-5 h-5 rounded flex items-center justify-center transition-all',
+              displayMode === 'buyOnly' ? 'bg-[#2B3139]' : 'hover:bg-[#1E2329]'
             )}
-            title="Only Buy"
+            title="Buy Only"
           >
-            <div className="w-4 h-4 bg-[#0D9D5F] rounded-sm" />
+            <div className="w-3.5 h-3.5 bg-[#0D9D5F] rounded-[1px]" />
           </button>
 
-          {/* Sell Only */}
           <button
             onClick={() => setDisplayMode('sellOnly')}
             className={cn(
-              'w-6 h-6 rounded flex items-center justify-center transition-all duration-200',
-              displayMode === 'sellOnly' ? 'bg-[#1E2329] ring-1 ring-[#3D4450]' : 'hover:bg-[#1E2329]'
+              'w-5 h-5 rounded flex items-center justify-center transition-all',
+              displayMode === 'sellOnly' ? 'bg-[#2B3139]' : 'hover:bg-[#1E2329]'
             )}
-            title="Only Sell"
+            title="Sell Only"
           >
-            <div className="w-4 h-4 bg-[#C8102E] rounded-sm" />
+            <div className="w-3.5 h-3.5 bg-[#C8102E] rounded-[1px]" />
           </button>
 
-          {/* Hamburger Menu */}
-          <button className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#EAECEF]">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M3 5a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V5zM3 10a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3 15a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" />
-            </svg>
-          </button>
+          {/* Precision Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setShowPrecisionDropdown(!showPrecisionDropdown)}
+              className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329] rounded transition-colors font-mono"
+            >
+              {precision}
+              <ChevronDown size={10} />
+            </button>
+            
+            {showPrecisionDropdown && (
+              <div className="absolute top-full right-0 mt-1 bg-[#1E2329] border border-[#2B3139] rounded shadow-lg z-50 min-w-[50px]">
+                {precisionOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => {
+                      setPrecision(opt);
+                      setShowPrecisionDropdown(false);
+                    }}
+                    className={cn(
+                      'w-full px-2 py-1 text-[10px] text-left font-mono transition-colors',
+                      precision === opt
+                        ? 'text-[#FF7A00] bg-[#2B3139]'
+                        : 'text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#2B3139]'
+                    )}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Column Headers */}
-      <div className="grid grid-cols-3 gap-2 px-3 py-1.5 text-[10px] text-[#848E9C] border-b border-[#2B3139]">
+      <div className="grid grid-cols-3 gap-1 px-2 py-1 text-[10px] text-[#5E6673] font-medium border-b border-[#1E2329]">
         <span>Price (USDT)</span>
         <span className="text-right">Qty. (BTC)</span>
         <span className="text-right">Sum (BTC)</span>
       </div>
 
-      {/* Asks (Sell Orders) - Top Section */}
-      {(displayMode === 'both' || displayMode === 'sellOnly') && (
-        <div className="flex flex-col-reverse flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#2B3139] scrollbar-track-[#0B0E11]">
-          {displayedAsks.map((entry, index) => (
-            <OrderbookRow
-              key={`ask-${entry[0]}-${index}`}
-              entry={entry}
-              maxTotal={maxTotal}
-              isBid={false}
-              onClick={handlePriceClick}
-            />
-          ))}
+      {/* Orderbook Content */}
+      {activeTab === 'orderbook' ? (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Asks (Sell Orders) - Top Section */}
+          {(displayMode === 'both' || displayMode === 'sellOnly') && (
+            <div className={cn(
+              'overflow-y-auto overflow-x-hidden scrollbar-none',
+              displayMode === 'both' ? 'flex-1' : 'flex-1'
+            )}>
+              <div className="flex flex-col">
+                {displayedAsks.map(({ entry, cumSum }, index) => (
+                  <OrderbookRow
+                    key={`ask-${entry[0]}-${index}`}
+                    entry={entry}
+                    cumulativeSum={cumSum}
+                    maxSum={maxSum}
+                    isBid={false}
+                    isFlashing={flashingPrices.has(entry[0])}
+                    flashDirection={flashingPrices.get(entry[0])}
+                    onClick={handlePriceClick}
+                    precision={precision}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Current Price - Center Separator */}
+          <div className="flex items-center justify-between px-2 py-1.5 bg-[#0B0E11] border-y border-[#1E2329]">
+            <div className="flex items-center gap-1">
+              <span 
+                className="text-base font-bold font-mono tabular-nums"
+                style={{ color: priceDirection === 'up' ? '#0D9D5F' : '#C8102E' }}
+              >
+                {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : precision === '0.1' ? 1 : 2)}
+              </span>
+              {priceDirection === 'up' ? (
+                <ChevronUp size={14} className="text-[#0D9D5F]" />
+              ) : (
+                <ChevronDown size={14} className="text-[#C8102E]" />
+              )}
+            </div>
+            <span className="text-[10px] text-[#5E6673] font-mono">
+              <span className="text-[#848E9C]">M</span> {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : precision === '0.1' ? 1 : 2)}
+            </span>
+          </div>
+
+          {/* Bids (Buy Orders) - Bottom Section */}
+          {(displayMode === 'both' || displayMode === 'buyOnly') && (
+            <div className={cn(
+              'overflow-y-auto overflow-x-hidden scrollbar-none',
+              displayMode === 'both' ? 'flex-1' : 'flex-1'
+            )}>
+              <div className="flex flex-col">
+                {displayedBids.map(({ entry, cumSum }, index) => (
+                  <OrderbookRow
+                    key={`bid-${entry[0]}-${index}`}
+                    entry={entry}
+                    cumulativeSum={cumSum}
+                    maxSum={maxSum}
+                    isBid={true}
+                    isFlashing={flashingPrices.has(entry[0])}
+                    flashDirection={flashingPrices.get(entry[0])}
+                    onClick={handlePriceClick}
+                    precision={precision}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        // Trades tab placeholder
+        <div className="flex-1 flex items-center justify-center text-[#5E6673] text-xs">
+          Trades coming soon
         </div>
       )}
 
-      {/* Current Price - Center */}
-      <div className="flex items-center justify-between px-3 py-2.5 bg-[#0B0E11] border-y border-[#2B3139]">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold font-mono" style={{ color: '#C8102E' }}>
-            {parseFloat(lastPrice).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+      {/* Footer - Buy/Sell Ratio Bar */}
+      <div className="flex items-center px-2 py-1.5 border-t border-[#1E2329] bg-[#0B0E11]">
+        {/* Ratio Bar */}
+        <div className="flex-1 h-1 bg-[#1E2329] rounded-full overflow-hidden flex">
+          <div 
+            className="h-full transition-all duration-300"
+            style={{ 
+              width: `${buyPercentage}%`,
+              backgroundColor: '#0D9D5F'
+            }} 
+          />
+          <div 
+            className="h-full transition-all duration-300"
+            style={{ 
+              width: `${sellPercentage}%`,
+              backgroundColor: '#C8102E'
+            }} 
+          />
+        </div>
+        
+        {/* Percentage Labels */}
+        <div className="flex items-center gap-2 ml-2 text-[10px] font-mono">
+          <span className="flex items-center gap-0.5">
+            <span className="w-1.5 h-1.5 rounded-sm bg-[#0D9D5F]" />
+            <span className="text-[#0D9D5F]">{buyPercentage}%</span>
           </span>
-          <ChevronDown size={16} className="text-[#C8102E]" />
-        </div>
-        <span className="text-xs text-[#848E9C] font-mono">M {parseFloat(lastPrice).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
-      </div>
-
-      {/* Bids (Buy Orders) - Bottom Section */}
-      {(displayMode === 'both' || displayMode === 'buyOnly') && (
-        <div className="flex flex-col flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#2B3139] scrollbar-track-[#0B0E11]">
-          {displayedBids.map((entry, index) => (
-            <OrderbookRow
-              key={`bid-${entry[0]}-${index}`}
-              entry={entry}
-              maxTotal={maxTotal}
-              isBid={true}
-              onClick={handlePriceClick}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Footer - Buy/Sell Ratio */}
-      <div className="flex items-center justify-between px-3 py-2 border-t border-[#2B3139] bg-[#0B0E11]">
-        <div className="flex items-center gap-2 text-xs font-mono">
-          <span style={{ color: '#0D9D5F' }}>B {buyPercentage}%</span>
-          <span style={{ color: '#C8102E' }}>S {sellPercentage}%</span>
+          <span className="flex items-center gap-0.5">
+            <span className="w-1.5 h-1.5 rounded-sm bg-[#C8102E]" />
+            <span className="text-[#C8102E]">{sellPercentage}%</span>
+          </span>
         </div>
       </div>
+
+      {/* Custom CSS for flash animations */}
+      <style jsx global>{`
+        @keyframes flashGreen {
+          0%, 100% { background-color: transparent; }
+          50% { background-color: rgba(13, 157, 95, 0.3); }
+        }
+        @keyframes flashRed {
+          0%, 100% { background-color: transparent; }
+          50% { background-color: rgba(200, 16, 46, 0.3); }
+        }
+        .animate-flash-green {
+          animation: flashGreen 0.3s ease-out;
+        }
+        .animate-flash-red {
+          animation: flashRed 0.3s ease-out;
+        }
+        .scrollbar-none::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-none {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }
