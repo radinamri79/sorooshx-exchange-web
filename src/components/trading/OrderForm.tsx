@@ -259,14 +259,14 @@ export function OrderForm({
       {/* ================================================================ */}
       {/* ACTION TABS - Open / Close                                       */}
       {/* ================================================================ */}
-      <div className="flex border-b border-[#2B3139]">
+      <div className="flex px-3 py-2 gap-2">
         {(['OPEN', 'CLOSE'] as const).map((action) => (
           <button
             key={action}
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, action }))}
             className={cn(
-              'flex-1 py-2.5 text-sm font-semibold transition-all duration-200 rounded-lg mx-0.5 my-0.5',
+              'flex-1 py-2.5 text-sm font-semibold transition-all duration-200 rounded-lg',
               formData.action === action
                 ? 'text-white bg-[#FF7A00]'
                 : 'text-[#848E9C] bg-[#1E2329] hover:text-[#EAECEF] hover:bg-[#2B3139]'
