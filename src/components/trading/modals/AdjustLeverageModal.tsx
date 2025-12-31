@@ -1,5 +1,5 @@
 /**
- * Compact Adjust Leverage Modal - Professional futures leverage management
+ * Adjust Leverage Modal - Professional futures leverage management inspired by Bitunix
  */
 'use client';
 
@@ -39,41 +39,41 @@ export function AdjustLeverageModal({
 
   if (!isOpen) return null;
 
-  const quickButtons = [1, 10, 25, 50, 100, 125];
+  const quickButtons = [1, 40, 80, 120, 160, 200];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-lg border border-gray-800 bg-[#0d0d0f] p-4 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-xl border border-gray-700 bg-black p-4 shadow-2xl">
         {/* Header */}
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-white">Leverage</h2>
+        <div className="mb-4 flex items-center justify-between border-b border-gray-700 pb-3">
+          <h2 className="text-base font-bold text-white">Adjust Leverage</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-300 transition"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Simultaneous Toggle */}
-        <label className="mb-3 flex items-center gap-2 cursor-pointer">
+        <label className="mb-4 flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             checked={adjustBoth}
             onChange={(e) => setAdjustBoth(e.target.checked)}
-            className="w-3.5 h-3.5 accent-orange-500"
+            className="w-4 h-4 accent-orange-500 rounded cursor-pointer bg-black border-gray-700 border"
           />
-          <span className="text-[10px] text-gray-400">Adjust both</span>
+          <span className="text-xs text-gray-400">Adjust Long and Short Together</span>
         </label>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Long Leverage */}
-          <div className="rounded border border-gray-800 bg-gray-900 p-2.5">
-            <div className="mb-1.5 flex items-center justify-between">
-              <label className="text-[11px] font-semibold text-emerald-500">
+          <div className="rounded-lg border border-gray-700 bg-gray-900/30 p-3">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-semibold text-emerald-500">
                 Long
               </label>
-              <span className="text-sm font-bold text-white">{longLeverage}x</span>
+              <span className="text-xl font-bold text-white">{longLeverage}X</span>
             </div>
             
             {/* Slider */}
@@ -83,31 +83,17 @@ export function AdjustLeverageModal({
               max={MAX_LEVERAGE}
               value={longLeverage}
               onChange={(e) => handleLongChange(parseInt(e.target.value))}
-              className="w-full h-1 bg-gray-800 rounded cursor-pointer accent-emerald-500"
+              className="w-full h-2 bg-gray-800 rounded-lg cursor-pointer accent-emerald-500"
+              style={{ accentColor: '#10b981' }}
             />
 
             {/* Quick Buttons */}
-            <div className="mt-1.5 grid grid-cols-3 gap-0.5">
-              {quickButtons.slice(0, 3).map((btn) => (
+            <div className="mt-3 grid grid-cols-6 gap-1">
+              {quickButtons.map((btn) => (
                 <button
                   key={btn}
                   onClick={() => handleLongChange(btn)}
-                  className={`rounded px-1.5 py-0.5 text-[9px] font-semibold transition ${
-                    longLeverage === btn
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                  }`}
-                >
-                  {btn}x
-                </button>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-0.5 mt-0.5">
-              {quickButtons.slice(3).map((btn) => (
-                <button
-                  key={btn}
-                  onClick={() => handleLongChange(btn)}
-                  className={`rounded px-1.5 py-0.5 text-[9px] font-semibold transition ${
+                  className={`rounded-lg px-2 py-1 text-xs font-bold transition ${
                     longLeverage === btn
                       ? 'bg-emerald-500 text-white'
                       : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -119,35 +105,35 @@ export function AdjustLeverageModal({
             </div>
 
             {/* Input with +/- */}
-            <div className="mt-1.5 flex items-center gap-0.5">
+            <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={() => handleLongChange(longLeverage - 1)}
-                className="flex-shrink-0 rounded bg-gray-800 px-1.5 py-0.5 text-gray-400 hover:bg-gray-700 transition"
+                className="flex-shrink-0 rounded-lg bg-gray-800 px-2 py-1 text-gray-400 hover:bg-gray-700 transition"
               >
-                <Minus size={12} />
+                <Minus size={16} />
               </button>
               <input
                 type="number"
                 value={longLeverage}
                 onChange={(e) => handleLongChange(parseInt(e.target.value) || MIN_LEVERAGE)}
-                className="flex-1 rounded bg-gray-800 px-1.5 py-0.5 text-[11px] text-center text-white outline-none border border-gray-700 focus:border-emerald-500 transition"
+                className="flex-1 rounded-lg bg-gray-800 px-3 py-1.5 text-center text-base font-bold text-white outline-none border border-gray-700 focus:border-emerald-500 transition"
               />
               <button
                 onClick={() => handleLongChange(longLeverage + 1)}
-                className="flex-shrink-0 rounded bg-gray-800 px-1.5 py-0.5 text-gray-400 hover:bg-gray-700 transition"
+                className="flex-shrink-0 rounded-lg bg-gray-800 px-2 py-1 text-gray-400 hover:bg-gray-700 transition"
               >
-                <Plus size={12} />
+                <Plus size={16} />
               </button>
             </div>
           </div>
 
           {/* Short Leverage */}
-          <div className="rounded border border-gray-800 bg-gray-900 p-2.5">
-            <div className="mb-1.5 flex items-center justify-between">
-              <label className="text-[11px] font-semibold text-red-500">
+          <div className="rounded-lg border border-gray-700 bg-gray-900/30 p-3">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-semibold text-red-500">
                 Short
               </label>
-              <span className="text-sm font-bold text-white">{shortLeverage}x</span>
+              <span className="text-xl font-bold text-white">{shortLeverage}X</span>
             </div>
 
             {/* Slider */}
@@ -157,31 +143,17 @@ export function AdjustLeverageModal({
               max={MAX_LEVERAGE}
               value={shortLeverage}
               onChange={(e) => handleShortChange(parseInt(e.target.value))}
-              className="w-full h-1 bg-gray-800 rounded cursor-pointer accent-red-500"
+              className="w-full h-2 bg-gray-800 rounded-lg cursor-pointer accent-red-500"
+              style={{ accentColor: '#ef4444' }}
             />
 
             {/* Quick Buttons */}
-            <div className="mt-1.5 grid grid-cols-3 gap-0.5">
-              {quickButtons.slice(0, 3).map((btn) => (
+            <div className="mt-3 grid grid-cols-6 gap-1">
+              {quickButtons.map((btn) => (
                 <button
                   key={btn}
                   onClick={() => handleShortChange(btn)}
-                  className={`rounded px-1.5 py-0.5 text-[9px] font-semibold transition ${
-                    shortLeverage === btn
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                  }`}
-                >
-                  {btn}x
-                </button>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-0.5 mt-0.5">
-              {quickButtons.slice(3).map((btn) => (
-                <button
-                  key={btn}
-                  onClick={() => handleShortChange(btn)}
-                  className={`rounded px-1.5 py-0.5 text-[9px] font-semibold transition ${
+                  className={`rounded-lg px-2 py-1 text-xs font-bold transition ${
                     shortLeverage === btn
                       ? 'bg-red-500 text-white'
                       : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -193,24 +165,24 @@ export function AdjustLeverageModal({
             </div>
 
             {/* Input with +/- */}
-            <div className="mt-1.5 flex items-center gap-0.5">
+            <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={() => handleShortChange(shortLeverage - 1)}
-                className="flex-shrink-0 rounded bg-gray-800 px-1.5 py-0.5 text-gray-400 hover:bg-gray-700 transition"
+                className="flex-shrink-0 rounded-lg bg-gray-800 px-2 py-1 text-gray-400 hover:bg-gray-700 transition"
               >
-                <Minus size={12} />
+                <Minus size={16} />
               </button>
               <input
                 type="number"
                 value={shortLeverage}
                 onChange={(e) => handleShortChange(parseInt(e.target.value) || MIN_LEVERAGE)}
-                className="flex-1 rounded bg-gray-800 px-1.5 py-0.5 text-[11px] text-center text-white outline-none border border-gray-700 focus:border-red-500 transition"
+                className="flex-1 rounded-lg bg-gray-800 px-3 py-1.5 text-center text-base font-bold text-white outline-none border border-gray-700 focus:border-red-500 transition"
               />
               <button
                 onClick={() => handleShortChange(shortLeverage + 1)}
-                className="flex-shrink-0 rounded bg-gray-800 px-1.5 py-0.5 text-gray-400 hover:bg-gray-700 transition"
+                className="flex-shrink-0 rounded-lg bg-gray-800 px-2 py-1 text-gray-400 hover:bg-gray-700 transition"
               >
-                <Plus size={12} />
+                <Plus size={16} />
               </button>
             </div>
           </div>
@@ -219,9 +191,9 @@ export function AdjustLeverageModal({
         {/* Confirm Button */}
         <button
           onClick={onClose}
-          className="mt-3 w-full rounded bg-orange-500 py-2 text-[12px] font-bold text-white hover:bg-orange-600 transition"
+          className="mt-4 w-full rounded-lg bg-orange-500 py-2.5 text-sm font-bold text-white hover:bg-orange-600 active:bg-orange-700 transition"
         >
-          Done
+          Confirm
         </button>
       </div>
     </div>
