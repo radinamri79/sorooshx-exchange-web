@@ -15,7 +15,7 @@ interface MarketInfoProps {
 // Market Info Modal
 function MarketInfoModal({ symbol, isOpen, onClose }: { symbol: string; isOpen: boolean; onClose: () => void }) {
   return isOpen ? (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-[#121214] rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto border border-[#2a2a2d]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2d]">
@@ -96,7 +96,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   const [closePrice, setClosePrice] = useState('0');
 
   return isOpen ? (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-[#121214] rounded-lg max-w-md w-full border border-[#2a2a2d]">
         {/* Header with Tabs */}
         <div className="border-b border-[#2a2a2d]">
