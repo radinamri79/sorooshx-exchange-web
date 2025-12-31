@@ -7,7 +7,7 @@ import { useOrderbookStore } from '@/stores/useOrderbookStore';
 import { binanceWS } from '@/services/websocket';
 import { fetchOrderbook } from '@/services/api';
 import type { OrderbookEntry } from '@/types';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Settings } from 'lucide-react';
 
 // ============================================================================
 // BITUNIX-STYLE ORDERBOOK COMPONENT
@@ -79,13 +79,12 @@ function OrderbookRow({
         flashClass
       )}
     >
-      {/* Depth bar - fills from appropriate side */}
+      {/* Depth bar - fills from RIGHT for both bids and asks like Bitunix */}
       <div
-        className="absolute top-0 bottom-0 transition-all duration-200 pointer-events-none"
+        className="absolute top-0 bottom-0 right-0 transition-all duration-200 pointer-events-none"
         style={{
           backgroundColor: depthColor,
           width: `${Math.min(depthPercentage, 100)}%`,
-          [isBid ? 'right' : 'left']: 0,
         }}
       />
       
@@ -312,53 +311,65 @@ export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
           </button>
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center gap-1">
-          {/* Display Mode Icons - Bitunix Style */}
+        {/* Controls - Bitunix Style */}
+        <div className="flex items-center gap-1.5">
+          {/* Display Mode Icons - Exact Bitunix Style */}
           <button
             onClick={() => setDisplayMode('both')}
             className={cn(
-              'w-5 h-5 rounded flex items-center justify-center transition-all',
+              'w-6 h-6 rounded flex items-center justify-center transition-all',
               displayMode === 'both' ? 'bg-[#2B3139]' : 'hover:bg-[#1E2329]'
             )}
             title="Buy and Sell"
           >
-            <div className="w-3.5 h-3.5 flex flex-col gap-[1px]">
-              <div className="flex-1 bg-[#C8102E] rounded-[1px]" />
-              <div className="flex-1 bg-[#0D9D5F] rounded-[1px]" />
+            <div className="w-4 h-4 grid grid-cols-2 gap-[2px]">
+              <div className="bg-[#C8102E] rounded-[2px]" />
+              <div className="bg-[#C8102E] rounded-[2px]" />
+              <div className="bg-[#0D9D5F] rounded-[2px]" />
+              <div className="bg-[#0D9D5F] rounded-[2px]" />
             </div>
           </button>
 
           <button
             onClick={() => setDisplayMode('buyOnly')}
             className={cn(
-              'w-5 h-5 rounded flex items-center justify-center transition-all',
+              'w-6 h-6 rounded flex items-center justify-center transition-all',
               displayMode === 'buyOnly' ? 'bg-[#2B3139]' : 'hover:bg-[#1E2329]'
             )}
             title="Buy Only"
           >
-            <div className="w-3.5 h-3.5 bg-[#0D9D5F] rounded-[1px]" />
+            <div className="w-4 h-4 grid grid-cols-2 gap-[2px]">
+              <div className="bg-[#0D9D5F] rounded-[2px]" />
+              <div className="bg-[#0D9D5F] rounded-[2px]" />
+              <div className="bg-[#0D9D5F] rounded-[2px]" />
+              <div className="bg-[#0D9D5F] rounded-[2px]" />
+            </div>
           </button>
 
           <button
             onClick={() => setDisplayMode('sellOnly')}
             className={cn(
-              'w-5 h-5 rounded flex items-center justify-center transition-all',
+              'w-6 h-6 rounded flex items-center justify-center transition-all',
               displayMode === 'sellOnly' ? 'bg-[#2B3139]' : 'hover:bg-[#1E2329]'
             )}
             title="Sell Only"
           >
-            <div className="w-3.5 h-3.5 bg-[#C8102E] rounded-[1px]" />
+            <div className="w-4 h-4 grid grid-cols-2 gap-[2px]">
+              <div className="bg-[#C8102E] rounded-[2px]" />
+              <div className="bg-[#C8102E] rounded-[2px]" />
+              <div className="bg-[#C8102E] rounded-[2px]" />
+              <div className="bg-[#C8102E] rounded-[2px]" />
+            </div>
           </button>
 
           {/* Precision Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setShowPrecisionDropdown(!showPrecisionDropdown)}
-              className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329] rounded transition-colors font-mono"
+              className="flex items-center gap-0.5 px-2 py-1 text-[11px] text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329] rounded transition-colors font-mono"
             >
               {precision}
-              <ChevronDown size={10} />
+              <ChevronDown size={12} />
             </button>
             
             {showPrecisionDropdown && (
@@ -383,6 +394,14 @@ export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
               </div>
             )}
           </div>
+
+          {/* Settings Icon */}
+          <button
+            className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#EAECEF]"
+            title="Settings"
+          >
+            <Settings size={14} />
+          </button>
         </div>
       </div>
 
@@ -471,10 +490,16 @@ export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
         </div>
       )}
 
-      {/* Footer - Buy/Sell Ratio Bar */}
-      <div className="flex items-center px-2 py-1.5 border-t border-[#1E2329] bg-[#0B0E11]">
+      {/* Footer - Buy/Sell Ratio Bar - Bitunix Style */}
+      <div className="flex items-center justify-between px-2 py-1.5 border-t border-[#1E2329] bg-[#0B0E11]">
+        {/* Buy Percentage */}
+        <div className="flex items-center gap-1 text-[11px] font-mono">
+          <span className="px-1 py-0.5 bg-[#0D9D5F]/20 text-[#0D9D5F] rounded text-[10px] font-medium">B</span>
+          <span className="text-[#0D9D5F]">{buyPercentage}%</span>
+        </div>
+
         {/* Ratio Bar */}
-        <div className="flex-1 h-1 bg-[#1E2329] rounded-full overflow-hidden flex">
+        <div className="flex-1 h-1.5 mx-3 bg-[#1E2329] rounded overflow-hidden flex">
           <div 
             className="h-full transition-all duration-300"
             style={{ 
@@ -491,16 +516,10 @@ export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
           />
         </div>
         
-        {/* Percentage Labels */}
-        <div className="flex items-center gap-2 ml-2 text-[10px] font-mono">
-          <span className="flex items-center gap-0.5">
-            <span className="w-1.5 h-1.5 rounded-sm bg-[#0D9D5F]" />
-            <span className="text-[#0D9D5F]">{buyPercentage}%</span>
-          </span>
-          <span className="flex items-center gap-0.5">
-            <span className="w-1.5 h-1.5 rounded-sm bg-[#C8102E]" />
-            <span className="text-[#C8102E]">{sellPercentage}%</span>
-          </span>
+        {/* Sell Percentage */}
+        <div className="flex items-center gap-1 text-[11px] font-mono">
+          <span className="text-[#C8102E]">{sellPercentage}%</span>
+          <span className="px-1 py-0.5 bg-[#C8102E]/20 text-[#C8102E] rounded text-[10px] font-medium">S</span>
         </div>
       </div>
 
