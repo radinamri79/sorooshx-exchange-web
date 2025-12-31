@@ -279,12 +279,12 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
         {/* MIDDLE COLUMN: Order Book - Bitunix Style Width */}
         <aside className={cn(
-          'w-[280px] xl:w-[320px] flex flex-col border-l border-[#2a2a2d]',
+          'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d]',
           isRTL && 'order-1 border-l-0 border-r'
         )}>
           <Orderbook 
             className="flex-1 bg-[#0d0d0f] border-0" 
-            maxRows={15}
+            maxRows={10}
           />
         </aside>
 

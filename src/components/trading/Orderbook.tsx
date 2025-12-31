@@ -75,9 +75,10 @@ function OrderbookRow({
       className={cn(
         'grid grid-cols-3 gap-1 px-2 py-[3px] text-[11px] cursor-pointer relative w-full',
         'transition-colors duration-75 hover:bg-[#1E2329]',
-        'font-mono tabular-nums',
+        'tabular-nums tracking-tight',
         flashClass
       )}
+      style={{ fontFamily: "'DIN Pro', 'Roboto Mono', 'SF Mono', 'Consolas', monospace" }}
     >
       {/* Depth bar - fills from RIGHT for both bids and asks like Bitunix */}
       <div
@@ -109,7 +110,7 @@ function OrderbookRow({
   );
 }
 
-export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
+export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
   const { currentSymbol, tickers } = useMarketStore();
   const { bids, asks, lastUpdateId, setOrderbook, mergeOrderbook, reset } = useOrderbookStore();
   
@@ -443,8 +444,11 @@ export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
           <div className="flex items-center justify-between px-2 py-1.5 bg-[#0B0E11] border-y border-[#1E2329]">
             <div className="flex items-center gap-1">
               <span 
-                className="text-base font-bold font-mono tabular-nums"
-                style={{ color: priceDirection === 'up' ? '#0D9D5F' : '#C8102E' }}
+                className="text-base font-bold tabular-nums"
+                style={{ 
+                  color: priceDirection === 'up' ? '#0D9D5F' : '#C8102E',
+                  fontFamily: "'DIN Pro', 'Roboto Mono', 'SF Mono', 'Consolas', monospace"
+                }}
               >
                 {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : precision === '0.1' ? 1 : 2)}
               </span>
@@ -454,7 +458,10 @@ export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
                 <ChevronDown size={14} className="text-[#C8102E]" />
               )}
             </div>
-            <span className="text-[10px] text-[#5E6673] font-mono">
+            <span 
+              className="text-[10px] text-[#5E6673] tabular-nums"
+              style={{ fontFamily: "'DIN Pro', 'Roboto Mono', 'SF Mono', 'Consolas', monospace" }}
+            >
               <span className="text-[#848E9C]">M</span> {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : precision === '0.1' ? 1 : 2)}
             </span>
           </div>
@@ -491,7 +498,10 @@ export function Orderbook({ className, maxRows = 12 }: OrderbookProps) {
       )}
 
       {/* Footer - Buy/Sell Ratio Bar - Bitunix Style */}
-      <div className="flex items-center justify-between px-2 py-1.5 border-t border-[#1E2329] bg-[#0B0E11]">
+      <div 
+        className="flex items-center justify-between px-2 py-1.5 border-t border-[#1E2329] bg-[#0B0E11]"
+        style={{ fontFamily: "'DIN Pro', 'Roboto Mono', 'SF Mono', 'Consolas', monospace" }}
+      >
         {/* Buy Percentage */}
         <div className="flex items-center gap-1 text-[11px] font-mono">
           <span className="px-1 py-0.5 bg-[#0D9D5F]/20 text-[#0D9D5F] rounded text-[10px] font-medium">B</span>
