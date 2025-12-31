@@ -402,24 +402,24 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
         )}
 
         {/* Current Price - Center Separator */}
-        <div className="flex items-center justify-between px-2 py-1.5 bg-[#0B0E11] border-y border-[#1E2329]">
-          <div className="flex items-center gap-1">
+        <div className="flex items-center justify-between px-2 py-3 bg-[#0B0E11] border-y border-[#1E2329]">
+          <div className="flex items-center gap-1.5">
             <span 
-              className="text-sm font-bold tabular-nums"
+              className="text-base font-bold tabular-nums"
               style={{ color: priceDirection === 'up' ? '#0D9D5F' : '#C8102E' }}
             >
               {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : 1)}
             </span>
             {priceDirection === 'up' ? (
-              <ChevronUp size={14} className="text-[#0D9D5F]" />
+              <ChevronUp size={16} className="text-[#0D9D5F]" />
             ) : (
-              <ChevronDown size={14} className="text-[#C8102E]" />
+              <ChevronDown size={16} className="text-[#C8102E]" />
             )}
           </div>
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-[#848E9C]">M</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[#848E9C]">M</span>
             <span 
-              className="text-xs font-medium tabular-nums"
+              className="text-sm font-medium tabular-nums"
               style={{ color: '#848E9C' }}
             >
               {formatWithPrecision(lastPrice, precision === '10' ? 0 : precision === '1' ? 0 : 1)}
@@ -447,41 +447,42 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
         )}
       </div>
 
-      {/* Footer - Buy/Sell Ratio Bar - Professional Modern Style */}
-      <div className="flex items-center justify-center gap-3 px-2 py-2.5 border-t border-[#1E2329] bg-[#0B0E11]">
-        {/* Buy Percentage & Icon */}
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: '#0D9D5F' }} />
-          <span className="text-xs font-semibold text-[#0D9D5F] min-w-[32px]">{buyPercentage}%</span>
+      {/* Footer - Buy/Sell Ratio Bar - Professional Bitunix Style */}
+      <div className="flex items-center justify-between px-2 py-3 border-t border-[#1E2329] bg-[#0B0E11]">
+        {/* Buy Percentage */}
+        <div className="flex items-center gap-1.5 text-sm">
+          <div className="flex items-center gap-0.5">
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#0D9D5F' }} />
+            <span className="text-[#0D9D5F] font-semibold" style={{ minWidth: '45px' }}>{buyPercentage}%</span>
+          </div>
         </div>
 
-        {/* Ratio Bar - Modern Professional Design */}
-        <div className="h-1.5 w-40 bg-[#1a1d23] rounded-full overflow-hidden flex" style={{ 
-          backgroundImage: 'linear-gradient(90deg, rgba(13,157,95,0.1), rgba(13,157,95,0.05))',
-          border: '1px solid rgba(30,35,41,0.5)'
-        }}>
+        {/* Ratio Bar - Enhanced Bitunix Style */}
+        <div className="flex-1 h-3 mx-3 bg-[#1E2329] rounded-full overflow-hidden flex shadow-sm" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
           <div 
-            className="h-full transition-all duration-500 ease-out"
+            className="h-full transition-all duration-300"
             style={{ 
               width: `${buyPercentage}%`,
-              background: 'linear-gradient(90deg, #0D9D5F 0%, #0a7a48 100%)',
-              boxShadow: '0 0 12px rgba(13, 157, 95, 0.6), inset 0 1px 2px rgba(255,255,255,0.1)'
+              backgroundColor: '#0D9D5F',
+              boxShadow: '0 0 10px rgba(13, 157, 95, 0.6)'
             }} 
           />
           <div 
-            className="h-full transition-all duration-500 ease-out"
+            className="h-full transition-all duration-300"
             style={{ 
               width: `${sellPercentage}%`,
-              background: 'linear-gradient(90deg, #c8102e 0%, #9a0a24 100%)',
-              boxShadow: '0 0 12px rgba(200, 16, 46, 0.6), inset 0 1px 2px rgba(255,255,255,0.1)'
+              backgroundColor: '#C8102E',
+              boxShadow: '0 0 10px rgba(200, 16, 46, 0.6)'
             }} 
           />
         </div>
-
-        {/* Sell Percentage & Icon */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs font-semibold text-[#C8102E] min-w-[32px] text-right">{sellPercentage}%</span>
-          <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: '#C8102E' }} />
+        
+        {/* Sell Percentage */}
+        <div className="flex items-center gap-1.5 text-sm">
+          <div className="flex items-center gap-0.5">
+            <span className="text-[#C8102E] font-semibold" style={{ minWidth: '45px', textAlign: 'right' }}>{sellPercentage}%</span>
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#C8102E' }} />
+          </div>
         </div>
       </div>
 
