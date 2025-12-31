@@ -6,3 +6,4 @@ export { TradingChart } from './TradingChart';
 export { OrdersPanel } from './OrdersPanel';
 export { AccountInfoPanel } from './AccountInfoPanel';
 export { DataExport } from './DataExport';
+export { Calculator } from './Calculator';
