@@ -324,13 +324,13 @@ export function OrderForm({
                   'border outline-none transition-all duration-200',
                   errors.price 
                     ? 'border-[#F6465D] focus:border-[#F6465D]' 
-                    : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF6B35]'
+                    : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF7A00]'
                 )}
               />
               <button
                 type="button"
                 onClick={setLastPrice}
-                className="absolute right-12 text-[10px] font-bold text-[#FF6B35] hover:text-[#FF8555]
+                className="absolute right-12 text-[10px] font-bold text-[#FF7A00] hover:text-[#FF8A20]
                            transition-colors px-1"
               >
                 Last
@@ -359,7 +359,7 @@ export function OrderForm({
               placeholder="0.00"
               className="w-full h-9 px-3 text-sm font-medium rounded
                          bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]
-                         border border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF6B35]
+                         border border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF7A00]
                          outline-none transition-all duration-200"
             />
           </div>
@@ -380,7 +380,7 @@ export function OrderForm({
                 'border outline-none transition-all duration-200',
                 errors.quantity 
                   ? 'border-[#F6465D]' 
-                  : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF6B35]'
+                  : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF7A00]'
               )}
             />
             <div className="absolute right-3 flex items-center gap-1 text-[11px] text-[#848E9C] cursor-pointer hover:text-[#EAECEF]">
@@ -411,7 +411,7 @@ export function OrderForm({
                   'absolute top-1/2 w-2.5 h-2.5 rounded-full border-2 transition-all duration-200',
                   'hover:scale-125',
                   formData.quantityPercent >= percent
-                    ? 'bg-[#FF6B35] border-[#FF6B35]'
+                    ? 'bg-[#FF7A00] border-[#FF7A00]'
                     : 'bg-[#0B0E11] border-[#5E6673] hover:border-[#848E9C]'
                 )}
                 style={{ left: `${percent}%`, transform: 'translate(-50%, -50%)' }}
@@ -442,7 +442,7 @@ export function OrderForm({
                 'w-4 h-4 rounded flex items-center justify-center transition-all duration-200',
                 'border-2 cursor-pointer',
                 formData.tpsl.enabled
-                  ? 'bg-[#FF6B35] border-[#FF6B35]'
+                  ? 'bg-[#FF7A00] border-[#FF7A00]'
                   : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
               )}
             >
@@ -464,7 +464,7 @@ export function OrderForm({
                   tpsl: { ...prev.tpsl, advancedMode: !prev.tpsl.advancedMode },
                 }))
               }
-              className="text-[10px] font-medium text-[#FF6B35] hover:text-[#FF8555] transition-colors"
+              className="text-[10px] font-medium text-[#FF7A00] hover:text-[#FF8A20] transition-colors"
             >
               Advanced ▸
             </button>
