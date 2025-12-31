@@ -12,7 +12,6 @@ import {
   TradingChart,
   OrdersPanel,
   AccountInfoPanel,
-  Calculator,
 } from '@/components/trading';
 import { binanceWS } from '@/services/websocket';
 import { 
@@ -294,19 +293,14 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <div className="h-[180px] bg-[#0d0d0f] border-t border-[#2a2a2d]" />
         </aside>
 
-        {/* RIGHT COLUMN: Order Form + Calculator + Account Info */}
+        {/* RIGHT COLUMN: Order Form + Account Info */}
         <aside className={cn(
           'w-[280px] flex flex-col border-l border-[#2a2a2d]',
           isRTL && 'order-3 border-l-0 border-r'
         )}>
           {/* Order Form Section */}
-          <div className="flex-1 overflow-auto bg-[#121214] min-h-0">
+          <div className="flex-1 overflow-auto bg-[#121214]">
             <OrderForm className="bg-transparent border-0" />
-          </div>
-
-          {/* Calculator Section */}
-          <div className="h-[280px] bg-[#0d0d0f] border-t border-[#2a2a2d] overflow-hidden">
-            <Calculator className="h-full w-full" />
           </div>
 
           {/* Account Info Section */}

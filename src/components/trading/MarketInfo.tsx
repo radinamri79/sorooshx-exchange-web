@@ -6,7 +6,7 @@ import { cn, formatPrice, formatNumber, formatPercentage } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { binanceWS } from '@/services/websocket';
 import type { BinanceTicker } from '@/types';
-import { TrendingUp, TrendingDown, Info, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, Info, X, Calculator as CalculatorIcon } from 'lucide-react';
 
 interface MarketInfoProps {
   className?: string;
@@ -435,6 +435,15 @@ export function MarketInfo({ className }: MarketInfoProps) {
           title="Market Info"
         >
           <Info size={16} />
+        </button>
+
+        {/* Calculator Icon Button */}
+        <button
+          onClick={() => setShowCalculatorModal(true)}
+          className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#FF7A00] shrink-0"
+          title="Calculator"
+        >
+          <CalculatorIcon size={16} />
         </button>
 
         {/* Main Price with Change */}
