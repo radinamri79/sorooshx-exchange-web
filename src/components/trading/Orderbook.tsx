@@ -402,7 +402,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
         )}
 
         {/* Current Price - Center Separator */}
-        <div className="flex items-center justify-between px-2 py-3 bg-[#0B0E11] border-t border-[#1E2329]">
+        <div className="flex items-center justify-between px-2 py-2.5 bg-[#0B0E11] border-y border-[#1E2329]">
           <div className="flex items-center gap-1.5">
             <span 
               className="text-base font-bold tabular-nums"
@@ -448,15 +448,17 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
       </div>
 
       {/* Footer - Buy/Sell Ratio Bar - Professional Bitunix Style */}
-      <div className="flex items-center justify-center gap-3 px-2 py-3 border-t border-[#1E2329] bg-[#0B0E11]">
-        {/* Buy Percentage & Icon */}
-        <div className="flex items-center gap-1 text-sm">
-          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#0D9D5F' }} />
-          <span className="text-[#0D9D5F] font-semibold" style={{ minWidth: '42px' }}>{buyPercentage}%</span>
+      <div className="flex items-center justify-between px-2 py-1.5 border-t border-[#1E2329] bg-[#0B0E11]">
+        {/* Buy Percentage */}
+        <div className="flex items-center gap-1.5 text-sm">
+          <div className="flex items-center gap-0.5">
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#0D9D5F' }} />
+            <span className="text-[#0D9D5F] font-semibold" style={{ minWidth: '45px' }}>{buyPercentage}%</span>
+          </div>
         </div>
 
         {/* Ratio Bar - Enhanced Bitunix Style */}
-        <div className="h-3 w-48 bg-[#1E2329] rounded-full overflow-hidden flex" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+        <div className="flex-1 h-3 mx-3 bg-[#1E2329] rounded-full overflow-hidden flex shadow-sm" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
           <div 
             className="h-full transition-all duration-300"
             style={{ 
@@ -475,10 +477,12 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
           />
         </div>
         
-        {/* Sell Percentage & Icon */}
-        <div className="flex items-center gap-1 text-sm">
-          <span className="text-[#C8102E] font-semibold" style={{ minWidth: '42px', textAlign: 'right' }}>{sellPercentage}%</span>
-          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#C8102E' }} />
+        {/* Sell Percentage */}
+        <div className="flex items-center gap-1.5 text-sm">
+          <div className="flex items-center gap-0.5">
+            <span className="text-[#C8102E] font-semibold" style={{ minWidth: '45px', textAlign: 'right' }}>{sellPercentage}%</span>
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#C8102E' }} />
+          </div>
         </div>
       </div>
 
