@@ -5,5 +5,6 @@ export { Orderbook } from './Orderbook';
 export { TradingChart } from './TradingChart';
 export { OrdersPanel } from './OrdersPanel';
 export { AccountInfoPanel } from './AccountInfoPanel';
+export { AccountAssets } from './AccountAssets';
 export { DataExport } from './DataExport';
 export { Calculator } from './Calculator';

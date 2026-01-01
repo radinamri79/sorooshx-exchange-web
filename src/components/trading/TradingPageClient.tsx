@@ -11,7 +11,7 @@ import {
   Orderbook,
   TradingChart,
   OrdersPanel,
-  AccountInfoPanel,
+  AccountAssets,
 } from '@/components/trading';
 import { binanceWS } from '@/services/websocket';
 import { 
@@ -199,8 +199,16 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
           <aside className="w-[280px] flex flex-col border-l border-[#2a2a2d]">
             <Orderbook className="flex-[1.2] bg-[#0d0d0f] border-0 rounded-none border-b border-[#2a2a2d]" maxRows={10} />
-            <div className="flex-1 overflow-auto">
-              <OrderForm className="bg-[#0d0d0f] border-0 rounded-none" />
+            <div className="flex-1 overflow-y-auto">
+              {/* Order Form Section */}
+              <div className="bg-[#0d0d0f]">
+                <OrderForm className="bg-transparent border-0 rounded-none" />
+              </div>
+
+              {/* Account Assets Section */}
+              <div className="border-t border-[#2a2a2d] bg-[#121214]">
+                <AccountAssets symbol="BTC/USDT" />
+              </div>
             </div>
           </aside>
         </div>
@@ -293,19 +301,22 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <div className="h-[180px] bg-[#0d0d0f] border-t border-[#2a2a2d]" />
         </aside>
 
-        {/* RIGHT COLUMN: Order Form + Account Info */}
+        {/* RIGHT COLUMN: Order Form + Account Assets */}
         <aside className={cn(
           'w-[280px] flex flex-col border-l border-[#2a2a2d]',
           isRTL && 'order-3 border-l-0 border-r'
         )}>
-          {/* Order Form Section */}
-          <div className="flex-1 overflow-auto bg-[#121214]">
-            <OrderForm className="bg-transparent border-0" />
-          </div>
+          {/* Scrollable Container for Form + Assets */}
+          <div className="flex-1 overflow-y-auto bg-[#121214]">
+            {/* Order Form Section */}
+            <div className="bg-[#0B0E11]">
+              <OrderForm className="bg-transparent border-0" />
+            </div>
 
-          {/* Account Info Section */}
-          <div className="h-[180px] bg-[#121214] border-t border-[#2a2a2d] overflow-hidden">
-            <AccountInfoPanel className="h-full bg-transparent" />
+            {/* Account Assets Section - Compact, no scrolling needed */}
+            <div className="border-t border-[#2a2a2d] bg-[#121214]">
+              <AccountAssets symbol="BTC/USDT" />
+            </div>
           </div>
         </aside>
       </div>
