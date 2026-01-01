@@ -381,10 +381,10 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
       </div>
 
       {/* Orderbook Content - Compact layout with no empty space */}
-      <div className="flex flex-col">
+      <div className="flex flex-col flex-1 overflow-hidden min-h-0">
         {/* Asks (Sell Orders) - Top Section */}
         {(displayMode === 'both' || displayMode === 'sellOnly') && (
-          <div className="flex flex-col">
+          <div className="flex flex-col overflow-hidden" style={{ height: displayMode === 'both' ? '50%' : '100%' }}>
             {displayedAsks.map(({ entry, cumSum }, index) => (
               <OrderbookRow
                 key={`ask-${entry[0]}-${index}`}
@@ -402,7 +402,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
         )}
 
         {/* Current Price - Center Separator */}
-        <div className="flex items-center justify-between px-2 py-2.5 bg-[#0B0E11] border-y border-[#1E2329]">
+        <div className="flex items-center justify-between px-2 py-2.5 bg-[#0B0E11] border-y border-[#1E2329] shrink-0">
           <div className="flex items-center gap-1.5">
             <span 
               className="text-base font-bold tabular-nums"
@@ -429,7 +429,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
 
         {/* Bids (Buy Orders) - Bottom Section */}
         {(displayMode === 'both' || displayMode === 'buyOnly') && (
-          <div className="flex flex-col">
+          <div className="flex flex-col overflow-hidden" style={{ height: displayMode === 'both' ? '50%' : '100%' }}>
             {displayedBids.map(({ entry, cumSum }, index) => (
               <OrderbookRow
                 key={`bid-${entry[0]}-${index}`}
