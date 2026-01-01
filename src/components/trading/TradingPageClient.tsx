@@ -321,12 +321,23 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           </aside>
         </div>
 
-        {/* BOTTOM SECTION: Orders Panel - Spans Chart + Orderbook width only */}
+        {/* BOTTOM SECTION: Orders Panel - Spans Chart + Orderbook width, right column shows AccountAssets */}
         <div className="flex h-[220px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
           {/* Orders Panel spans flex-1 (chart) + w-[260px] (orderbook) */}
           <div className="flex-1 flex overflow-hidden border-r border-[#2a2a2d]">
             <OrdersPanel className="flex-1 overflow-auto" />
           </div>
+          
+          {/* RIGHT COLUMN: Continues scrollable AccountAssets from above */}
+          <aside className={cn(
+            'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11] overflow-y-auto',
+            isRTL && 'border-l-0 border-r'
+          )}>
+            {/* Account Assets continuation - visible in bottom section */}
+            <div className="border-t border-[#2a2a2d] bg-[#0B0E11]">
+              <AccountAssets symbol="BTC/USDT" />
+            </div>
+          </aside>
         </div>
       </div>
     </div>
