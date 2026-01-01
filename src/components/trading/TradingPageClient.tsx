@@ -314,8 +314,11 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               <OrderForm className="bg-transparent border-0" />
             </div>
 
+            {/* Divider */}
+            <div className="border-t border-[#2a2a2d] shrink-0" />
+
             {/* Account Assets Section */}
-            <div className="border-t border-[#2a2a2d] bg-[#0B0E11] shrink-0 overflow-y-auto">
+            <div className="bg-[#0B0E11] shrink-0 overflow-y-auto">
               <AccountAssets symbol="BTC/USDT" />
             </div>
           </aside>
