@@ -18,7 +18,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui';
@@ -236,29 +235,30 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] overflow-hidden flex flex-col bg-[#121214] border-[#2a2a2d] p-3 md:p-6">
-        <DialogHeader>
-          <DialogTitle className="text-[#f5f5f5] text-sm md:text-base">{t('title')}</DialogTitle>
+      <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-hidden flex flex-col bg-[#0B0E11] border border-[#2a2a2d] p-0 rounded-xl shadow-2xl backdrop-blur-lg">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2d] bg-[#0B0E11]">
+          <DialogTitle className="text-[#f5f5f5] text-lg font-bold">{t('title')}</DialogTitle>
           <DialogDescription className="sr-only">
             {t('searchPlaceholder')}
           </DialogDescription>
-        </DialogHeader>
+        </div>
 
         {/* Search Input */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b6b6b]" />
+        <div className="relative px-6 pt-4">
+          <Search className="absolute left-9 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b6b6b]" />
           <input
             ref={inputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full h-10 md:h-9 pl-10 pr-10 rounded border border-[#2a2a2d] bg-[#17181b] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-1 focus:ring-[#ed7620] text-sm"
+            className="w-full h-10 pl-10 pr-10 rounded-lg border border-[#2a2a2d] bg-[#1E2329] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-2 focus:ring-[#ed7620] focus:border-transparent text-sm transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#a1a1a1] p-1"
+              className="absolute right-9 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#a1a1a1] p-1 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -266,20 +266,20 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         </div>
 
         {/* Category Tabs - Scrollable on mobile */}
-        <div className="flex items-center gap-1.5 py-2 border-b border-[#2a2a2d] overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-1.5 px-6 py-3 border-b border-[#2a2a2d] overflow-x-auto scrollbar-hide">
           {CATEGORIES.map((category) => (
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
               className={cn(
-                'px-2.5 py-1.5 text-[11px] md:text-xs font-medium rounded whitespace-nowrap transition-colors flex items-center gap-1 shrink-0',
+                'px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0',
                 selectedCategory === category.id
-                  ? 'bg-[#ed7620] text-white'
-                  : 'text-[#6b6b6b] hover:text-[#a1a1a1] hover:bg-[#17181b]'
+                  ? 'bg-[#ed7620] text-white shadow-lg shadow-[#ed7620]/20'
+                  : 'text-[#6b6b6b] hover:text-[#a1a1a1] hover:bg-[#1E2329]'
               )}
             >
               {category.id === 'favorites' && (
-                <Star className="w-3 h-3" />
+                <Star className="w-3.5 h-3.5" />
               )}
               {category.id === 'favorites' ? 'Favorites' : 
                category.id === 'all' ? 'All' :
@@ -290,7 +290,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         </div>
 
         {/* Ticker List */}
-        <div className="flex-1 overflow-y-auto min-h-[250px] md:min-h-[300px]">
+        <div className="flex-1 overflow-y-auto min-h-[300px] md:min-h-[400px]">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ed7620]" />
@@ -298,12 +298,12 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
           ) : filteredSymbols.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-[#6b6b6b]">
               <Search className="w-12 h-12 mb-2 opacity-50" />
-              <p>{t('noResults')}</p>
+              <p className="text-sm">{t('noResults')}</p>
             </div>
           ) : (
-            <div className="grid gap-0.5 py-2">
+            <div className="px-2">
               {/* Header */}
-              <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-2 px-3 py-1.5 text-xs text-[#6b6b6b] sticky top-0 bg-[#121214] font-medium">
+              <div className="grid grid-cols-[auto_1.5fr_1fr_1fr] gap-3 px-3 py-3 text-xs text-[#6b6b6b] sticky top-0 bg-[#0B0E11] font-medium border-b border-[#2a2a2d] z-10">
                 <span className="w-6" />
                 <span>{t('pair')}</span>
                 <span className="text-right">{t('price')}</span>
@@ -311,7 +311,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
               </div>
 
               {/* Rows */}
-              {filteredSymbols.slice(0, 50).map((symbol) => {
+              {filteredSymbols.slice(0, 100).map((symbol) => {
                 const ticker = tickers[symbol];
                 const change = ticker ? parseFloat(ticker.P) : 0;
                 const isUp = change >= 0;
@@ -330,16 +330,16 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                       }
                     }}
                     className={cn(
-                      'grid grid-cols-[auto_1fr_1fr_1fr] gap-2 px-2 py-2.5 md:py-2 rounded transition-colors text-left cursor-pointer active:bg-[#1e1f23]',
+                      'grid grid-cols-[auto_1.5fr_1fr_1fr] gap-3 px-3 py-2.5 rounded-lg transition-all text-left cursor-pointer my-0.5',
                       symbol === currentSymbol
-                        ? 'bg-[#ed7620]/10 border border-[#ed7620]/30'
-                        : 'hover:bg-[#17181b]'
+                        ? 'bg-[#ed7620]/15 border border-[#ed7620]/40 shadow-lg shadow-[#ed7620]/10'
+                        : 'hover:bg-[#1E2329] active:bg-[#2B3139]'
                     )}
                   >
                     {/* Favorite Star */}
                     <button
                       onClick={(e) => handleToggleFavorite(e, symbol)}
-                      className="w-6 flex items-center justify-center"
+                      className="w-6 flex items-center justify-center hover:scale-110 transition-transform"
                     >
                       <Star
                         className={cn(
@@ -352,32 +352,31 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                     </button>
 
                     {/* Symbol */}
-                    <div className="flex items-center gap-1">
-                      <span className="font-semibold text-[#f5f5f5] text-xs">
-                        {symbol.replace('USDT', '')}
-                      </span>
-                      <span className="text-[#6b6b6b] text-[10px]">/USDT</span>
-                      <span className="text-[8px] font-medium px-1 py-0.5 rounded bg-[#ed7620]/10 text-[#ed7620]">
-                        Perp
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-[#f5f5f5] text-sm">
+                          {symbol.replace('USDT', '')}
+                        </span>
+                        <span className="text-[10px] text-[#6b6b6b]">/USDT Perp</span>
+                      </div>
                     </div>
 
                     {/* Price */}
-                    <span className="text-right text-[#f5f5f5] tabular-nums text-xs">
+                    <span className="text-right text-[#f5f5f5] tabular-nums text-sm font-medium">
                       {ticker ? formatPrice(ticker.c) : '--'}
                     </span>
 
                     {/* Change */}
-                    <div className="flex items-center justify-end gap-0.5">
+                    <div className="flex items-center justify-end gap-1">
                       {isUp ? (
-                        <TrendingUp className="w-3 h-3 text-[#26a69a]" />
+                        <TrendingUp className="w-3.5 h-3.5 text-[#0D9D5F]" />
                       ) : (
-                        <TrendingDown className="w-3 h-3 text-[#ef5350]" />
+                        <TrendingDown className="w-3.5 h-3.5 text-[#C8102E]" />
                       )}
                       <span
                         className={cn(
-                          'tabular-nums text-xs',
-                          isUp ? 'text-[#26a69a]' : 'text-[#ef5350]'
+                          'tabular-nums text-sm font-medium min-w-[50px] text-right',
+                          isUp ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
                         )}
                       >
                         {ticker ? formatPercentage(ticker.P) : '--'}
@@ -387,9 +386,9 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                 );
               })}
 
-              {filteredSymbols.length > 50 && (
-                <p className="text-center text-[#6b6b6b] text-sm py-2">
-                  {t('showingCount', { count: 50, total: filteredSymbols.length })}
+              {filteredSymbols.length > 100 && (
+                <p className="text-center text-[#6b6b6b] text-xs py-4">
+                  {t('showingCount', { count: 100, total: filteredSymbols.length })}
                 </p>
               )}
             </div>
