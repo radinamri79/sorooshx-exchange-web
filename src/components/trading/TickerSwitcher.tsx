@@ -246,7 +246,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
 
         {/* Search Input */}
         <div className="relative px-6 pt-4">
-          <Search className="absolute left-9 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b6b6b]" />
+          <Search className="absolute left-9 top-1/2 translate-y-0 w-4 h-4 text-[#6b6b6b]" />
           <input
             ref={inputRef}
             type="text"
@@ -258,7 +258,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#a1a1a1] p-1 transition-colors"
+              className="absolute right-3 top-1/2 translate-y-0.5 text-[#6b6b6b] hover:text-[#a1a1a1] p-1 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
