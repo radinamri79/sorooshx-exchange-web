@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, ChevronDown, FileText } from 'lucide-react';
+import { FileText, MoreVertical, X } from 'lucide-react';
 import { cn, formatPrice, formatNumber, formatCurrency } from '@/lib/utils';
 import { useTradeStore } from '@/stores/useTradeStore';
 import { useMarketStore } from '@/stores/useMarketStore';
@@ -14,7 +14,7 @@ interface OrdersPanelProps {
   className?: string;
 }
 
-type TabValue = 'positions' | 'openOrders' | 'orderHistory';
+type TabValue = 'positions' | 'openOrders' | 'orderHistory' | 'positionHistory' | 'tradeHistory' | 'fundingHistory' | 'assets' | 'futuresBonus' | 'copyTrades' | 'tradingBots' | 'orderDetails' | 'transactionHistory';
 
 export function OrdersPanel({ className }: OrdersPanelProps) {
   // Translation hook ready for future localization
@@ -96,14 +96,14 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
 
   return (
     <div className={cn('flex flex-col bg-transparent overflow-hidden', className)}>
-      {/* Header Tabs - Compact */}
-      <div className="flex items-center justify-between px-3 border-b border-[#2a2a2d] bg-[#121214]">
-        <div className="flex items-center gap-0.5">
+      {/* Header Tabs - Professional with all tabs like Bitget/Bitunix */}
+      <div className="flex items-center justify-between px-3 border-b border-[#2a2a2d] bg-[#121214] overflow-x-auto">
+        <div className="flex items-center gap-0.5 shrink-0">
           {/* Positions Tab */}
           <button
             onClick={() => setActiveTab('positions')}
             className={cn(
-              'px-2 py-2 text-xs font-medium transition-colors relative',
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
               activeTab === 'positions' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -115,62 +115,199 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
             )}
           </button>
           
-          {/* Orders Tab with dropdown */}
+          {/* Copy Trades Tab */}
+          <button
+            onClick={() => setActiveTab('copyTrades')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'copyTrades' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Copy trades (0)
+            {activeTab === 'copyTrades' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Trading Bots Tab */}
+          <button
+            onClick={() => setActiveTab('tradingBots')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'tradingBots' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Trading bots (0)
+            {activeTab === 'tradingBots' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Open Orders Tab */}
           <button
             onClick={() => setActiveTab('openOrders')}
             className={cn(
-              'flex items-center gap-0.5 px-2 py-2 text-xs font-medium transition-colors relative',
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
               activeTab === 'openOrders' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
             )}
           >
-            Orders({openOrders.length})
-            <ChevronDown className="w-2.5 h-2.5" />
+            Open Orders({openOrders.length})
             {activeTab === 'openOrders' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Order History Tab */}
+          <button
+            onClick={() => setActiveTab('orderHistory')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'orderHistory' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Order history
+            {activeTab === 'orderHistory' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Position History Tab */}
+          <button
+            onClick={() => setActiveTab('positionHistory')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'positionHistory' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Position history
+            {activeTab === 'positionHistory' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Trade History Tab */}
+          <button
+            onClick={() => setActiveTab('tradeHistory')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'tradeHistory' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Trade history
+            {activeTab === 'tradeHistory' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Funding History Tab */}
+          <button
+            onClick={() => setActiveTab('fundingHistory')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'fundingHistory' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Funding history
+            {activeTab === 'fundingHistory' && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
             )}
           </button>
 
           {/* Assets Tab */}
           <button
-            className="px-2 py-2 text-xs font-medium text-[#6b6b6b] hover:text-[#a1a1a1] transition-colors"
-          >
-            Assets
-          </button>
-
-          {/* History Tab */}
-          <button
-            onClick={() => setActiveTab('orderHistory')}
+            onClick={() => setActiveTab('assets')}
             className={cn(
-              'px-2 py-2 text-xs font-medium transition-colors relative',
-              activeTab === 'orderHistory' 
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'assets' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
             )}
           >
-            History
-            {activeTab === 'orderHistory' && (
+            Assets
+            {activeTab === 'assets' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Futures Bonus Tab */}
+          <button
+            onClick={() => setActiveTab('futuresBonus')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'futuresBonus' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Futures Bonus
+            {activeTab === 'futuresBonus' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Order Details Tab (Bitget) */}
+          <button
+            onClick={() => setActiveTab('orderDetails')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'orderDetails' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Order details
+            {activeTab === 'orderDetails' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+            )}
+          </button>
+
+          {/* Transaction History Tab (Bitget) */}
+          <button
+            onClick={() => setActiveTab('transactionHistory')}
+            className={cn(
+              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              activeTab === 'transactionHistory' 
+                ? 'text-[#f5f5f5]' 
+                : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
+            )}
+          >
+            Transaction history
+            {activeTab === 'transactionHistory' && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
             )}
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Hide other pairs checkbox */}
-          <label className="flex items-center gap-1.5 text-[10px] text-[#6b6b6b] cursor-pointer hover:text-[#a1a1a1]">
+        {/* Right side controls */}
+        <div className="flex items-center gap-2 ml-auto shrink-0">
+          {/* Show current symbol checkbox */}
+          <label className="flex items-center gap-1.5 text-[10px] text-[#6b6b6b] cursor-pointer hover:text-[#a1a1a1] whitespace-nowrap">
             <input
               type="checkbox"
               checked={!showAllSymbols}
               onChange={(e) => setShowAllSymbols(!e.target.checked)}
               className="w-3 h-3 rounded border-[#2a2a2d] bg-[#17181b] text-[#ed7620] focus:ring-[#ed7620]"
             />
-            Hide others
+            <span>Show current</span>
           </label>
 
-          {/* Close all button */}
-          <button className="px-2 py-1 text-[10px] font-medium text-[#6b6b6b] hover:text-[#a1a1a1] border border-[#2a2a2d] rounded transition-colors bg-[#17181b]">
-            Close All
+          {/* More options menu */}
+          <button className="p-1.5 text-[#6b6b6b] hover:text-[#a1a1a1] transition-colors">
+            <MoreVertical size={16} />
           </button>
         </div>
       </div>
@@ -392,6 +529,73 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
               </tbody>
             </table>
           )}
+        </div>
+      )}
+
+      {/* Position History Tab */}
+      {activeTab === 'positionHistory' && (
+        <div className="flex-1 overflow-auto">
+          {filteredPositions.length === 0 ? (
+            <EmptyState message="No position history" />
+          ) : (
+            <EmptyState message="No position history" />
+          )}
+        </div>
+      )}
+
+      {/* Trade History Tab */}
+      {activeTab === 'tradeHistory' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No trade history" />
+        </div>
+      )}
+
+      {/* Funding History Tab */}
+      {activeTab === 'fundingHistory' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No funding history" />
+        </div>
+      )}
+
+      {/* Copy Trades Tab */}
+      {activeTab === 'copyTrades' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No copy trades" />
+        </div>
+      )}
+
+      {/* Trading Bots Tab */}
+      {activeTab === 'tradingBots' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No trading bots" />
+        </div>
+      )}
+
+      {/* Assets Tab */}
+      {activeTab === 'assets' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No assets" />
+        </div>
+      )}
+
+      {/* Futures Bonus Tab */}
+      {activeTab === 'futuresBonus' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No futures bonus available" />
+        </div>
+      )}
+
+      {/* Order Details Tab (Bitget) */}
+      {activeTab === 'orderDetails' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No order details available" />
+        </div>
+      )}
+
+      {/* Transaction History Tab (Bitget) */}
+      {activeTab === 'transactionHistory' && (
+        <div className="flex-1 overflow-auto">
+          <EmptyState message="No transaction history" />
         </div>
       )}
     </div>
