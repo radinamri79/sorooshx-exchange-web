@@ -278,52 +278,62 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0" />
       </div>
 
-      {/* MAIN TRADING AREA: Reorganized Layout */}
-      <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
-        {/* LEFT COLUMN: Chart (full height) */}
-        <main className={cn('flex-1 flex flex-col overflow-hidden min-w-0', isRTL && 'order-2')}>
-          {/* TradingView Chart - Full height */}
-          <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
-            <TradingChart className="w-full h-full bg-[#0d0d0f] border-0" />
-          </div>
-        </main>
-
-        {/* MIDDLE COLUMN: Order Book */}
-        <aside className={cn(
-          'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d]',
-          isRTL && 'order-1 border-l-0 border-r'
-        )}>
-          <div className="flex-1 overflow-hidden">
-            <Orderbook 
-              className="h-full bg-[#0d0d0f] border-0" 
-              maxRows={15}
-            />
-          </div>
-        </aside>
-
-        {/* RIGHT COLUMN: Order Form + Account Assets (Fixed width) */}
-        <aside className={cn(
-          'w-[280px] flex flex-col border-l border-[#2a2a2d]',
-          isRTL && 'order-3 border-l-0 border-r'
-        )}>
-          {/* Scrollable Container for Form + Assets */}
-          <div className="flex-1 overflow-y-auto bg-[#121214]">
-            {/* Order Form Section */}
-            <div className="bg-[#0B0E11]">
-              <OrderForm className="bg-transparent border-0" />
+      {/* MAIN TRADING AREA: Flex column layout with top section and bottom orders panel */}
+      <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0d0f]">
+        
+        {/* TOP SECTION: Chart + Orderbook + OrderForm */}
+        <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
+          {/* LEFT COLUMN: Chart */}
+          <main className={cn('flex-1 flex flex-col overflow-hidden min-w-0', isRTL && 'order-2')}>
+            {/* TradingView Chart */}
+            <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
+              <TradingChart className="w-full h-full bg-[#0d0d0f] border-0" />
             </div>
+          </main>
 
-            {/* Account Assets Section */}
-            <div className="border-t border-[#2a2a2d] bg-[#121214]">
-              <AccountAssets symbol="BTC/USDT" />
+          {/* MIDDLE COLUMN: Order Book */}
+          <aside className={cn(
+            'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d]',
+            isRTL && 'order-1 border-l-0 border-r'
+          )}>
+            <div className="flex-1 overflow-hidden">
+              <Orderbook 
+                className="h-full bg-[#0d0d0f] border-0" 
+                maxRows={15}
+              />
             </div>
-          </div>
-        </aside>
-      </div>
+          </aside>
 
-      {/* BOTTOM SECTION: Orders Panel - Full Width Below */}
-      <div className="h-[200px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden flex flex-col">
-        <OrdersPanel className="flex-1 overflow-auto" />
+          {/* RIGHT COLUMN: Order Form + Account Assets */}
+          <aside className={cn(
+            'w-[280px] flex flex-col border-l border-[#2a2a2d]',
+            isRTL && 'order-3 border-l-0 border-r'
+          )}>
+            {/* Scrollable Container for Form + Assets */}
+            <div className="flex-1 overflow-y-auto bg-[#0B0E11]">
+              {/* Order Form Section */}
+              <div className="bg-[#0B0E11]">
+                <OrderForm className="bg-transparent border-0" />
+              </div>
+
+              {/* Account Assets Section */}
+              <div className="border-t border-[#2a2a2d] bg-[#0B0E11]">
+                <AccountAssets symbol="BTC/USDT" />
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        {/* BOTTOM SECTION: Orders Panel - Spans Chart + Orderbook width only */}
+        <div className="flex h-[220px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
+          {/* Orders Panel spans flex-1 (chart) + w-[260px] (orderbook) */}
+          <div className="flex-1 flex overflow-hidden border-r border-[#2a2a2d]">
+            <OrdersPanel className="flex-1 overflow-auto" />
+          </div>
+          
+          {/* Empty space matching OrderForm + Assets width */}
+          <div className="w-[280px]" />
+        </div>
       </div>
     </div>
   );
