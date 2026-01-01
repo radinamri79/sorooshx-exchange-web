@@ -99,6 +99,29 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   const [positionType, setPositionType] = useState<'cross' | 'isolated'>('cross');
   const [availableMargin, setAvailableMargin] = useState('0');
   const [isLong, setIsLong] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showPositionDropdown, setShowPositionDropdown] = useState(false);
+
+  // Animation handling
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+      requestAnimationFrame(() => {
+        setIsAnimating(true);
+      });
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setIsVisible(false), 200);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isOpen]);
+
+  const handleClose = () => {
+    setIsAnimating(false);
+    setTimeout(onClose, 200);
+  };
 
   // Calculate PnL results
   const pnlResults = useMemo(() => {
@@ -164,73 +187,100 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
     };
   }, [quantity, openPrice, availableMargin, leverage, isLong]);
 
-  return isOpen ? (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#121214] rounded-lg max-w-md w-full border border-[#2a2a2d] max-h-[90vh] overflow-y-auto">
+  if (!isVisible) return null;
+
+  return (
+    <div
+      className={cn(
+        'fixed inset-0 z-50 flex items-center justify-center px-4',
+        'transition-all duration-200 ease-out',
+        isAnimating ? 'bg-black/70 backdrop-blur-sm' : 'bg-transparent'
+      )}
+      onClick={handleClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={cn(
+          'w-full max-w-md rounded-xl shadow-2xl',
+          'transition-all duration-200 ease-out',
+          isAnimating
+            ? 'opacity-100 scale-100 translate-y-0'
+            : 'opacity-0 scale-95 translate-y-4'
+        )}
+        style={{ backgroundColor: '#0B0E11', border: '1px solid #2B3139' }}
+      >
         {/* Header with Tabs */}
-        <div className="border-b border-[#2a2a2d] sticky top-0 bg-[#121214] z-10">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex gap-4">
+        <div className="border-b border-[#2B3139]">
+          <div className="flex items-center justify-between px-5 py-4 gap-2">
+            <div className="flex gap-1 flex-wrap lg:flex-nowrap lg:gap-4">
               <button
                 onClick={() => setTab('pnl')}
                 className={cn(
-                  'text-sm font-medium pb-2 border-b-2 transition-colors',
+                  'text-xs lg:text-sm font-medium pb-2 border-b-2 transition-colors whitespace-nowrap',
                   tab === 'pnl'
                     ? 'text-[#EAECEF] border-[#FF7A00]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
                 )}
               >
-                PnL Calculation
+                PnL
               </button>
               <button
                 onClick={() => setTab('target')}
                 className={cn(
-                  'text-sm font-medium pb-2 border-b-2 transition-colors',
+                  'text-xs lg:text-sm font-medium pb-2 border-b-2 transition-colors whitespace-nowrap',
                   tab === 'target'
                     ? 'text-[#EAECEF] border-[#FF7A00]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
                 )}
               >
-                Target Price
+                Target
               </button>
               <button
                 onClick={() => setTab('liquidation')}
                 className={cn(
-                  'text-sm font-medium pb-2 border-b-2 transition-colors',
+                  'text-xs lg:text-sm font-medium pb-2 border-b-2 transition-colors whitespace-nowrap',
                   tab === 'liquidation'
                     ? 'text-[#EAECEF] border-[#FF7A00]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
                 )}
               >
-                Liquidation Price
+                Liquidation
               </button>
             </div>
-            <button onClick={onClose} className="text-[#848E9C] hover:text-[#EAECEF] flex-shrink-0">
-              <X size={20} />
+            <button
+              onClick={handleClose}
+              className="p-1 rounded hover:bg-[#2B3139] transition-colors flex-shrink-0"
+              style={{ color: '#848E9C' }}
+            >
+              <X size={18} />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="px-5 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
           {/* Symbol */}
           <div>
-            <label className="text-xs text-[#848E9C] block mb-2">Symbol</label>
-            <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
-              <span className="text-sm font-medium text-[#EAECEF]">{currentSymbol}</span>
+            <label className="text-xs font-medium" style={{ color: '#848E9C' }}>
+              Symbol
+            </label>
+            <div className="mt-1 px-3 py-2 rounded-lg text-sm font-medium" style={{ backgroundColor: '#1E2329', color: '#EAECEF' }}>
+              {currentSymbol}
             </div>
           </div>
 
           {/* Long/Short Selector */}
           <div>
-            <label className="text-xs text-[#848E9C] block mb-2">Position Type</label>
+            <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+              Position Type
+            </label>
             <div className="flex gap-2">
               <button
                 onClick={() => setIsLong(true)}
                 className={cn(
-                  'flex-1 py-2 px-3 rounded text-sm font-medium transition-colors',
+                  'flex-1 h-9 px-3 rounded-lg text-sm font-semibold transition-all duration-200',
                   isLong
-                    ? 'bg-[#0D9D5F] text-white'
+                    ? 'bg-[#0D9D5F] text-white shadow-lg'
                     : 'bg-[#1E2329] text-[#848E9C] hover:bg-[#2a3035]'
                 )}
               >
@@ -239,9 +289,9 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <button
                 onClick={() => setIsLong(false)}
                 className={cn(
-                  'flex-1 py-2 px-3 rounded text-sm font-medium transition-colors',
+                  'flex-1 h-9 px-3 rounded-lg text-sm font-semibold transition-all duration-200',
                   !isLong
-                    ? 'bg-[#C8102E] text-white'
+                    ? 'bg-[#C8102E] text-white shadow-lg'
                     : 'bg-[#1E2329] text-[#848E9C] hover:bg-[#2a3035]'
                 )}
               >
@@ -252,7 +302,9 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
           {/* Leverage */}
           <div>
-            <label className="text-xs text-[#848E9C] block mb-2">Leverage</label>
+            <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+              Leverage
+            </label>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -262,14 +314,16 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 onChange={(e) => setLeverage(e.target.value)}
                 className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#FF7A00]"
               />
-              <span className="text-sm font-medium text-[#EAECEF] min-w-[50px]">{leverage}X</span>
+              <span className="text-sm font-semibold text-[#EAECEF] min-w-[45px] text-right">{leverage}X</span>
             </div>
           </div>
 
           {/* Quantity */}
           <div>
-            <label className="text-xs text-[#848E9C] block mb-2">Quantity</label>
-            <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+            <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+              Quantity
+            </label>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
               <input
                 type="number"
                 value={quantity}
@@ -283,8 +337,10 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
           {/* Open Price */}
           <div>
-            <label className="text-xs text-[#848E9C] block mb-2">Open Price</label>
-            <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+            <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+              Open Price
+            </label>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
               <input
                 type="number"
                 value={openPrice}
@@ -299,8 +355,10 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
           {/* Tab-specific inputs */}
           {tab === 'pnl' && (
             <div>
-              <label className="text-xs text-[#848E9C] block mb-2">Close Price</label>
-              <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+              <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+                Close Price
+              </label>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
                 <input
                   type="number"
                   value={closePrice}
@@ -315,8 +373,10 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
           {tab === 'target' && (
             <div>
-              <label className="text-xs text-[#848E9C] block mb-2">ROI</label>
-              <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+              <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+                ROI
+              </label>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
                 <input
                   type="number"
                   value={roi}
@@ -331,21 +391,68 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
           {tab === 'liquidation' && (
             <>
-              <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Position Type</label>
-                <select
-                  value={positionType}
-                  onChange={(e) => setPositionType(e.target.value as 'cross' | 'isolated')}
-                  className="w-full bg-[#1E2329] text-[#EAECEF] text-sm rounded px-3 py-2 border border-[#2a2a2d] outline-none"
+              <div className="relative">
+                <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+                  Position Type
+                </label>
+                <button
+                  onClick={() => setShowPositionDropdown(!showPositionDropdown)}
+                  className={cn(
+                    'w-full h-9 px-3 rounded-lg text-sm font-medium text-left transition-all duration-200 flex items-center justify-between',
+                    showPositionDropdown ? 'border border-[#FF7A00]' : 'border border-[#2B3139] hover:border-[#FF7A00]'
+                  )}
+                  style={{ backgroundColor: '#1E2329' }}
                 >
-                  <option value="cross">Cross</option>
-                  <option value="isolated">Isolated</option>
-                </select>
+                  <span style={{ color: '#EAECEF' }} className="capitalize">
+                    {positionType}
+                  </span>
+                  <svg
+                    className={cn('w-4 h-4 transition-transform duration-200', showPositionDropdown && 'rotate-180')}
+                    style={{ color: '#848E9C' }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showPositionDropdown && (
+                  <div
+                    className="absolute top-full left-0 right-0 mt-1 rounded-lg shadow-xl z-10 overflow-hidden"
+                    style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}
+                  >
+                    <button
+                      onClick={() => {
+                        setPositionType('cross');
+                        setShowPositionDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 text-sm text-left transition-colors hover:bg-[#2B3139]"
+                      style={{ color: positionType === 'cross' ? '#FF7A00' : '#EAECEF' }}
+                    >
+                      Cross
+                    </button>
+                    <div style={{ borderColor: '#2B3139' }} className="border-t" />
+                    <button
+                      onClick={() => {
+                        setPositionType('isolated');
+                        setShowPositionDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 text-sm text-left transition-colors hover:bg-[#2B3139]"
+                      style={{ color: positionType === 'isolated' ? '#FF7A00' : '#EAECEF' }}
+                    >
+                      Isolated
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
-                <label className="text-xs text-[#848E9C] block mb-2">Available Margin</label>
-                <div className="flex items-center gap-2 bg-[#1E2329] rounded px-3 py-2 border border-[#2a2a2d]">
+                <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>
+                  Available Margin
+                </label>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
                   <input
                     type="number"
                     value={availableMargin}
@@ -360,21 +467,27 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
           )}
 
           {/* Results Section */}
-          <div className="bg-[#1E2329] rounded p-4 border border-[#2a2a2d] mt-4">
-            <div className="text-xs font-medium text-[#EAECEF] mb-3">Results</div>
+          <div className="rounded-lg p-3 mt-4" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
+            <div className="text-xs font-semibold mb-2" style={{ color: '#EAECEF' }}>
+              Results
+            </div>
 
             {tab === 'pnl' && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Margin</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">{pnlResults.margin} USDT</span>
+                  <span className="text-xs" style={{ color: '#848E9C' }}>
+                    Margin
+                  </span>
+                  <span className="text-xs font-medium text-[#EAECEF]">{pnlResults.margin} USDT</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Profit</span>
-                  <span className={cn(
-                    'text-sm font-medium',
-                    parseFloat(pnlResults.profit) >= 0 ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
-                  )}>
+                  <span className="text-xs" style={{ color: '#848E9C' }}>
+                    Profit
+                  </span>
+                  <span
+                    className="text-xs font-medium"
+                    style={{ color: parseFloat(pnlResults.profit) >= 0 ? '#0D9D5F' : '#C8102E' }}
+                  >
                     {parseFloat(pnlResults.profit) >= 0 ? '+' : ''}{pnlResults.profit} USDT
                   </span>
                 </div>
@@ -384,19 +497,25 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             {tab === 'target' && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Target Price</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">{targetResults.targetPrice}</span>
+                  <span className="text-xs" style={{ color: '#848E9C' }}>
+                    Target Price
+                  </span>
+                  <span className="text-xs font-medium text-[#EAECEF]">{targetResults.targetPrice}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Margin</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">{targetResults.margin} USDT</span>
+                  <span className="text-xs" style={{ color: '#848E9C' }}>
+                    Margin
+                  </span>
+                  <span className="text-xs font-medium text-[#EAECEF]">{targetResults.margin} USDT</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Profit</span>
-                  <span className={cn(
-                    'text-sm font-medium',
-                    parseFloat(targetResults.profit) >= 0 ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
-                  )}>
+                  <span className="text-xs" style={{ color: '#848E9C' }}>
+                    Profit
+                  </span>
+                  <span
+                    className="text-xs font-medium"
+                    style={{ color: parseFloat(targetResults.profit) >= 0 ? '#0D9D5F' : '#C8102E' }}
+                  >
                     {parseFloat(targetResults.profit) >= 0 ? '+' : ''}{targetResults.profit} USDT
                   </span>
                 </div>
@@ -406,26 +525,41 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             {tab === 'liquidation' && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#848E9C]">Liquidation Price</span>
-                  <span className="text-sm font-medium text-[#EAECEF]">{liquidationResults.liquidationPrice}</span>
+                  <span className="text-xs" style={{ color: '#848E9C' }}>
+                    Liquidation Price
+                  </span>
+                  <span className="text-xs font-medium text-[#EAECEF]">{liquidationResults.liquidationPrice}</span>
                 </div>
               </div>
             )}
           </div>
 
           {/* Warning Message */}
-          <p className="text-xs text-[#C8102E]">
+          <p className="text-xs leading-relaxed px-3 py-2 rounded-lg" style={{ color: '#F0B90B', backgroundColor: 'rgba(240, 185, 11, 0.1)' }}>
             Results are for reference only. Deviations may occur in actual operations due to fees and funding rates.
           </p>
+        </div>
 
-          {/* Calculate Button */}
-          <button className="w-full py-3 px-4 bg-[#FF7A00] text-black rounded-lg font-semibold hover:bg-[#ff8c3a] transition-colors">
+        {/* Action Buttons */}
+        <div className="px-5 pb-5 flex gap-3 border-t border-[#2B3139]">
+          <button
+            onClick={handleClose}
+            className="flex-1 h-10 rounded-lg text-sm font-semibold transition-all duration-200 hover:brightness-110 active:brightness-90"
+            style={{ backgroundColor: '#2B3139', color: '#EAECEF' }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleClose}
+            className="flex-1 h-10 rounded-lg text-sm font-bold text-white transition-all duration-200 hover:brightness-110 active:brightness-90"
+            style={{ backgroundColor: '#FF7A00' }}
+          >
             Calculate
           </button>
         </div>
       </div>
     </div>
-  ) : null;
+  );
 }
 
 export function MarketInfo({ className }: MarketInfoProps) {
