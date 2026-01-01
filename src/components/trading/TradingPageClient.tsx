@@ -118,7 +118,15 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           )}
           {activeTab === 'order' && (
             <div className="h-full overflow-y-auto">
-              <OrderForm className="bg-[#0d0d0f] border-0 rounded-none" />
+              {/* Order Form Section */}
+              <div className="bg-[#0d0d0f]">
+                <OrderForm className="bg-transparent border-0 rounded-none" />
+              </div>
+
+              {/* Account Assets Section for Mobile */}
+              <div className="border-t border-[#2a2a2d] bg-[#121214]">
+                <AccountAssets symbol="BTC/USDT" />
+              </div>
             </div>
           )}
           {activeTab === 'positions' && (
