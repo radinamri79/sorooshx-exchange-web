@@ -278,38 +278,30 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0" />
       </div>
 
-      {/* MAIN TRADING AREA: 3-Column Layout like Bitget */}
+      {/* MAIN TRADING AREA: Reorganized Layout */}
       <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
-        {/* LEFT COLUMN: Chart + Orders */}
+        {/* LEFT COLUMN: Chart (full height) */}
         <main className={cn('flex-1 flex flex-col overflow-hidden min-w-0', isRTL && 'order-2')}>
-          {/* TradingView Chart */}
+          {/* TradingView Chart - Full height */}
           <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
             <TradingChart className="w-full h-full bg-[#0d0d0f] border-0" />
           </div>
-
-          {/* Orders & Positions Panel */}
-          <div className="h-[180px] bg-[#121214] border-t border-[#2a2a2d] overflow-hidden">
-            <OrdersPanel className="h-full bg-transparent border-0" />
-          </div>
         </main>
 
-        {/* MIDDLE COLUMN: Order Book - Bitunix Style Width, Height matches chart */}
+        {/* MIDDLE COLUMN: Order Book */}
         <aside className={cn(
           'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d]',
           isRTL && 'order-1 border-l-0 border-r'
         )}>
-          {/* Orderbook only spans chart height (flex-1 minus bottom panel) */}
           <div className="flex-1 overflow-hidden">
             <Orderbook 
               className="h-full bg-[#0d0d0f] border-0" 
-              maxRows={10}
+              maxRows={15}
             />
           </div>
-          {/* Empty space below to align with bottom panel */}
-          <div className="h-[180px] bg-[#0d0d0f] border-t border-[#2a2a2d]" />
         </aside>
 
-        {/* RIGHT COLUMN: Order Form + Account Assets */}
+        {/* RIGHT COLUMN: Order Form + Account Assets (Fixed width) */}
         <aside className={cn(
           'w-[280px] flex flex-col border-l border-[#2a2a2d]',
           isRTL && 'order-3 border-l-0 border-r'
@@ -321,12 +313,17 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               <OrderForm className="bg-transparent border-0" />
             </div>
 
-            {/* Account Assets Section - Compact, no scrolling needed */}
+            {/* Account Assets Section */}
             <div className="border-t border-[#2a2a2d] bg-[#121214]">
               <AccountAssets symbol="BTC/USDT" />
             </div>
           </div>
         </aside>
+      </div>
+
+      {/* BOTTOM SECTION: Orders Panel - Full Width Below */}
+      <div className="h-[200px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden flex flex-col">
+        <OrdersPanel className="flex-1 overflow-auto" />
       </div>
     </div>
   );

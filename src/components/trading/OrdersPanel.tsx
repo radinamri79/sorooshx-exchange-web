@@ -95,9 +95,9 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
   };
 
   return (
-    <div className={cn('flex flex-col bg-transparent overflow-hidden', className)}>
+    <div className={cn('flex flex-col bg-[#0B0E11] overflow-hidden', className)}>
       {/* Header Tabs - Professional with all tabs like Bitget/Bitunix */}
-      <div className="flex items-center justify-between px-3 border-b border-[#2a2a2d] bg-[#121214] overflow-x-auto">
+      <div className="flex items-center justify-between px-3 border-b border-[#2a2a2d] bg-[#0B0E11] overflow-x-auto">
         <div className="flex items-center gap-0.5 shrink-0">
           {/* Positions Tab */}
           <button
@@ -294,14 +294,24 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
 
         {/* Right side controls */}
         <div className="flex items-center gap-2 ml-auto shrink-0">
-          {/* Show current symbol checkbox */}
-          <label className="flex items-center gap-1.5 text-[10px] text-[#6b6b6b] cursor-pointer hover:text-[#a1a1a1] whitespace-nowrap">
-            <input
-              type="checkbox"
-              checked={!showAllSymbols}
-              onChange={(e) => setShowAllSymbols(!e.target.checked)}
-              className="w-3 h-3 rounded border-[#2a2a2d] bg-[#17181b] text-[#ed7620] focus:ring-[#ed7620]"
-            />
+          {/* Show current symbol checkbox - Custom styled to match OrderForm */}
+          <label className="flex items-center gap-1.5 text-[10px] text-[#6b6b6b] cursor-pointer hover:text-[#a1a1a1] whitespace-nowrap group">
+            <div
+              onClick={() => setShowAllSymbols(!showAllSymbols)}
+              className={cn(
+                'w-4 h-4 rounded flex items-center justify-center transition-all duration-200',
+                'border-2 cursor-pointer',
+                !showAllSymbols
+                  ? 'bg-[#ed7620] border-[#ed7620]'
+                  : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
+              )}
+            >
+              {!showAllSymbols && (
+                <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                </svg>
+              )}
+            </div>
             <span>Show current</span>
           </label>
 
@@ -319,7 +329,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
             <EmptyState message="No open positions" />
           ) : (
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-[#121214]">
+              <thead className="sticky top-0 bg-[#0B0E11]">
                 <tr className="text-[#6b6b6b] border-b border-[#2a2a2d]">
                   <th className="px-4 py-2.5 text-left font-medium">Symbol</th>
                   <th className="px-3 py-2.5 text-left font-medium">Size</th>
@@ -418,7 +428,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
             <EmptyState message="No open orders" />
           ) : (
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-[#121214]">
+              <thead className="sticky top-0 bg-[#0B0E11]">
                 <tr className="text-[#6b6b6b] border-b border-[#2a2a2d]">
                   <th className="px-4 py-2.5 text-left font-medium">Time</th>
                   <th className="px-3 py-2.5 text-left font-medium">Symbol</th>
@@ -482,7 +492,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
             <EmptyState message="No order history" />
           ) : (
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-[#121214]">
+              <thead className="sticky top-0 bg-[#0B0E11]">
                 <tr className="text-[#6b6b6b] border-b border-[#2a2a2d]">
                   <th className="px-4 py-2.5 text-left font-medium">Time</th>
                   <th className="px-3 py-2.5 text-left font-medium">Symbol</th>
