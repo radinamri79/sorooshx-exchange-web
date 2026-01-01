@@ -9,6 +9,7 @@ describe('TradingService', () => {
     balance: '10000',
     availableBalance: '10000',
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   describe('calculateMarginRequired', () => {
