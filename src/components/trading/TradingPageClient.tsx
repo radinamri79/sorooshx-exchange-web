@@ -321,18 +321,9 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           </aside>
         </div>
 
-        {/* BOTTOM SECTION: Orders Panel - Spans Chart + Orderbook width, right column empty */}
-        <div className="flex h-[220px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
-          {/* Orders Panel spans flex-1 (chart) + w-[260px] (orderbook) */}
-          <div className="flex-1 flex overflow-hidden border-r border-[#2a2a2d]">
-            <OrdersPanel className="flex-1 overflow-auto" />
-          </div>
-          
-          {/* RIGHT COLUMN: Empty space matching OrderForm width */}
-          <aside className={cn(
-            'w-[280px] border-l border-[#2a2a2d] bg-[#0B0E11]',
-            isRTL && 'border-l-0 border-r'
-          )} />
+        {/* BOTTOM SECTION: Orders Panel - Full width */}
+        <div className="flex-1 flex overflow-hidden border-t border-[#2a2a2d] bg-[#0B0E11]">
+          <OrdersPanel className="flex-1 overflow-auto" />
         </div>
       </div>
     </div>
