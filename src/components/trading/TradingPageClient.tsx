@@ -306,7 +306,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
           {/* RIGHT COLUMN: Order Form + Account Assets */}
           <aside className={cn(
-            'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11] overflow-hidden',
+            'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11] overflow-y-auto',
             isRTL && 'order-3 border-l-0 border-r'
           )}>
             {/* Order Form Section */}
@@ -314,11 +314,8 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               <OrderForm className="bg-transparent border-0" />
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-[#2a2a2d] shrink-0" />
-
             {/* Account Assets Section */}
-            <div className="bg-[#0B0E11] shrink-0 overflow-y-auto">
+            <div className="border-t border-[#2a2a2d] bg-[#0B0E11] shrink-0">
               <AccountAssets symbol="BTC/USDT" />
             </div>
           </aside>

@@ -246,19 +246,19 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
 
         {/* Search Input */}
         <div className="relative px-6 pt-4">
-          <Search className="absolute left-10 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b6b6b]" />
+          <Search className="absolute left-9 top-3 w-4 h-4 text-[#6b6b6b]" />
           <input
             ref={inputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full h-10 pl-10 pr-10 rounded-lg border border-[#2a2a2d] bg-[#1E2329] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-2 focus:ring-[#ed7620] focus:border-transparent text-sm transition-all"
+            className="w-full h-10 pl-10 pr-10 rounded-lg border border-[#2a2a2d] bg-[#1E2329] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-2 focus:ring-[#ed7620] focus:border-transparent text-sm transition-all leading-10"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-10 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#a1a1a1] p-1 transition-colors"
+              className="absolute right-3 top-3 text-[#6b6b6b] hover:text-[#a1a1a1] p-1 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
