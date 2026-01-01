@@ -99,9 +99,11 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   const [positionType, setPositionType] = useState<'cross' | 'isolated'>('cross');
   const [availableMargin, setAvailableMargin] = useState('0');
   const [isLong, setIsLong] = useState(true);
+  const [currency, setCurrency] = useState('USDT');
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showPositionDropdown, setShowPositionDropdown] = useState(false);
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
 
   // Animation handling
   useEffect(() => {
@@ -201,8 +203,8 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'w-full max-w-md rounded-xl shadow-2xl',
-          'transition-all duration-200 ease-out',
+          'w-full max-w-lg rounded-xl shadow-2xl flex flex-col',
+          'transition-all duration-200 ease-out max-h-[85vh]',
           isAnimating
             ? 'opacity-100 scale-100 translate-y-0'
             : 'opacity-0 scale-95 translate-y-4'
@@ -210,13 +212,13 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         style={{ backgroundColor: '#0B0E11', border: '1px solid #2B3139' }}
       >
         {/* Header with Tabs */}
-        <div className="border-b border-[#2B3139]">
-          <div className="flex items-center justify-between px-5 py-4 gap-2">
-            <div className="flex gap-1 flex-wrap lg:flex-nowrap lg:gap-4">
+        <div className="border-b border-[#2B3139] flex-shrink-0">
+          <div className="flex items-center justify-between px-4 py-3 gap-2">
+            <div className="flex gap-0.5">
               <button
                 onClick={() => setTab('pnl')}
                 className={cn(
-                  'text-xs lg:text-sm font-medium pb-2 border-b-2 transition-colors whitespace-nowrap',
+                  'text-xs font-medium px-3 py-1.5 border-b-2 transition-colors',
                   tab === 'pnl'
                     ? 'text-[#EAECEF] border-[#FF7A00]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
@@ -227,7 +229,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <button
                 onClick={() => setTab('target')}
                 className={cn(
-                  'text-xs lg:text-sm font-medium pb-2 border-b-2 transition-colors whitespace-nowrap',
+                  'text-xs font-medium px-3 py-1.5 border-b-2 transition-colors',
                   tab === 'target'
                     ? 'text-[#EAECEF] border-[#FF7A00]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
@@ -238,13 +240,13 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <button
                 onClick={() => setTab('liquidation')}
                 className={cn(
-                  'text-xs lg:text-sm font-medium pb-2 border-b-2 transition-colors whitespace-nowrap',
+                  'text-xs font-medium px-3 py-1.5 border-b-2 transition-colors',
                   tab === 'liquidation'
                     ? 'text-[#EAECEF] border-[#FF7A00]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
                 )}
               >
-                Liquidation
+                Liq.
               </button>
             </div>
             <button
@@ -252,13 +254,13 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               className="p-1 rounded hover:bg-[#2B3139] transition-colors flex-shrink-0"
               style={{ color: '#848E9C' }}
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="px-5 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
+        {/* Content - Scrollable */}
+        <div className="px-4 py-3 space-y-2.5 overflow-y-auto flex-1">
           {/* Symbol */}
           <div>
             <label className="text-xs font-medium" style={{ color: '#848E9C' }}>
@@ -267,6 +269,26 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             <div className="mt-1 px-3 py-2 rounded-lg text-sm font-medium" style={{ backgroundColor: '#1E2329', color: '#EAECEF' }}>
               {currentSymbol}
             </div>
+          </div>
+
+          {/* Currency Selector */}
+          <div className="relative">
+            <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>Currency</label>
+            <button
+              onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+              className={cn('w-full h-9 px-3 rounded-lg text-sm font-medium text-left transition-all flex items-center justify-between', showCurrencyDropdown ? 'border border-[#FF7A00]' : 'border border-[#2B3139] hover:border-[#FF7A00]')}
+              style={{ backgroundColor: '#1E2329', color: '#EAECEF' }}
+            >
+              {currency}
+              <svg className={cn('w-4 h-4 transition-transform', showCurrencyDropdown && 'rotate-180')} style={{ color: '#848E9C' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+            </button>
+            {showCurrencyDropdown && (
+              <div className="absolute top-full left-0 right-0 mt-1 rounded-lg shadow-lg z-20" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
+                {['USDT', 'BUSD', 'USDC'].map((cur) => (
+                  <button key={cur} type="button" onClick={() => { setCurrency(cur); setShowCurrencyDropdown(false); }} className="w-full px-3 py-2 text-sm text-left transition-colors hover:bg-[#2B3139]" style={{ color: currency === cur ? '#FF7A00' : '#EAECEF' }}>{cur}</button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Long/Short Selector */}
@@ -466,96 +488,31 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             </>
           )}
 
-          {/* Results Section */}
-          <div className="rounded-lg p-3 mt-4" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
-            <div className="text-xs font-semibold mb-2" style={{ color: '#EAECEF' }}>
-              Results
-            </div>
-
+          {/* Results Section - Compact */}
+          <div className="rounded px-2 py-1.5" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
+            <div className="text-xs font-semibold mb-1" style={{ color: '#EAECEF' }}>Results</div>
             {tab === 'pnl' && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: '#848E9C' }}>
-                    Margin
-                  </span>
-                  <span className="text-xs font-medium text-[#EAECEF]">{pnlResults.margin} USDT</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: '#848E9C' }}>
-                    Profit
-                  </span>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: parseFloat(pnlResults.profit) >= 0 ? '#0D9D5F' : '#C8102E' }}
-                  >
-                    {parseFloat(pnlResults.profit) >= 0 ? '+' : ''}{pnlResults.profit} USDT
-                  </span>
-                </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div><span style={{ color: '#848E9C' }} className="block">Margin</span><span style={{ color: '#EAECEF' }} className="font-medium">{pnlResults.margin} {currency}</span></div>
+                <div><span style={{ color: '#848E9C' }} className="block">Profit</span><span style={{ color: parseFloat(pnlResults.profit) >= 0 ? '#0D9D5F' : '#C8102E' }} className="font-medium">{parseFloat(pnlResults.profit) >= 0 ? '+' : ''}{pnlResults.profit}</span></div>
               </div>
             )}
-
             {tab === 'target' && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: '#848E9C' }}>
-                    Target Price
-                  </span>
-                  <span className="text-xs font-medium text-[#EAECEF]">{targetResults.targetPrice}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: '#848E9C' }}>
-                    Margin
-                  </span>
-                  <span className="text-xs font-medium text-[#EAECEF]">{targetResults.margin} USDT</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: '#848E9C' }}>
-                    Profit
-                  </span>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: parseFloat(targetResults.profit) >= 0 ? '#0D9D5F' : '#C8102E' }}
-                  >
-                    {parseFloat(targetResults.profit) >= 0 ? '+' : ''}{targetResults.profit} USDT
-                  </span>
-                </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div><span style={{ color: '#848E9C' }} className="block">Target</span><span style={{ color: '#EAECEF' }} className="font-medium">{targetResults.targetPrice}</span></div>
+                <div><span style={{ color: '#848E9C' }} className="block">Profit</span><span style={{ color: parseFloat(targetResults.profit) >= 0 ? '#0D9D5F' : '#C8102E' }} className="font-medium">{parseFloat(targetResults.profit) >= 0 ? '+' : ''}{targetResults.profit} {currency}</span></div>
               </div>
             )}
-
             {tab === 'liquidation' && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: '#848E9C' }}>
-                    Liquidation Price
-                  </span>
-                  <span className="text-xs font-medium text-[#EAECEF]">{liquidationResults.liquidationPrice}</span>
-                </div>
-              </div>
+              <div className="text-xs"><span style={{ color: '#848E9C' }} className="block">Liquidation Price</span><span style={{ color: '#EAECEF' }} className="font-medium">{liquidationResults.liquidationPrice}</span></div>
             )}
           </div>
-
-          {/* Warning Message */}
-          <p className="text-xs leading-relaxed px-3 py-2 rounded-lg" style={{ color: '#F0B90B', backgroundColor: 'rgba(240, 185, 11, 0.1)' }}>
-            Results are for reference only. Deviations may occur in actual operations due to fees and funding rates.
-          </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="px-5 pb-5 flex gap-3 border-t border-[#2B3139]">
-          <button
-            onClick={handleClose}
-            className="flex-1 h-10 rounded-lg text-sm font-semibold transition-all duration-200 hover:brightness-110 active:brightness-90"
-            style={{ backgroundColor: '#2B3139', color: '#EAECEF' }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleClose}
-            className="flex-1 h-10 rounded-lg text-sm font-bold text-white transition-all duration-200 hover:brightness-110 active:brightness-90"
-            style={{ backgroundColor: '#FF7A00' }}
-          >
-            Calculate
-          </button>
+        {/* Footer - Action Buttons */}
+        <div className="border-t border-[#2B3139] px-4 py-2.5 flex gap-2 flex-shrink-0">
+          <button onClick={handleClose} className="flex-1 h-8 rounded text-xs font-semibold transition-all hover:brightness-110" style={{ backgroundColor: '#2B3139', color: '#EAECEF' }}>Cancel</button>
+          <button onClick={handleClose} className="flex-1 h-8 rounded text-xs font-bold text-white transition-all hover:brightness-110" style={{ backgroundColor: '#FF7A00' }}>Calculate</button>
         </div>
       </div>
     </div>

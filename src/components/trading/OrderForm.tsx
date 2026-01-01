@@ -220,16 +220,40 @@ export function OrderForm({
       {/* ================================================================ */}
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-[#2B3139]">
         <div className="flex items-center gap-2">
-          {/* Margin Mode Selector */}
-          <button
-            type="button"
-            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded
-                       bg-[#1E2329] text-[#EAECEF] hover:bg-[#2B3139] 
-                       transition-all duration-200 border border-[#2B3139]"
-          >
-            {formData.marginMode === 'CROSS' ? 'Cross' : 'Isolated'}
-            <ChevronDown size={12} className="text-[#848E9C]" />
-          </button>
+          {/* Margin Mode Selector - Beautiful Dropdown */}
+          <div className="relative group">
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded
+                         bg-[#1E2329] text-[#EAECEF] group-hover:border-[#FF7A00]
+                         transition-all duration-200 border border-[#2B3139]"
+            >
+              {formData.marginMode === 'CROSS' ? '✕ Cross' : '◎ Iso'}
+              <ChevronDown size={12} className="text-[#848E9C] group-hover:text-[#FF7A00] transition-colors" />
+            </button>
+            
+            {/* Dropdown Menu */}
+            <div className="absolute left-0 top-full mt-1.5 w-32 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 rounded-lg shadow-xl z-50" 
+                 style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, marginMode: 'CROSS' }))}
+                className="w-full px-3 py-2 text-xs text-left font-medium transition-all hover:bg-[#2B3139] rounded-t-lg"
+                style={{ color: formData.marginMode === 'CROSS' ? '#FF7A00' : '#EAECEF' }}
+              >
+                ✕ Cross Mode
+              </button>
+              <div style={{ borderColor: '#2B3139' }} className="border-b" />
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, marginMode: 'ISOLATED' }))}
+                className="w-full px-3 py-2 text-xs text-left font-medium transition-all hover:bg-[#2B3139] rounded-b-lg"
+                style={{ color: formData.marginMode === 'ISOLATED' ? '#FF7A00' : '#EAECEF' }}
+              >
+                ◎ Isolated Mode
+              </button>
+            </div>
+          </div>
 
           {/* Leverage Display Button - Bitunix Style */}
           <button
