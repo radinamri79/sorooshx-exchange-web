@@ -278,53 +278,55 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0" />
       </div>
 
-      {/* MAIN TRADING AREA: Flex column layout with top section and bottom orders panel */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0d0f]">
+      {/* MAIN TRADING AREA: Left section scrolls, right column fixed at top */}
+      <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
         
-        {/* TOP SECTION: Chart + Orderbook + OrderForm */}
-        <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
-          {/* LEFT COLUMN: Chart */}
-          <main className={cn('flex-1 flex flex-col overflow-hidden min-w-0', isRTL && 'order-2')}>
-            {/* TradingView Chart */}
-            <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
-              <TradingChart className="w-full h-full bg-[#0d0d0f] border-0" />
-            </div>
-          </main>
+        {/* LEFT SECTION: Chart (top) + Orders Panel (bottom) - both scrollable */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0d0f]">
+          {/* TOP: Chart + Orderbook */}
+          <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
+            {/* Chart */}
+            <main className={cn('flex-1 flex flex-col overflow-hidden min-w-0', isRTL && 'order-2')}>
+              <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
+                <TradingChart className="w-full h-full bg-[#0d0d0f] border-0" />
+              </div>
+            </main>
 
-          {/* MIDDLE COLUMN: Order Book */}
-          <aside className={cn(
-            'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d] overflow-hidden',
-            isRTL && 'order-1 border-l-0 border-r'
-          )}>
-            <div className="flex-1 flex overflow-hidden">
-              <Orderbook 
-                className="w-full h-full bg-[#0d0d0f] border-0" 
-                maxRows={10}
-              />
-            </div>
-          </aside>
+            {/* Order Book */}
+            <aside className={cn(
+              'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d] overflow-hidden',
+              isRTL && 'order-1 border-l-0 border-r'
+            )}>
+              <div className="flex-1 flex overflow-hidden">
+                <Orderbook 
+                  className="w-full h-full bg-[#0d0d0f] border-0" 
+                  maxRows={10}
+                />
+              </div>
+            </aside>
+          </div>
 
-          {/* RIGHT COLUMN: Order Form + Account Assets */}
-          <aside className={cn(
-            'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11]',
-            isRTL && 'order-3 border-l-0 border-r'
-          )}>
-            {/* Order Form Section */}
-            <div className="bg-[#0B0E11] shrink-0">
-              <OrderForm className="bg-transparent border-0" />
-            </div>
-
-            {/* Account Assets Section */}
-            <div className="border-t border-[#2a2a2d] bg-[#0B0E11] shrink-0">
-              <AccountAssets symbol="BTC/USDT" />
-            </div>
-          </aside>
+          {/* BOTTOM: Orders Panel - Full width */}
+          <div className="h-[220px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
+            <OrdersPanel className="w-full h-full overflow-auto" />
+          </div>
         </div>
 
-        {/* BOTTOM SECTION: Orders Panel - Full width */}
-        <div className="flex-1 flex overflow-hidden border-t border-[#2a2a2d] bg-[#0B0E11]">
-          <OrdersPanel className="flex-1 overflow-auto" />
-        </div>
+        {/* RIGHT COLUMN: Order Form + Account Assets - Full height */}
+        <aside className={cn(
+          'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11] overflow-hidden',
+          isRTL && 'border-l-0 border-r'
+        )}>
+          {/* Order Form Section */}
+          <div className="bg-[#0B0E11] shrink-0">
+            <OrderForm className="bg-transparent border-0" />
+          </div>
+
+          {/* Account Assets Section */}
+          <div className="flex-1 border-t border-[#2a2a2d] bg-[#0B0E11] overflow-y-auto">
+            <AccountAssets symbol="BTC/USDT" />
+          </div>
+        </aside>
       </div>
     </div>
   );
