@@ -131,8 +131,7 @@ describe('AccountAssets Component', () => {
     });
 
     it('should handle window resize', async () => {
-      const { container, rerender } = render(<AccountAssets {...mockProps} />);
-      const initialElement = container.firstChild;
+      const { container } = render(<AccountAssets {...mockProps} />);
 
       global.innerWidth = 1920;
       window.dispatchEvent(new Event('resize'));
