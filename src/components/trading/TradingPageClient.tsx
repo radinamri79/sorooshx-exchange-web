@@ -327,9 +327,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <div className="flex-1 flex overflow-hidden border-r border-[#2a2a2d]">
             <OrdersPanel className="flex-1 overflow-auto" />
           </div>
-          
-          {/* Empty space matching OrderForm + Assets width */}
-          <div className="w-[280px]" />
         </div>
       </div>
     </div>
