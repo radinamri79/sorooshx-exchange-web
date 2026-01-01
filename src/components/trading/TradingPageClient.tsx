@@ -293,13 +293,13 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
           {/* MIDDLE COLUMN: Order Book */}
           <aside className={cn(
-            'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d]',
+            'w-[260px] xl:w-[280px] flex flex-col border-l border-[#2a2a2d] overflow-hidden',
             isRTL && 'order-1 border-l-0 border-r'
           )}>
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 flex overflow-hidden">
               <Orderbook 
-                className="h-full bg-[#0d0d0f] border-0" 
-                maxRows={15}
+                className="w-full h-full bg-[#0d0d0f] border-0" 
+                maxRows={10}
               />
             </div>
           </aside>
