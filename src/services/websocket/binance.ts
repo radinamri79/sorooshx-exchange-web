@@ -381,7 +381,8 @@ class BinanceWebSocketManager {
         this.connectionAttempts++;
         
         // If connection closes immediately, likely blocked
-        if (this.connectionAttempts >= this.maxConnectionAttempts || event.wasClean === false) {
+        // event.wasClean might be undefined in tests, so check existence first
+        if (this.connectionAttempts >= this.maxConnectionAttempts || (event && event.wasClean === false)) {
           // Try next source
           this.tryNextSource();
         } else {
