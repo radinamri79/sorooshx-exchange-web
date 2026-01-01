@@ -228,7 +228,7 @@ export function OrderForm({
                          bg-[#1E2329] text-[#EAECEF] group-hover:border-[#FF7A00]
                          transition-all duration-200 border border-[#2B3139]"
             >
-              {formData.marginMode === 'CROSS' ? '✕ Cross' : '◎ Iso'}
+              {formData.marginMode === 'CROSS' ? 'Cross' : 'Isolated'}
               <ChevronDown size={12} className="text-[#848E9C] group-hover:text-[#FF7A00] transition-colors" />
             </button>
             
@@ -241,7 +241,7 @@ export function OrderForm({
                 className="w-full px-3 py-2 text-xs text-left font-medium transition-all hover:bg-[#2B3139] rounded-t-lg"
                 style={{ color: formData.marginMode === 'CROSS' ? '#FF7A00' : '#EAECEF' }}
               >
-                ✕ Cross Mode
+                Cross Mode
               </button>
               <div style={{ borderColor: '#2B3139' }} className="border-b" />
               <button
@@ -250,7 +250,7 @@ export function OrderForm({
                 className="w-full px-3 py-2 text-xs text-left font-medium transition-all hover:bg-[#2B3139] rounded-b-lg"
                 style={{ color: formData.marginMode === 'ISOLATED' ? '#FF7A00' : '#EAECEF' }}
               >
-                ◎ Isolated Mode
+                Isolated Mode
               </button>
             </div>
           </div>
