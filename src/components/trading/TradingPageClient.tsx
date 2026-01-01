@@ -278,10 +278,10 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0" />
       </div>
 
-      {/* MAIN TRADING AREA: Left section scrolls, right column fixed at top */}
+      {/* MAIN TRADING AREA: Left section fixed height, right column expands with content - page scrolls */}
       <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
         
-        {/* LEFT SECTION: Chart (top) + Orders Panel (bottom) - both scrollable */}
+        {/* LEFT SECTION: Chart (top) + Orders Panel (bottom) - Fixed height, takes flex-1 */}
         <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0d0f]">
           {/* TOP: Chart + Orderbook */}
           <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
@@ -306,15 +306,15 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             </aside>
           </div>
 
-          {/* BOTTOM: Orders Panel - Full width */}
+          {/* BOTTOM: Orders Panel - Fixed height */}
           <div className="h-[220px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
             <OrdersPanel className="w-full h-full overflow-auto" />
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Order Form + Account Assets - Full height */}
+        {/* RIGHT COLUMN: Order Form + Account Assets - Expands naturally, scrolls with page */}
         <aside className={cn(
-          'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11] overflow-hidden',
+          'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11] shrink-0 overflow-y-auto',
           isRTL && 'border-l-0 border-r'
         )}>
           {/* Order Form Section */}
@@ -322,8 +322,8 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             <OrderForm className="bg-transparent border-0" />
           </div>
 
-          {/* Account Assets Section */}
-          <div className="flex-1 border-t border-[#2a2a2d] bg-[#0B0E11] overflow-y-auto">
+          {/* Account Assets Section - Expands naturally */}
+          <div className="border-t border-[#2a2a2d] bg-[#0B0E11]">
             <AccountAssets symbol="BTC/USDT" />
           </div>
         </aside>
