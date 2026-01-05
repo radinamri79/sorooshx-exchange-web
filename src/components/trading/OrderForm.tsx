@@ -423,7 +423,7 @@ export function OrderForm({
                   'border outline-none transition-all duration-200',
                   errors.price 
                     ? 'border-[#F6465D] focus:border-[#F6465D]' 
-                    : 'border-[#2B3139] hover:border-[#ffb496] focus:border-[#ffb496]'
+                    : 'border-[#2B3139] focus:border-[#ffb496]'
                 )}
               />
               <button
