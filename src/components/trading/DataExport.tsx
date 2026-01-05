@@ -138,7 +138,7 @@ export function DataExport({ className }: DataExportProps) {
       {/* Export Section */}
       <div className="space-y-2">
         <h3 className="text-xs font-semibold text-[#f5f5f5] flex items-center gap-2">
-          <Download className="w-4 h-4 text-[#ed7620]" />
+          <Download className="w-4 h-4 text-[#ffb496]" />
           Export Data
         </h3>
 
@@ -185,7 +185,7 @@ export function DataExport({ className }: DataExportProps) {
       {/* Import Section */}
       <div className="space-y-2">
         <h3 className="text-xs font-semibold text-[#f5f5f5] flex items-center gap-2">
-          <Upload className="w-4 h-4 text-[#ed7620]" />
+          <Upload className="w-4 h-4 text-[#ffb496]" />
           Import Data
         </h3>
 
@@ -227,7 +227,7 @@ export function DataExport({ className }: DataExportProps) {
       {trades.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-xs font-semibold text-[#f5f5f5] flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-[#ed7620]" />
+            <BarChart3 className="w-4 h-4 text-[#ffb496]" />
             Trade Statistics
           </h3>
 

@@ -360,7 +360,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
                     className={cn(
                       'w-full px-2 py-1 text-[10px] text-left transition-colors',
                       precision === opt
-                        ? 'text-[#FF7A00] bg-[#2B3139]'
+                        ? 'text-[#ffb496] bg-[#2B3139]'
                         : 'text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#2B3139]'
                     )}
                   >

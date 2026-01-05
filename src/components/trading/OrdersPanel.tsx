@@ -86,7 +86,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
         return 'text-[#6b6b6b]';
       case 'open':
       case 'pending':
-        return 'text-[#ed7620]';
+        return 'text-[#ffb496]';
       case 'partially_filled':
         return 'text-[#f0b90b]';
       default:
@@ -302,7 +302,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
                 'w-4 h-4 rounded flex items-center justify-center transition-all duration-200',
                 'border-2 cursor-pointer',
                 !showAllSymbols
-                  ? 'bg-[#ed7620] border-[#ed7620]'
+                  ? 'bg-[#ffb496] border-[#ffb496]'
                   : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
               )}
             >
@@ -363,7 +363,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
                             )}>
                               {position.side === 'long' ? 'Long' : 'Short'}
                             </span>
-                            <span className="text-[#ed7620] text-[9px] font-semibold">{position.leverage}X</span>
+                            <span className="text-[#ffb496] text-[9px] font-semibold">{position.leverage}X</span>
                           </div>
                         </div>
                       </td>

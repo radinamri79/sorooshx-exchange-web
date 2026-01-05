@@ -206,14 +206,14 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         className={cn(
           'flex items-center gap-1.5 px-2 py-1.5 rounded bg-[#17181b] hover:bg-[#1e1f23] transition-colors border border-[#2a2a2d]',
           className,
-          isOpen && 'bg-[#1e1f23] border-[#ed7620]'
+          isOpen && 'bg-[#1e1f23] border-[#ffb496]'
         )}
       >
         <div className="flex items-center gap-1.5">
           <span className="font-bold text-[#f5f5f5] text-xs">
             {currentSymbol.replace('USDT', '')}/USDT
           </span>
-          <span className="text-[8px] font-medium px-1 py-0.5 rounded bg-[#ed7620]/10 text-[#ed7620]">
+          <span className="text-[8px] font-medium px-1 py-0.5 rounded bg-[#ffb496]/10 text-[#ffb496]">
             Perp
           </span>
           <span
@@ -248,7 +248,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('searchPlaceholder')}
-                className="w-full h-9 pl-9 pr-9 rounded-lg border border-[#2a2a2d] bg-[#1E2329] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-2 focus:ring-[#ed7620] focus:border-transparent text-xs transition-all"
+                className="w-full h-9 pl-9 pr-9 rounded-lg border border-[#2a2a2d] bg-[#1E2329] text-[#f5f5f5] placeholder:text-[#6b6b6b] focus:outline-none focus:ring-2 focus:ring-[#ffb496] focus:border-transparent text-xs transition-all"
               />
               {searchQuery && (
                 <button
@@ -269,7 +269,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                   className={cn(
                     'px-2.5 py-1 text-[11px] font-medium rounded whitespace-nowrap transition-all flex items-center gap-1 shrink-0',
                     selectedCategory === category.id
-                      ? 'bg-[#ed7620] text-white'
+                      ? 'bg-[#ffb496] text-black'
                       : 'text-[#6b6b6b] hover:text-[#a1a1a1] hover:bg-[#1E2329]'
                   )}
                 >
@@ -288,7 +288,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
             <div className="flex-1 overflow-y-auto">
               {isLoading ? (
                 <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#ed7620]" />
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#ffb496]" />
                 </div>
               ) : filteredSymbols.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-32 text-[#6b6b6b] py-4">
@@ -318,7 +318,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                       }}
                       className={cn(
                         'w-full flex items-center justify-between gap-2 px-4 py-2.5 hover:bg-[#1E2329] transition-colors border-b border-[#1E2329] last:border-b-0 cursor-pointer',
-                        currentSymbol === symbol && 'bg-[#1E2329] border-l-2 border-l-[#ed7620]'
+                        currentSymbol === symbol && 'bg-[#1E2329] border-l-2 border-l-[#ffb496]'
                       )}
                     >
                       {/* Symbol with Star */}
@@ -328,11 +328,11 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                             e.stopPropagation();
                             toggleFavorite(symbol);
                           }}
-                          className="p-0.5 text-[#6b6b6b] hover:text-[#ed7620] transition-colors flex-shrink-0"
+                          className="p-0.5 text-[#6b6b6b] hover:text-[#ffb496] transition-colors flex-shrink-0"
                         >
                           <Star
                             className="w-3.5 h-3.5"
-                            fill={favorites.includes(symbol) ? '#ed7620' : 'none'}
+                            fill={favorites.includes(symbol) ? '#ffb496' : 'none'}
                           />
                         </button>
 

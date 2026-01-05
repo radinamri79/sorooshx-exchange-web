@@ -145,7 +145,7 @@ function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#0d0d0f] z-10">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-[#ed7620] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#ffb496] border-t-transparent rounded-full animate-spin" />
             <span className="text-xs text-[#6b6b6b]">Loading chart...</span>
           </div>
         </div>
@@ -156,7 +156,7 @@ function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
             <span className="text-sm text-[#ef5350]">{error}</span>
             <button 
               onClick={() => window.location.reload()}
-              className="px-3 py-1.5 text-xs bg-[#ed7620] text-white rounded hover:bg-[#ff8c3a] transition-colors"
+              className="px-3 py-1.5 text-xs bg-[#ffb496] text-black rounded hover:bg-[#ffc4b0] transition-colors"
             >
               Reload
             </button>

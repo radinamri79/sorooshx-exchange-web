@@ -85,12 +85,12 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <div className="absolute top-11 left-0 right-0 z-50 bg-[#121214] border-b border-[#2a2a2d] shadow-lg">
             <div className="p-3 space-y-2">
               <button className="w-full py-2.5 px-3 text-left text-sm text-[#f5f5f5] hover:bg-[#1e1f23] rounded-lg flex items-center gap-2">
-                <User className="w-4 h-4 text-[#ed7620]" />
+                <User className="w-4 h-4 text-[#ffb496]" />
                 Login / Register
               </button>
               <div className="border-t border-[#2a2a2d] pt-2 grid grid-cols-2 gap-2">
                 <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Spot</button>
-                <button className="py-2 px-3 text-xs text-[#ed7620] bg-[#ed7620]/10 rounded-lg font-medium">Futures</button>
+                <button className="py-2 px-3 text-xs text-[#ffb496] bg-[#ffb496]/10 rounded-lg font-medium">Futures</button>
                 <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Convert</button>
                 <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Copy Trade</button>
               </div>
@@ -138,7 +138,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             onClick={() => setActiveTab('chart')}
             className={cn(
               'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'chart' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
+              activeTab === 'chart' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
             )}
           >
             <CandlestickChart className={cn('w-5 h-5', activeTab === 'chart' && 'stroke-[2.5]')} />
@@ -148,7 +148,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             onClick={() => setActiveTab('orderbook')}
             className={cn(
               'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'orderbook' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
+              activeTab === 'orderbook' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
             )}
           >
             <BookOpenText className={cn('w-5 h-5', activeTab === 'orderbook' && 'stroke-[2.5]')} />
@@ -158,7 +158,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             onClick={() => setActiveTab('order')}
             className={cn(
               'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'order' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
+              activeTab === 'order' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
             )}
           >
             <ArrowRightLeft className={cn('w-5 h-5', activeTab === 'order' && 'stroke-[2.5]')} />
@@ -168,7 +168,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             onClick={() => setActiveTab('positions')}
             className={cn(
               'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'positions' ? 'text-[#ed7620]' : 'text-[#6b6b6b]'
+              activeTab === 'positions' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
             )}
           >
             <ClipboardList className={cn('w-5 h-5', activeTab === 'positions' && 'stroke-[2.5]')} />
@@ -229,7 +229,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
         {/* Right side: Login / Sign up (optional, can be hidden or removed) */}
         <div className="flex items-center gap-3">
-          <button className="px-3 py-1.5 text-sm font-medium text-white hover:text-[#ed7620] transition-colors">
+          <button className="px-3 py-1.5 text-sm font-medium text-white hover:text-[#ffb496] transition-colors">
             Login
           </button>
           <button className="px-4 py-1.5 text-sm font-medium text-white border border-white rounded hover:bg-white/10 transition-colors">

@@ -182,7 +182,7 @@ export function Calculator({ className }: CalculatorProps) {
               max="125"
               value={leverage}
               onChange={(e) => setLeverage(e.target.value)}
-              className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#FF7A00]"
+              className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#ffb496]"
             />
             <span className="text-sm font-medium text-[#EAECEF] min-w-[50px]">{leverage}X</span>
           </div>
@@ -345,7 +345,7 @@ export function Calculator({ className }: CalculatorProps) {
 
       {/* Calculate Button */}
       <div className="border-t border-[#2a2a2d] p-6 bg-[#0d0d0f]">
-        <button className="w-full py-3 px-4 bg-[#FF7A00] text-black rounded-lg font-semibold hover:bg-[#ff8c3a] transition-colors">
+        <button className="w-full py-3 px-4 bg-[#ffb496] text-black rounded-lg font-semibold hover:bg-[#ffc4b0] transition-colors">
           Calculate
         </button>
       </div>

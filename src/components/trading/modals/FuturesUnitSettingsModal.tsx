@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils';
 // SOROOSHX BRAND COLORS
 // ============================================================================
 const COLORS = {
-  orange: '#FF7A00',
-  orangeHover: '#FF8A20',
+  orange: '#ffb496',
+  orangeHover: '#ffc4b0',
   bgPrimary: '#0B0E11',
   bgSecondary: '#1E2329',
   bgTertiary: '#2B3139',
@@ -143,9 +143,9 @@ export function FuturesUnitSettingsModal({
               key={option.id}
               className={cn(
                 'flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200',
-                'border hover:border-[#FF6B35]/50',
+                'border hover:border-[#ffb496]/50',
                 unit === option.id 
-                  ? 'border-[#FF6B35] bg-[#FF6B35]/10' 
+                  ? 'border-[#ffb496] bg-[#ffb496]/10' 
                   : 'border-[#2B3139] bg-[#1E2329]'
               )}
               onClick={() => setUnit(option.id)}

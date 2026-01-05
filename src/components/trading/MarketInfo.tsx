@@ -95,7 +95,7 @@ function MarketInfoModal({ symbol, isOpen, onClose }: { symbol: string; isOpen: 
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-[#2a2a2d] flex justify-center">
-          <button className="text-[#FF7A00] text-sm hover:text-[#ff8c3a] font-medium">
+          <button className="text-[#ffb496] text-sm hover:text-[#ffc4b0] font-medium">
             View more token information
           </button>
         </div>
@@ -310,7 +310,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             <label className="text-xs font-medium block mb-2" style={{ color: '#848E9C' }}>Currency</label>
             <button
               onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-              className={cn('w-full h-9 px-3 rounded-lg text-sm font-medium text-left transition-all flex items-center justify-between', showCurrencyDropdown ? 'border border-[#FF7A00]' : 'border border-[#2B3139] hover:border-[#FF7A00]')}
+              className={cn('w-full h-9 px-3 rounded-lg text-sm font-medium text-left transition-all flex items-center justify-between', showCurrencyDropdown ? 'border border-[#ffb496]' : 'border border-[#2B3139] hover:border-[#ffb496]')}
               style={{ backgroundColor: '#1E2329', color: '#EAECEF' }}
             >
               {currency}
@@ -319,7 +319,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             {showCurrencyDropdown && (
               <div className="absolute top-full left-0 right-0 mt-1 rounded-lg shadow-lg z-20" style={{ backgroundColor: '#1E2329', border: '1px solid #2B3139' }}>
                 {['USDT', 'BUSD', 'USDC'].map((cur) => (
-                  <button key={cur} type="button" onClick={() => { setCurrency(cur); setShowCurrencyDropdown(false); }} className="w-full px-3 py-2 text-sm text-left transition-colors hover:bg-[#2B3139]" style={{ color: currency === cur ? '#FF7A00' : '#EAECEF' }}>{cur}</button>
+                  <button key={cur} type="button" onClick={() => { setCurrency(cur); setShowCurrencyDropdown(false); }} className="w-full px-3 py-2 text-sm text-left transition-colors hover:bg-[#2B3139]" style={{ color: currency === cur ? '#ffb496' : '#EAECEF' }}>{cur}</button>
                 ))}
               </div>
             )}
@@ -368,7 +368,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 max="125"
                 value={leverage}
                 onChange={(e) => setLeverage(e.target.value)}
-                className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#FF7A00]"
+                className="flex-1 h-1 bg-[#1E2329] rounded-full appearance-none cursor-pointer accent-[#ffb496]"
               />
               <span className="text-sm font-semibold text-[#EAECEF] min-w-[45px] text-right">{leverage}X</span>
             </div>
@@ -455,7 +455,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   onClick={() => setShowPositionDropdown(!showPositionDropdown)}
                   className={cn(
                     'w-full h-9 px-3 rounded-lg text-sm font-medium text-left transition-all duration-200 flex items-center justify-between',
-                    showPositionDropdown ? 'border border-[#FF7A00]' : 'border border-[#2B3139] hover:border-[#FF7A00]'
+                    showPositionDropdown ? 'border border-[#ffb496]' : 'border border-[#2B3139] hover:border-[#ffb496]'
                   )}
                   style={{ backgroundColor: '#1E2329' }}
                 >
@@ -485,7 +485,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                         setShowPositionDropdown(false);
                       }}
                       className="w-full px-3 py-2 text-sm text-left transition-colors hover:bg-[#2B3139]"
-                      style={{ color: positionType === 'cross' ? '#FF7A00' : '#EAECEF' }}
+                      style={{ color: positionType === 'cross' ? '#ffb496' : '#EAECEF' }}
                     >
                       Cross
                     </button>
@@ -496,7 +496,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                         setShowPositionDropdown(false);
                       }}
                       className="w-full px-3 py-2 text-sm text-left transition-colors hover:bg-[#2B3139]"
-                      style={{ color: positionType === 'isolated' ? '#FF7A00' : '#EAECEF' }}
+                      style={{ color: positionType === 'isolated' ? '#ffb496' : '#EAECEF' }}
                     >
                       Isolated
                     </button>
@@ -546,7 +546,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         {/* Footer - Action Buttons */}
         <div className="border-t border-[#2B3139] px-4 py-2.5 flex gap-2 flex-shrink-0">
           <button onClick={handleClose} className="flex-1 h-8 rounded text-xs font-semibold transition-all hover:brightness-110" style={{ backgroundColor: '#2B3139', color: '#EAECEF' }}>Cancel</button>
-          <button onClick={handleClose} className="flex-1 h-8 rounded text-xs font-bold text-white transition-all hover:brightness-110" style={{ backgroundColor: '#FF7A00' }}>Calculate</button>
+          <button onClick={handleClose} className="flex-1 h-8 rounded text-xs font-bold text-black transition-all hover:brightness-110" style={{ backgroundColor: '#ffb496' }}>Calculate</button>
         </div>
       </div>
     </div>

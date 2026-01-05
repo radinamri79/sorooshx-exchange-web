@@ -225,11 +225,11 @@ export function OrderForm({
             <button
               type="button"
               className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded
-                         bg-[#1E2329] text-[#EAECEF] group-hover:border-[#FF7A00]
+                         bg-[#1E2329] text-[#EAECEF] group-hover:border-[#ffb496]
                          transition-all duration-200 border border-[#2B3139]"
             >
               {formData.marginMode === 'CROSS' ? 'Cross' : 'Isolated'}
-              <ChevronDown size={12} className="text-[#848E9C] group-hover:text-[#FF7A00] transition-colors" />
+              <ChevronDown size={12} className="text-[#848E9C] group-hover:text-[#ffb496] transition-colors" />
             </button>
             
             {/* Dropdown Menu */}
@@ -239,7 +239,7 @@ export function OrderForm({
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, marginMode: 'CROSS' }))}
                 className="w-full px-3 py-2 text-xs text-left font-medium transition-all hover:bg-[#2B3139] rounded-t-lg"
-                style={{ color: formData.marginMode === 'CROSS' ? '#FF7A00' : '#EAECEF' }}
+                style={{ color: formData.marginMode === 'CROSS' ? '#ffb496' : '#EAECEF' }}
               >
                 Cross Mode
               </button>
@@ -248,7 +248,7 @@ export function OrderForm({
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, marginMode: 'ISOLATED' }))}
                 className="w-full px-3 py-2 text-xs text-left font-medium transition-all hover:bg-[#2B3139] rounded-b-lg"
-                style={{ color: formData.marginMode === 'ISOLATED' ? '#FF7A00' : '#EAECEF' }}
+                style={{ color: formData.marginMode === 'ISOLATED' ? '#ffb496' : '#EAECEF' }}
               >
                 Isolated Mode
               </button>
@@ -348,13 +348,13 @@ export function OrderForm({
                   'border outline-none transition-all duration-200',
                   errors.price 
                     ? 'border-[#F6465D] focus:border-[#F6465D]' 
-                    : 'border-[#2B3139] hover:border-[#FF7A00] focus:border-[#FF7A00]'
+                    : 'border-[#2B3139] hover:border-[#ffb496] focus:border-[#ffb496]'
                 )}
               />
               <button
                 type="button"
                 onClick={setLastPrice}
-                className="absolute right-12 text-[10px] font-bold text-[#FF7A00] hover:text-[#FF8A20]
+                className="absolute right-12 text-[10px] font-bold text-[#ffb496] hover:text-[#ffc4b0]
                            transition-colors px-1"
               >
                 Last
@@ -383,7 +383,7 @@ export function OrderForm({
               placeholder="0.00"
               className="w-full h-9 px-3 text-sm font-medium rounded
                          bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]
-                         border border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF7A00]
+                         border border-[#2B3139] hover:border-[#3D4450] focus:border-[#ffb496]
                          outline-none transition-all duration-200"
             />
           </div>
@@ -404,7 +404,7 @@ export function OrderForm({
                 'border outline-none transition-all duration-200',
                 errors.quantity 
                   ? 'border-[#F6465D]' 
-                  : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#FF7A00]'
+                  : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#ffb496]'
               )}
             />
             <div className="absolute right-3 flex items-center gap-1 text-[11px] text-[#848E9C] cursor-pointer hover:text-[#EAECEF]"

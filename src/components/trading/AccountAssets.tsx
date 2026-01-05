@@ -11,7 +11,7 @@ interface AccountAssetsProps {
 }
 
 const COLORS = {
-  orange: '#FF7A00',
+  orange: '#ffb496',
   longGreen: '#0D9D5F',
   shortRed: '#C8102E',
   textPrimary: '#EAECEF',
