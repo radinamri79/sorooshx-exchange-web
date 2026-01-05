@@ -358,14 +358,14 @@ export function OrderForm({
       {/* ================================================================ */}
       {/* ACTION TABS - Open / Close                                       */}
       {/* ================================================================ */}
-      <div className="flex px-3 py-2 gap-2">
+      <div className="flex px-2 py-2 gap-2">
         {(['OPEN', 'CLOSE'] as const).map((action) => (
           <button
             key={action}
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, action }))}
             className={cn(
-              'flex-1 py-2.5 text-sm font-semibold transition-all duration-200 rounded-lg',
+              'flex-1 py-2.5 text-sm font-semibold transition-all duration-200 rounded',
               formData.action === action
                 ? 'text-black bg-[#ffb496]'
                 : 'text-[#848E9C] bg-[#1E2329] hover:text-[#EAECEF] hover:bg-[#2B3139]'
@@ -379,14 +379,14 @@ export function OrderForm({
       {/* ================================================================ */}
       {/* ORDER TYPE TABS - Limit / Market / Trigger                       */}
       {/* ================================================================ */}
-      <div className="flex items-center px-3 py-2 gap-2 border-b border-[#2B3139]">
+      <div className="flex items-center px-2 py-2 gap-2 border-b border-[#2B3139]">
         {(['LIMIT', 'MARKET', 'TRIGGER'] as const).map((type) => (
           <button
             key={type}
             type="button"
             onClick={() => handleOrderTypeChange(type)}
             className={cn(
-              'px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200',
+              'flex-1 px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200 text-center',
               formData.orderType === type
                 ? 'text-black bg-[#ffb496]'
                 : 'text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329]'
