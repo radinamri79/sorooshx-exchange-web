@@ -142,7 +142,7 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
                 'w-4 h-4 rounded flex items-center justify-center transition-all duration-200',
                 'border-2 cursor-pointer',
                 adjustBoth
-                  ? 'bg-transparent border-[#FF6B35]'
+                  ? 'bg-transparent border-[#ffb496]'
                   : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
               )}
             >

@@ -99,7 +99,7 @@ export function Calculator({ className }: CalculatorProps) {
             className={cn(
               'text-sm font-medium pb-2 border-b-2 transition-colors',
               tab === 'pnl'
-                ? 'text-[#EAECEF] border-[#FF7A00]'
+                ? 'text-[#EAECEF] border-[#ffb496]'
                 : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
             )}
           >
@@ -110,7 +110,7 @@ export function Calculator({ className }: CalculatorProps) {
             className={cn(
               'text-sm font-medium pb-2 border-b-2 transition-colors',
               tab === 'target'
-                ? 'text-[#EAECEF] border-[#FF7A00]'
+                ? 'text-[#EAECEF] border-[#ffb496]'
                 : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
             )}
           >
@@ -121,7 +121,7 @@ export function Calculator({ className }: CalculatorProps) {
             className={cn(
               'text-sm font-medium pb-2 border-b-2 transition-colors',
               tab === 'liquidation'
-                ? 'text-[#EAECEF] border-[#FF7A00]'
+                ? 'text-[#EAECEF] border-[#ffb496]'
                 : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
             )}
           >

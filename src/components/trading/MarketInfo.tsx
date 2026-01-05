@@ -254,7 +254,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 className={cn(
                   'text-xs font-medium px-3 py-1.5 border-b-2 transition-colors',
                   tab === 'pnl'
-                    ? 'text-[#EAECEF] border-[#FF7A00]'
+                    ? 'text-[#EAECEF] border-[#ffb496]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
                 )}
               >
@@ -265,7 +265,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 className={cn(
                   'text-xs font-medium px-3 py-1.5 border-b-2 transition-colors',
                   tab === 'target'
-                    ? 'text-[#EAECEF] border-[#FF7A00]'
+                    ? 'text-[#EAECEF] border-[#ffb496]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
                 )}
               >
@@ -276,7 +276,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 className={cn(
                   'text-xs font-medium px-3 py-1.5 border-b-2 transition-colors',
                   tab === 'liquidation'
-                    ? 'text-[#EAECEF] border-[#FF7A00]'
+                    ? 'text-[#EAECEF] border-[#ffb496]'
                     : 'text-[#848E9C] border-transparent hover:text-[#EAECEF]'
                 )}
               >
@@ -624,7 +624,7 @@ export function MarketInfo({ className }: MarketInfoProps) {
         {/* Info Icon Button - Left of Price */}
         <button
           onClick={() => setShowMarketInfoModal(true)}
-          className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#FF7A00] shrink-0"
+          className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
           title="Market Info"
         >
           <Info size={16} />
@@ -633,7 +633,7 @@ export function MarketInfo({ className }: MarketInfoProps) {
         {/* Calculator Icon Button */}
         <button
           onClick={() => setShowCalculatorModal(true)}
-          className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#FF7A00] shrink-0"
+          className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
           title="Calculator"
         >
           <CalculatorIcon size={16} />

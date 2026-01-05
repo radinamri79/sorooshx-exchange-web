@@ -21,8 +21,8 @@ import { Settings, ChevronDown } from 'lucide-react';
 // ============================================================================
 const COLORS = {
   // Primary Brand - Orange Accent (SOROOSHX Official)
-  orange: '#FF7A00',
-  orangeHover: '#FF8A20',
+  orange: '#ffb496',
+  orangeHover: '#ffc4b0',
   orangeActive: '#E66A00',
   
   // Candlestick Colors (Professional Trading - Dark Tones)
@@ -292,7 +292,7 @@ export function OrderForm({
             className={cn(
               'flex-1 py-2.5 text-sm font-semibold transition-all duration-200 rounded-lg',
               formData.action === action
-                ? 'text-white bg-[#FF7A00]'
+                ? 'text-black bg-[#ffb496]'
                 : 'text-[#848E9C] bg-[#1E2329] hover:text-[#EAECEF] hover:bg-[#2B3139]'
             )}
           >
@@ -313,7 +313,7 @@ export function OrderForm({
             className={cn(
               'px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200',
               formData.orderType === type
-                ? 'text-white bg-[#FF7A00]'
+                ? 'text-black bg-[#ffb496]'
                 : 'text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329]'
             )}
           >
@@ -437,7 +437,7 @@ export function OrderForm({
                   'absolute top-1/2 w-2.5 h-2.5 rounded-full border-2 transition-all duration-200',
                   'hover:scale-125',
                   formData.quantityPercent >= percent
-                    ? 'bg-[#FF7A00] border-[#FF7A00]'
+                    ? 'bg-[#ffb496] border-[#ffb496]'
                     : 'bg-[#0B0E11] border-[#5E6673] hover:border-[#848E9C]'
                 )}
                 style={{ left: `${percent}%`, transform: 'translate(-50%, -50%)' }}
@@ -468,7 +468,7 @@ export function OrderForm({
                 'w-4 h-4 rounded flex items-center justify-center transition-all duration-200',
                 'border-2 cursor-pointer',
                 formData.tpsl.enabled
-                  ? 'bg-[#FF7A00] border-[#FF7A00]'
+                  ? 'bg-[#ffb496] border-[#ffb496]'
                   : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
               )}
             >

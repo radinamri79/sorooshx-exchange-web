@@ -111,7 +111,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Positions({filteredPositions.length})
             {activeTab === 'positions' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
           
@@ -127,7 +127,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Copy trades (0)
             {activeTab === 'copyTrades' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -143,7 +143,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Trading bots (0)
             {activeTab === 'tradingBots' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -159,7 +159,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Open Orders({openOrders.length})
             {activeTab === 'openOrders' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -175,7 +175,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Order history
             {activeTab === 'orderHistory' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -191,7 +191,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Position history
             {activeTab === 'positionHistory' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -207,7 +207,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Trade history
             {activeTab === 'tradeHistory' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -223,7 +223,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Funding history
             {activeTab === 'fundingHistory' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -239,7 +239,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Assets
             {activeTab === 'assets' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -255,7 +255,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Futures Bonus
             {activeTab === 'futuresBonus' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -271,7 +271,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Order details
             {activeTab === 'orderDetails' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
 
@@ -287,7 +287,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           >
             Transaction history
             {activeTab === 'transactionHistory' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ed7620]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffb496]" />
             )}
           </button>
         </div>

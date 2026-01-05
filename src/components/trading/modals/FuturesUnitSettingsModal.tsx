@@ -155,12 +155,12 @@ export function FuturesUnitSettingsModal({
                 className={cn(
                   'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200',
                   unit === option.id
-                    ? 'border-[#FF6B35]'
+                    ? 'border-[#ffb496]'
                     : 'border-[#5E6673]'
                 )}
               >
                 {unit === option.id && (
-                  <div className="w-2 h-2 rounded-full bg-[#FF6B35]" />
+                  <div className="w-2 h-2 rounded-full bg-[#ffb496]" />
                 )}
               </div>
 
