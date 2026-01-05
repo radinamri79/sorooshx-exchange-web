@@ -73,6 +73,23 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
     setTimeout(onClose, 200);
   };
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen]);
+
   if (!isVisible) return null;
 
   const quickButtons = [1, 40, 80, 120, 160, 200];

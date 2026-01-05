@@ -14,6 +14,23 @@ interface MarketInfoProps {
 
 // Market Info Modal
 function MarketInfoModal({ symbol, isOpen, onClose }: { symbol: string; isOpen: boolean; onClose: () => void }) {
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, onClose]);
+
   return isOpen ? (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-[#121214] rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto border border-[#2a2a2d]">
@@ -124,6 +141,23 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
     setIsAnimating(false);
     setTimeout(onClose, 200);
   };
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen]);
 
   // Calculate PnL results
   const pnlResults = useMemo(() => {
