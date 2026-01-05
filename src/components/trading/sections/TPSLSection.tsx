@@ -29,13 +29,21 @@ export function TPSLSection({
   return (
     <div className="space-y-3 rounded-lg bg-gray-800/30 p-4">
       {/* Header with Toggle */}
-      <label className="flex cursor-pointer items-center gap-3">
-        <input
-          type="checkbox"
-          checked={tpsl.enabled}
-          onChange={(e) => onToggle(e.target.checked)}
-          className="h-5 w-5 accent-orange-500"
-        />
+      <label className="flex cursor-pointer items-center gap-3 group">
+        <div
+          onClick={() => onToggle(!tpsl.enabled)}
+          className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200 border-2 cursor-pointer ${
+            tpsl.enabled
+              ? 'bg-[#ffb496] border-[#ffb496]'
+              : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
+          }`}
+        >
+          {tpsl.enabled && (
+            <svg className="w-3 h-3" fill="#000000" viewBox="0 0 20 20">
+              <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+            </svg>
+          )}
+        </div>
         <span className="font-semibold text-white">TP / SL</span>
         {!tpsl.enabled && (
           <span className="text-xs text-gray-400">Not set</span>
