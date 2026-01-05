@@ -233,12 +233,12 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         <>
           {/* Blur Overlay */}
           <div 
-            className="fixed inset-0 z-40 backdrop-blur-sm bg-black/20"
+            className="fixed inset-0 z-40 backdrop-blur-sm bg-black/20 md:block hidden"
             onClick={() => setIsOpen(false)}
           />
           
           {/* Dropdown Content */}
-          <div className="fixed md:absolute bottom-0 md:bottom-auto md:top-full md:left-0 left-0 right-0 md:mt-2 md:w-96 w-full max-h-[80vh] md:max-h-[500px] flex flex-col bg-[#0B0E11] border border-[#2a2a2d] md:rounded-lg shadow-2xl z-50 overflow-hidden rounded-t-lg md:rounded-b-lg">
+          <div className="fixed md:absolute bottom-0 md:bottom-auto md:top-full md:left-0 left-0 right-0 md:mt-2 md:w-96 w-full h-[70vh] md:h-auto md:max-h-[500px] flex flex-col bg-[#0B0E11] border border-[#2a2a2d] md:rounded-lg shadow-2xl z-50 overflow-hidden rounded-t-lg md:rounded-b-lg animate-sheet-up md:animate-none">
             {/* Search Input */}
             <div className="relative px-4 pt-4 pb-2 flex items-center">
               <Search className="absolute left-6 w-4 h-4 text-[#6b6b6b]" />

@@ -621,19 +621,19 @@ export function MarketInfo({ className }: MarketInfoProps) {
           className
         )}
       >
-        {/* Info Icon Button - Left of Price */}
+        {/* Info Icon Button - Left of Price - Only on Desktop */}
         <button
           onClick={() => setShowMarketInfoModal(true)}
-          className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
+          className="hidden md:block p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
           title="Market Info"
         >
           <Info size={16} />
         </button>
 
-        {/* Calculator Icon Button */}
+        {/* Calculator Icon Button - Only on Desktop */}
         <button
           onClick={() => setShowCalculatorModal(true)}
-          className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
+          className="hidden md:block p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
           title="Calculator"
         >
           <CalculatorIcon size={16} />

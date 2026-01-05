@@ -14,10 +14,6 @@ import {
   AccountAssets,
 } from '@/components/trading';
 import { binanceWS } from '@/services/websocket';
-import { 
-  Bell, 
-  Wallet,
-} from 'lucide-react';
 
 interface TradingPageClientProps {
   locale: string;
@@ -50,19 +46,11 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
     return (
       <div className="flex flex-col h-[100dvh] bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Symbol & Market Info Bar - Mobile */}
-        <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0 pt-2">
+        <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0">
           <div className="flex items-center justify-between px-3 py-1.5">
             <TickerSwitcher className="shrink-0" />
-            <div className="flex items-center gap-3">
-              <button className="p-1.5 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
-                <Bell className="w-4 h-4" />
-              </button>
-              <button className="p-1.5 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
-                <Wallet className="w-4 h-4" />
-              </button>
-            </div>
           </div>
-          <MarketInfo className="bg-transparent border-0 px-3 py-2 overflow-x-auto mobile-market-info" />
+          <MarketInfo className="bg-transparent border-0 px-3 py-2 mobile-market-info" />
         </div>
 
         {/* Main Content Area - Single scrollable page */}
@@ -119,9 +107,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <Image src="/sorooshx-logo.png" alt="SorooshX" width={120} height={32} className="object-contain" />
           <TickerSwitcher />
           <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0 overflow-hidden" />
-          <button className="p-1.5 text-[#a1a1a1] hover:text-white rounded hover:bg-[#1e1f23]">
-            <Wallet className="w-4 h-4" />
-          </button>
         </header>
 
         <div className="flex-1 flex overflow-hidden">

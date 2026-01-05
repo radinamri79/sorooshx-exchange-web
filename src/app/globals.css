@@ -259,4 +259,35 @@
       display: none;
     }
   }
+
+  /* Bottom Sheet Animation for Mobile */
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideDownMobile {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  .animate-sheet-up {
+    animation: slideUpMobile 0.3s ease-out forwards;
+  }
+
+  .animate-sheet-down {
+    animation: slideDownMobile 0.3s ease-out forwards;
+  }
 }
