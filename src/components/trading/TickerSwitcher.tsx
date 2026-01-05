@@ -204,14 +204,15 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-1.5 px-2 py-1.5 rounded bg-[#17181b] hover:bg-[#1e1f23] transition-colors border border-[#2a2a2d] md:border md:border-[#2a2a2d] md:hover:bg-[#1e1f23]',
-          'md:border md:border-[#2a2a2d] sm:border-0',
+          'flex items-center gap-1.5 px-3 py-2 rounded bg-[#17181b] hover:bg-[#1e1f23] transition-colors',
+          'border-0 md:border md:border-[#2a2a2d]',
+          'md:hover:bg-[#1e1f23]',
           className,
           isOpen && 'md:bg-[#1e1f23] md:border-[#ffb496]'
         )}
       >
         <div className="flex items-center gap-1.5">
-          <span className="font-bold text-[#f5f5f5] text-xs">
+          <span className="font-bold text-[#f5f5f5] text-sm md:text-xs">
             {currentSymbol.replace('USDT', '')}/USDT
           </span>
           <span className="text-[8px] font-medium px-1 py-0.5 rounded bg-[#ffb496]/10 text-[#ffb496]">

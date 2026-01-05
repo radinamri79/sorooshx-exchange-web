@@ -615,29 +615,29 @@ export function MarketInfo({ className }: MarketInfoProps) {
 
   return (
     <>
-      {/* Mobile Layout: Buttons on same row, Info below */}
+      {/* Mobile Layout: Two rows - price/icons and market stats */}
       <div className="md:hidden">
-        {/* Desktop-like row: Buttons + Price Info */}
+        {/* Row 1: Price info (left) and Icons (right) */}
         <div
           className={cn(
-            'flex items-center gap-3 px-0 py-0 bg-transparent border-0',
+            'flex items-center justify-between gap-3 px-0 py-0 bg-transparent border-0',
             className
           )}
         >
-          {/* Main Price with Change */}
+          {/* Main Price with Change - Left side */}
           <div className="flex items-center gap-2 min-w-fit shrink-0">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-1.5">
                 <span
                   className={cn(
-                    'text-sm font-bold tabular-nums',
+                    'text-base font-bold tabular-nums',
                     isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
                   )}
                 >
                   {stats.lastPrice}
                 </span>
                 <div className={cn(
-                  'flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] font-medium',
+                  'flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold',
                   isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
                 )}>
                   {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
@@ -647,53 +647,52 @@ export function MarketInfo({ className }: MarketInfoProps) {
             </div>
           </div>
 
-          {/* Spacer */}
-          <div className="flex-1" />
+          {/* Icons on right side - larger size */}
+          <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+            <button
+              onClick={() => setShowMarketInfoModal(true)}
+              className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
+              title="Market Info"
+            >
+              <Info size={18} />
+            </button>
 
-          {/* Info Icon Button - Right side */}
-          <button
-            onClick={() => setShowMarketInfoModal(true)}
-            className="p-1 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
-            title="Market Info"
-          >
-            <Info size={14} />
-          </button>
-
-          {/* Calculator Icon Button */}
-          <button
-            onClick={() => setShowCalculatorModal(true)}
-            className="p-1 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
-            title="Calculator"
-          >
-            <CalculatorIcon size={14} />
-          </button>
+            <button
+              onClick={() => setShowCalculatorModal(true)}
+              className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
+              title="Calculator"
+            >
+              <CalculatorIcon size={18} />
+            </button>
+          </div>
         </div>
 
-        {/* Market Info Stats - Full width below */}
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
-          <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] text-[#6b6b6b]">Market Price</span>
-            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.markPrice}</span>
+        {/* Row 2: Market details - centered with dividers */}
+        <div className="flex items-center justify-center gap-3 px-2 py-1.5 overflow-x-auto scrollbar-hide">
+          <div className="flex flex-col gap-0.5 min-w-fit text-center">
+            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">Market</span>
+            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.markPrice}</span>
           </div>
 
-          <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] text-[#6b6b6b]">Index Price</span>
-            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.indexPrice}</span>
+          <div className="w-px h-6 bg-[#2a2a2d] flex-shrink-0" />
+
+          <div className="flex flex-col gap-0.5 min-w-fit text-center">
+            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">24H High</span>
+            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.high24h}</span>
           </div>
 
-          <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] text-[#6b6b6b]">24H High</span>
-            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.high24h}</span>
+          <div className="w-px h-6 bg-[#2a2a2d] flex-shrink-0" />
+
+          <div className="flex flex-col gap-0.5 min-w-fit text-center">
+            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">24H Low</span>
+            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.low24h}</span>
           </div>
 
-          <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] text-[#6b6b6b]">24H Low</span>
-            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.low24h}</span>
-          </div>
+          <div className="w-px h-6 bg-[#2a2a2d] flex-shrink-0" />
 
-          <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] text-[#6b6b6b]">Vol(BTC)</span>
-            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.volume24h}</span>
+          <div className="flex flex-col gap-0.5 min-w-fit text-center">
+            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">Volume</span>
+            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.volume24h}</span>
           </div>
         </div>
       </div>
