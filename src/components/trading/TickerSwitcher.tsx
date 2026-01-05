@@ -227,7 +227,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
             {currentTicker ? formatPercentage(currentTicker.P) : '--'}
           </span>
         </div>
-        <ChevronDown className={cn('w-3.5 h-3.5 text-[#6b6b6b] transition-transform', isOpen && 'rotate-180')} />
+        <ChevronDown className={cn('w-5 h-5 md:w-3.5 md:h-3.5 text-[#6b6b6b] transition-transform', isOpen && 'rotate-180')} />
       </button>
 
       {/* Dropdown Menu */}

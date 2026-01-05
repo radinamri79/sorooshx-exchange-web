@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo, useState, forwardRef, useImperativeHandle } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn, formatPrice, formatNumber, formatPercentage } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
@@ -553,15 +553,21 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   );
 }
 
-export function MarketInfo({ className }: MarketInfoProps) {
-  useTranslations('trading');
-  const { currentSymbol, tickers, setTicker } = useMarketStore();
-  const tickerRef = useRef<BinanceTicker | null>(null);
-  const [showMarketInfoModal, setShowMarketInfoModal] = useState(false);
-  const [showCalculatorModal, setShowCalculatorModal] = useState(false);
+export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalculatorModal: () => void }, MarketInfoProps>(
+  function MarketInfo({ className }, ref) {
+    useTranslations('trading');
+    const { currentSymbol, tickers, setTicker } = useMarketStore();
+    const tickerRef = useRef<BinanceTicker | null>(null);
+    const [showMarketInfoModal, setShowMarketInfoModal] = useState(false);
+    const [showCalculatorModal, setShowCalculatorModal] = useState(false);
 
-  const ticker = tickers[currentSymbol] || null;
-  tickerRef.current = ticker as BinanceTicker | null;
+    useImperativeHandle(ref, () => ({
+      triggerInfoModal: () => setShowMarketInfoModal(true),
+      triggerCalculatorModal: () => setShowCalculatorModal(true),
+    }));
+
+    const ticker = tickers[currentSymbol] || null;
+    tickerRef.current = ticker as BinanceTicker | null;
 
   useEffect(() => {
     const streamName = `${currentSymbol.toLowerCase()}@ticker`;
@@ -616,83 +622,54 @@ export function MarketInfo({ className }: MarketInfoProps) {
   return (
     <>
       {/* Mobile Layout: Two rows - price/icons and market stats */}
-      <div className="md:hidden">
-        {/* Row 1: Price info (left) and Icons (right) */}
-        <div
-          className={cn(
-            'flex items-center justify-between gap-3 px-0 py-0 bg-transparent border-0',
-            className
-          )}
-        >
-          {/* Main Price with Change - Left side */}
-          <div className="flex items-center gap-2 min-w-fit shrink-0">
-            <div className="flex flex-col gap-0.5">
-              <div className="flex items-center gap-1.5">
-                <span
-                  className={cn(
-                    'text-base font-bold tabular-nums',
-                    isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
-                  )}
-                >
-                  {stats.lastPrice}
-                </span>
-                <div className={cn(
-                  'flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold',
-                  isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
-                )}>
-                  {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
-                  {isPositive ? '+' : ''}{stats.priceChangePercent}
-                </div>
-              </div>
+      <div className="md:hidden flex flex-col gap-2">
+        {/* Row 1: Centered Price with Change */}
+        <div className="flex flex-col items-center justify-center py-1">
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                'text-3xl font-bold tabular-nums',
+                isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
+              )}
+            >
+              {stats.lastPrice}
+            </span>
+            <div className={cn(
+              'flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-semibold',
+              isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
+            )}>
+              {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+              {isPositive ? '+' : ''}{stats.priceChangePercent}
             </div>
-          </div>
-
-          {/* Icons on right side - larger size */}
-          <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
-            <button
-              onClick={() => setShowMarketInfoModal(true)}
-              className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
-              title="Market Info"
-            >
-              <Info size={18} />
-            </button>
-
-            <button
-              onClick={() => setShowCalculatorModal(true)}
-              className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
-              title="Calculator"
-            >
-              <CalculatorIcon size={18} />
-            </button>
           </div>
         </div>
 
-        {/* Row 2: Market details - centered with dividers */}
-        <div className="flex items-center justify-center gap-3 px-2 py-1.5 overflow-x-auto scrollbar-hide">
-          <div className="flex flex-col gap-0.5 min-w-fit text-center">
-            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">Market</span>
-            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.markPrice}</span>
+        {/* Row 2: Market details - full width with larger text and dividers */}
+        <div className="flex items-center justify-between gap-2 px-0 py-1.5">
+          <div className="flex-1 flex flex-col gap-1 items-center text-center">
+            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">Market</span>
+            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.markPrice}</span>
           </div>
 
-          <div className="w-px h-6 bg-[#2a2a2d] flex-shrink-0" />
+          <div className="w-px h-8 bg-[#2a2a2d] flex-shrink-0" />
 
-          <div className="flex flex-col gap-0.5 min-w-fit text-center">
-            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">24H High</span>
-            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.high24h}</span>
+          <div className="flex-1 flex flex-col gap-1 items-center text-center">
+            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">24H High</span>
+            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.high24h}</span>
           </div>
 
-          <div className="w-px h-6 bg-[#2a2a2d] flex-shrink-0" />
+          <div className="w-px h-8 bg-[#2a2a2d] flex-shrink-0" />
 
-          <div className="flex flex-col gap-0.5 min-w-fit text-center">
-            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">24H Low</span>
-            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.low24h}</span>
+          <div className="flex-1 flex flex-col gap-1 items-center text-center">
+            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">24H Low</span>
+            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.low24h}</span>
           </div>
 
-          <div className="w-px h-6 bg-[#2a2a2d] flex-shrink-0" />
+          <div className="w-px h-8 bg-[#2a2a2d] flex-shrink-0" />
 
-          <div className="flex flex-col gap-0.5 min-w-fit text-center">
-            <span className="text-[7px] text-[#6b6b6b] uppercase tracking-wider">Volume</span>
-            <span className="text-[10px] text-[#f5f5f5] font-medium tabular-nums">{stats.volume24h}</span>
+          <div className="flex-1 flex flex-col gap-1 items-center text-center">
+            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">Volume</span>
+            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.volume24h}</span>
           </div>
         </div>
       </div>
@@ -814,4 +791,5 @@ export function MarketInfo({ className }: MarketInfoProps) {
       />
     </>
   );
-}
+  }
+);

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { Info, Calculator as CalculatorIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   MarketInfo,
@@ -24,6 +25,8 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const isRTL = locale === 'fa';
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  
+  const marketInfoRef = useRef<{ triggerInfoModal: () => void; triggerCalculatorModal: () => void } | null>(null);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -47,12 +50,29 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
       <div className="flex flex-col h-[100dvh] bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Symbol & Market Info Bar - Mobile */}
         <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0 flex flex-col">
-          {/* Top row: TickerSwitcher and Market Info together */}
-          <div className="px-3 py-2">
-            <div className="flex items-center justify-between gap-2 mb-1.5">
-              <TickerSwitcher className="shrink-0" />
+          {/* Row 1: TickerSwitcher (left) + Icons (right, larger) */}
+          <div className="flex items-center justify-between px-3 py-2.5 gap-3">
+            <TickerSwitcher className="shrink-0" />
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => marketInfoRef.current?.triggerInfoModal()}
+                className="p-2 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
+                title="Market Info"
+              >
+                <Info size={20} />
+              </button>
+              <button
+                onClick={() => marketInfoRef.current?.triggerCalculatorModal()}
+                className="p-2 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
+                title="Calculator"
+              >
+                <CalculatorIcon size={20} />
+              </button>
             </div>
-            <MarketInfo className="bg-transparent border-0 mobile-market-info" />
+          </div>
+          {/* Row 2-3: Price centered and Market Stats */}
+          <div className="px-3 pb-2">
+            <MarketInfo ref={marketInfoRef} className="bg-transparent border-0" />
           </div>
         </div>
 
