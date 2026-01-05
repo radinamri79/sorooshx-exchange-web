@@ -237,58 +237,74 @@ function LeverageSection({ label, value, onChange, color, isMobile = false }: Le
     maximumFractionDigits: 0,
   });
 
+  const quickButtons = [1, 40, 80, 120, 160, 200];
+
   return (
-    <div className={cn('space-y-2.5', isMobile ? 'py-1.5' : 'py-2')}>
+    <div className={cn('space-y-2', isMobile ? 'py-1.5' : 'py-2')}>
       {/* Label */}
       <span className={cn('block font-medium', isMobile ? 'text-xs' : 'text-sm')} style={{ color }}>
         {label}
       </span>
 
-      {/* Input Field with +/- Buttons */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onChange(value - 1)}
-          className={cn('rounded-lg transition-colors hover:brightness-110 active:scale-95 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
-          style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
-        >
-          <Minus size={isMobile ? 16 : 18} />
-        </button>
+      {/* Main Controls - Input with +/- and Quick Buttons Sidebar */}
+      <div className={cn('flex gap-2.5', isMobile ? 'flex-col' : 'flex-row items-start')}>
+        {/* Left Side - Input with +/- Buttons */}
+        <div className="flex items-center gap-2 flex-1">
+          <button
+            onClick={() => onChange(value - 1)}
+            className={cn('rounded-lg transition-colors hover:brightness-110 active:scale-95 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
+            style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
+          >
+            <Minus size={isMobile ? 16 : 18} />
+          </button>
 
-        <div className={cn('flex-1 rounded-lg flex items-center justify-center relative', isMobile ? 'h-9' : 'h-11')} style={{ backgroundColor: COLORS.bgSecondary, border: `1.5px solid ${color}` }}>
-          <input
-            type="number"
-            value={value}
-            onChange={(e) => onChange(parseInt(e.target.value) || MIN_LEVERAGE)}
-            className={cn('w-full rounded-lg outline-none transition-all duration-200 text-center font-bold bg-transparent', isMobile ? 'h-9 text-lg' : 'h-11 text-2xl')}
-            style={{
-              color,
-            }}
-          />
-          <span className={cn('font-bold pr-2 pointer-events-none', isMobile ? 'text-lg' : 'text-2xl')} style={{ color }}>
-            X
-          </span>
+          {/* Display Value with X - Bitunix Style */}
+          <div className={cn('flex-1 rounded-lg flex items-center justify-center font-bold', isMobile ? 'h-9 text-xl' : 'h-11 text-3xl')} style={{ backgroundColor: COLORS.bgSecondary, border: `1.5px solid ${color}`, color }}>
+            {value}X
+          </div>
+
+          <button
+            onClick={() => onChange(value + 1)}
+            className={cn('rounded-lg transition-colors hover:brightness-110 active:scale-95 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
+            style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
+          >
+            <Plus size={isMobile ? 16 : 18} />
+          </button>
         </div>
 
-        <button
-          onClick={() => onChange(value + 1)}
-          className={cn('rounded-lg transition-colors hover:brightness-110 active:scale-95 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
-          style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
-        >
-          <Plus size={isMobile ? 16 : 18} />
-        </button>
+        {/* Right Side - Quick Buttons Sidebar */}
+        <div className={cn('flex gap-1', isMobile ? 'w-full justify-between' : 'flex-col')}>
+          {quickButtons.map((btn) => (
+            <button
+              key={btn}
+              onClick={() => onChange(btn)}
+              className={cn(
+                'rounded font-semibold transition-all duration-200 hover:brightness-110 active:scale-95 flex items-center justify-center',
+                isMobile
+                  ? 'flex-1 px-2 py-1 text-[10px] min-h-[30px]'
+                  : 'px-2 py-1.5 text-[11px] min-w-[44px]'
+              )}
+              style={{
+                backgroundColor: value === btn ? color : COLORS.bgSecondary,
+                color: value === btn ? '#000000' : COLORS.textSecondary,
+                borderWidth: value === btn ? '0px' : `1px`,
+                borderColor: COLORS.borderColor,
+              }}
+            >
+              {btn}x
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Max Position Nominal Value */}
-      <div
-        className={cn('rounded-lg', isMobile ? 'p-2' : 'p-2.5')}
-        style={{ backgroundColor: COLORS.bgSecondary }}
-      >
-        <div className={cn('font-medium opacity-70', isMobile ? 'text-[11px]' : 'text-xs')} style={{ color: COLORS.textSecondary }}>
+      {/* Max Position Nominal Value - Inline with space between */}
+      <div className={cn('flex items-center justify-between px-3 py-2 rounded-lg', isMobile ? 'text-xs' : 'text-sm')} style={{ backgroundColor: COLORS.bgSecondary }}>
+        <span className="font-medium" style={{ color: COLORS.textSecondary }}>
           Max Position Nominal Value
-        </div>
-        <div className={cn('font-semibold', isMobile ? 'text-xs' : 'text-sm')} style={{ color: COLORS.textPrimary }}>
+        </span>
+        <span className="font-semibold" style={{ color: COLORS.textPrimary }}>
           {maxPositionValue} USDT
-        </div>
+        </span>
       </div>
     </div>
   );
