@@ -29,17 +29,17 @@ export function TPSLSection({
   return (
     <div className="space-y-3 rounded-lg bg-gray-800/30 p-4">
       {/* Header with Toggle */}
-      <label className="flex cursor-pointer items-center gap-3 group">
+      <label className="flex items-center gap-2 cursor-pointer group">
         <div
           onClick={() => onToggle(!tpsl.enabled)}
-          className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200 border-2 cursor-pointer ${
+          className={`w-4 h-4 rounded flex items-center justify-center transition-all duration-200 border-2 cursor-pointer ${
             tpsl.enabled
               ? 'bg-[#ffb496] border-[#ffb496]'
               : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
           }`}
         >
           {tpsl.enabled && (
-            <svg className="w-3 h-3" fill="#000000" viewBox="0 0 20 20">
+            <svg className="w-2.5 h-2.5" fill="#000000" viewBox="0 0 20 20">
               <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
             </svg>
           )}
