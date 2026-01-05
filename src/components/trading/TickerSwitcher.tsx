@@ -284,14 +284,23 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                   const isUp = ticker && parseFloat(ticker.P) >= 0;
 
                   return (
-                    <button
+                    <div
                       key={symbol}
                       onClick={() => {
                         setCurrentSymbol(symbol);
                         setIsOpen(false);
                       }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setCurrentSymbol(symbol);
+                          setIsOpen(false);
+                        }
+                      }}
                       className={cn(
-                        'w-full flex items-center justify-between gap-2 px-4 py-2.5 hover:bg-[#1E2329] transition-colors border-b border-[#1E2329] last:border-b-0',
+                        'w-full flex items-center justify-between gap-2 px-4 py-2.5 hover:bg-[#1E2329] transition-colors border-b border-[#1E2329] last:border-b-0 cursor-pointer',
                         currentSymbol === symbol && 'bg-[#1E2329] border-l-2 border-l-[#ed7620]'
                       )}
                     >
@@ -343,7 +352,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
                           </span>
                         </div>
                       </div>
-                    </button>
+                    </div>
                   );
                 })
               )}
