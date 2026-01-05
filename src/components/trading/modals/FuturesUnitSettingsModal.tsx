@@ -189,7 +189,7 @@ export function FuturesUnitSettingsModal({
         <div className="px-4 pb-4">
           <button
             onClick={handleClose}
-            className="w-full h-10 rounded-lg text-sm font-bold text-white transition-all duration-200
+            className="w-full h-10 rounded-lg text-sm font-bold text-black transition-all duration-200
                        hover:brightness-110 active:brightness-90 active:scale-[0.98]"
             style={{ backgroundColor: COLORS.orange }}
           >

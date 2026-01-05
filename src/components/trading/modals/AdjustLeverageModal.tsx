@@ -147,7 +147,7 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
               )}
             >
               {adjustBoth && (
-                <svg className="w-2.5 h-2.5" fill={COLORS.orange} viewBox="0 0 20 20">
+                <svg className="w-2.5 h-2.5" fill="#000000" viewBox="0 0 20 20">
                   <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
                 </svg>
               )}
@@ -206,7 +206,7 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
           </button>
           <button
             onClick={handleClose}
-            className="flex-1 h-11 rounded-lg text-sm font-bold text-white transition-all duration-200
+            className="flex-1 h-11 rounded-lg text-sm font-bold text-black transition-all duration-200
                        hover:brightness-110 active:brightness-90 active:scale-[0.98]"
             style={{ backgroundColor: COLORS.orange }}
           >
