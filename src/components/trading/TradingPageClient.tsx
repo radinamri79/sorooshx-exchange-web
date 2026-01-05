@@ -15,15 +15,11 @@ import {
 } from '@/components/trading';
 import { binanceWS } from '@/services/websocket';
 import { 
-  CandlestickChart, 
-  BookOpenText, 
-  ArrowRightLeft, 
-  ClipboardList, 
-  Menu, 
-  X, 
   Bell, 
   Wallet,
-  User
+  User,
+  Menu, 
+  X, 
 } from 'lucide-react';
 
 interface TradingPageClientProps {
@@ -35,7 +31,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const isRTL = locale === 'fa';
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  const [activeTab, setActiveTab] = useState<'chart' | 'orderbook' | 'order' | 'positions'>('chart');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -54,7 +49,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
     return () => binanceWS.disconnect();
   }, []);
 
-  // Mobile Layout - Optimized for small screens
+  // Mobile Layout - Single page responsive design without bottom navigation
   if (isMobile) {
     return (
       <div className="flex flex-col h-[100dvh] bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -106,75 +101,48 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <MarketInfo className="bg-transparent border-0 px-3 py-1.5 overflow-x-auto" />
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
-          {activeTab === 'chart' && (
-            <TradingChart className="h-full min-h-[300px] bg-[#0d0d0f] border-0 rounded-none" />
-          )}
-          {activeTab === 'orderbook' && (
-            <Orderbook className="h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={25} />
-          )}
-          {activeTab === 'order' && (
-            <div className="h-full overflow-y-auto">
-              {/* Order Form Section */}
-              <div className="bg-[#0d0d0f]">
-                <OrderForm className="bg-transparent border-0 rounded-none" />
-              </div>
+        {/* Main Content Area - Single scrollable page */}
+        <div className="flex-1 overflow-y-auto bg-[#0d0d0f]">
+          {/* Chart Section */}
+          <div className="w-full h-[280px] shrink-0 border-b border-[#2a2a2d]">
+            <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
+          </div>
 
-              {/* Account Assets Section for Mobile */}
-              <div className="border-t border-[#2a2a2d] bg-[#121214]">
-                <AccountAssets symbol="BTC/USDT" />
+          {/* Two-column layout for Orderbook and Order Form on mobile */}
+          <div className="flex gap-px bg-[#2a2a2d]">
+            {/* Left Column: Orderbook */}
+            <div className="flex-1 min-w-0 bg-[#0d0d0f] max-h-[350px] overflow-hidden">
+              <div className="px-2 py-2 border-b border-[#2a2a2d]">
+                <h3 className="text-xs font-semibold text-[#a1a1a1]">Order Book</h3>
               </div>
+              <Orderbook className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={12} />
             </div>
-          )}
-          {activeTab === 'positions' && (
-            <OrdersPanel className="h-full bg-[#0d0d0f] border-0 rounded-none" />
-          )}
-        </div>
 
-        {/* Bottom Navigation - iOS/Android Style */}
-        <nav className="flex items-center justify-around bg-[#121214] border-t border-[#2a2a2d] h-14 shrink-0 safe-area-bottom">
-          <button
-            onClick={() => setActiveTab('chart')}
-            className={cn(
-              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'chart' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
-            )}
-          >
-            <CandlestickChart className={cn('w-5 h-5', activeTab === 'chart' && 'stroke-[2.5]')} />
-            <span className="text-[10px] font-medium">Chart</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('orderbook')}
-            className={cn(
-              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'orderbook' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
-            )}
-          >
-            <BookOpenText className={cn('w-5 h-5', activeTab === 'orderbook' && 'stroke-[2.5]')} />
-            <span className="text-[10px] font-medium">Order Book</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('order')}
-            className={cn(
-              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'order' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
-            )}
-          >
-            <ArrowRightLeft className={cn('w-5 h-5', activeTab === 'order' && 'stroke-[2.5]')} />
-            <span className="text-[10px] font-medium">Trade</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('positions')}
-            className={cn(
-              'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors active:bg-[#1e1f23]',
-              activeTab === 'positions' ? 'text-[#ffb496]' : 'text-[#6b6b6b]'
-            )}
-          >
-            <ClipboardList className={cn('w-5 h-5', activeTab === 'positions' && 'stroke-[2.5]')} />
-            <span className="text-[10px] font-medium">Positions</span>
-          </button>
-        </nav>
+            {/* Right Column: Order Form */}
+            <div className="flex-1 min-w-0 bg-[#0d0d0f] border-l border-[#2a2a2d] overflow-y-auto">
+              <div className="px-2 py-2 border-b border-[#2a2a2d]">
+                <h3 className="text-xs font-semibold text-[#a1a1a1]">Trading</h3>
+              </div>
+              <OrderForm className="bg-transparent border-0 rounded-none" />
+            </div>
+          </div>
+
+          {/* Account Assets Section */}
+          <div className="border-t border-[#2a2a2d] bg-[#121214]">
+            <div className="px-3 py-2 border-b border-[#2a2a2d]">
+              <h3 className="text-xs font-semibold text-[#a1a1a1]">Account</h3>
+            </div>
+            <AccountAssets symbol="BTC/USDT" />
+          </div>
+
+          {/* Orders/Positions Section */}
+          <div className="border-t border-[#2a2a2d] bg-[#121214]">
+            <div className="px-3 py-2 border-b border-[#2a2a2d]">
+              <h3 className="text-xs font-semibold text-[#a1a1a1]">Positions & Orders</h3>
+            </div>
+            <OrdersPanel className="w-full bg-[#0d0d0f] border-0 rounded-none" />
+          </div>
+        </div>
       </div>
     );
   }
