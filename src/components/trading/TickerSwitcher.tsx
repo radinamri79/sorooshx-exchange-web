@@ -132,6 +132,23 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
     }
   }, [isOpen]);
 
+  // Handle Escape key to close dropdown
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen]);
+
   // Filter symbols based on search and category
   const filteredSymbols = useMemo(() => {
     let symbols = allSymbols;
@@ -223,8 +240,8 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
           {/* Dropdown Content */}
           <div className="absolute top-full left-0 mt-2 w-96 max-h-[500px] flex flex-col bg-[#0B0E11] border border-[#2a2a2d] rounded-lg shadow-2xl z-50 overflow-hidden">
             {/* Search Input */}
-            <div className="relative px-4 pt-4 pb-2">
-              <Search className="absolute left-6 top-1/2 translate-y-0 w-4 h-4 text-[#6b6b6b]" />
+            <div className="relative px-4 pt-4 pb-2 flex items-center">
+              <Search className="absolute left-6 w-4 h-4 text-[#6b6b6b]" />
               <input
                 ref={inputRef}
                 type="text"
@@ -236,7 +253,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-5 top-1/2 translate-y-0 text-[#6b6b6b] hover:text-[#a1a1a1] p-1 transition-colors"
+                  className="absolute right-5 text-[#6b6b6b] hover:text-[#a1a1a1] p-1 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
