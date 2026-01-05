@@ -204,9 +204,10 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-1.5 px-2 py-1.5 rounded bg-[#17181b] hover:bg-[#1e1f23] transition-colors border border-[#2a2a2d]',
+          'flex items-center gap-1.5 px-2 py-1.5 rounded bg-[#17181b] hover:bg-[#1e1f23] transition-colors border border-[#2a2a2d] md:border md:border-[#2a2a2d] md:hover:bg-[#1e1f23]',
+          'md:border md:border-[#2a2a2d] sm:border-0',
           className,
-          isOpen && 'bg-[#1e1f23] border-[#ffb496]'
+          isOpen && 'md:bg-[#1e1f23] md:border-[#ffb496]'
         )}
       >
         <div className="flex items-center gap-1.5">
@@ -233,7 +234,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         <>
           {/* Blur Overlay */}
           <div 
-            className="fixed inset-0 z-40 backdrop-blur-sm bg-black/20 md:block hidden"
+            className="fixed inset-0 z-40 backdrop-blur-sm bg-black/20"
             onClick={() => setIsOpen(false)}
           />
           

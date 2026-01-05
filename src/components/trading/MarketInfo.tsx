@@ -615,104 +615,190 @@ export function MarketInfo({ className }: MarketInfoProps) {
 
   return (
     <>
-      <div
-        className={cn(
-          'flex items-center gap-3 md:gap-4 px-0 py-0 bg-transparent border-0',
-          className
-        )}
-      >
-        {/* Info Icon Button - Left of Price - Only on Desktop */}
-        <button
-          onClick={() => setShowMarketInfoModal(true)}
-          className="hidden md:block p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
-          title="Market Info"
+      {/* Mobile Layout: Buttons on same row, Info below */}
+      <div className="md:hidden">
+        {/* Desktop-like row: Buttons + Price Info */}
+        <div
+          className={cn(
+            'flex items-center gap-3 px-0 py-0 bg-transparent border-0',
+            className
+          )}
         >
-          <Info size={16} />
-        </button>
-
-        {/* Calculator Icon Button - Only on Desktop */}
-        <button
-          onClick={() => setShowCalculatorModal(true)}
-          className="hidden md:block p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
-          title="Calculator"
-        >
-          <CalculatorIcon size={16} />
-        </button>
-
-        {/* Main Price with Change */}
-        <div className="flex items-center gap-2 min-w-fit shrink-0">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span
-                className={cn(
-                  'text-sm md:text-base font-bold tabular-nums',
-                  isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
-                )}
-              >
-                {stats.lastPrice}
-              </span>
-              <div className={cn(
-                'flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] md:text-[9px] font-medium',
-                isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
-              )}>
-                {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
-                {isPositive ? '+' : ''}{stats.priceChangePercent}
+          {/* Main Price with Change */}
+          <div className="flex items-center gap-2 min-w-fit shrink-0">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={cn(
+                    'text-sm font-bold tabular-nums',
+                    isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
+                  )}
+                >
+                  {stats.lastPrice}
+                </span>
+                <div className={cn(
+                  'flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] font-medium',
+                  isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
+                )}>
+                  {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                  {isPositive ? '+' : ''}{stats.priceChangePercent}
+                </div>
               </div>
             </div>
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b] tabular-nums">
-              ≈ ${stats.lastPrice}
-            </span>
           </div>
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Info Icon Button - Right side */}
+          <button
+            onClick={() => setShowMarketInfoModal(true)}
+            className="p-1 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
+            title="Market Info"
+          >
+            <Info size={14} />
+          </button>
+
+          {/* Calculator Icon Button */}
+          <button
+            onClick={() => setShowCalculatorModal(true)}
+            className="p-1 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
+            title="Calculator"
+          >
+            <CalculatorIcon size={14} />
+          </button>
         </div>
 
-        {/* Divider */}
-        <div className="hidden xs:block w-px h-6 md:h-7 bg-[#2a2a2d] shrink-0" />
-
-        {/* Compact Stats - Bitunix Style */}
-        <div className="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide flex-1">
+        {/* Market Info Stats - Full width below */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
           <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Market Price</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.markPrice}</span>
+            <span className="text-[8px] text-[#6b6b6b]">Market Price</span>
+            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.markPrice}</span>
           </div>
 
           <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Index Price</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.indexPrice}</span>
+            <span className="text-[8px] text-[#6b6b6b]">Index Price</span>
+            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.indexPrice}</span>
           </div>
 
           <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24H High</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.high24h}</span>
+            <span className="text-[8px] text-[#6b6b6b]">24H High</span>
+            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.high24h}</span>
           </div>
 
           <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24H Low</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.low24h}</span>
+            <span className="text-[8px] text-[#6b6b6b]">24H Low</span>
+            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.low24h}</span>
           </div>
 
           <div className="flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24H Vol(BTC)</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.volume24h}</span>
+            <span className="text-[8px] text-[#6b6b6b]">Vol(BTC)</span>
+            <span className="text-[9px] text-[#f5f5f5] tabular-nums">{stats.volume24h}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden md:block">
+        <div
+          className={cn(
+            'flex items-center gap-3 md:gap-4 px-0 py-0 bg-transparent border-0',
+            className
+          )}
+        >
+          {/* Info Icon Button - Left of Price */}
+          <button
+            onClick={() => setShowMarketInfoModal(true)}
+            className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
+            title="Market Info"
+          >
+            <Info size={16} />
+          </button>
+
+          {/* Calculator Icon Button */}
+          <button
+            onClick={() => setShowCalculatorModal(true)}
+            className="p-1.5 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496] shrink-0"
+            title="Calculator"
+          >
+            <CalculatorIcon size={16} />
+          </button>
+
+          {/* Main Price with Change */}
+          <div className="flex items-center gap-2 min-w-fit shrink-0">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={cn(
+                    'text-sm md:text-base font-bold tabular-nums',
+                    isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
+                  )}
+                >
+                  {stats.lastPrice}
+                </span>
+                <div className={cn(
+                  'flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] md:text-[9px] font-medium',
+                  isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
+                )}>
+                  {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                  {isPositive ? '+' : ''}{stats.priceChangePercent}
+                </div>
+              </div>
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b] tabular-nums">
+                ≈ ${stats.lastPrice}
+              </span>
+            </div>
           </div>
 
-          <div className="hidden sm:flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Vol(USDT)</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.quoteVolume24h}</span>
-          </div>
+          {/* Divider */}
+          <div className="w-px h-6 md:h-7 bg-[#2a2a2d] shrink-0" />
 
-          <div className="hidden md:flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Funding</span>
-            <span className="text-[9px] md:text-[10px] text-[#0D9D5F] tabular-nums">0.0100%</span>
-          </div>
+          {/* Compact Stats - Bitunix Style */}
+          <div className="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide flex-1">
+            <div className="flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Market Price</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.markPrice}</span>
+            </div>
 
-          <div className="hidden md:flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Next</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">02:15:32</span>
-          </div>
+            <div className="flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Index Price</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.indexPrice}</span>
+            </div>
 
-          <div className="hidden lg:flex flex-col gap-0 min-w-fit shrink-0">
-            <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">OI</span>
-            <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">4.52B</span>
+            <div className="flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24H High</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.high24h}</span>
+            </div>
+
+            <div className="flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24H Low</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.low24h}</span>
+            </div>
+
+            <div className="flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">24H Vol(BTC)</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.volume24h}</span>
+            </div>
+
+            <div className="hidden sm:flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Vol(USDT)</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">{stats.quoteVolume24h}</span>
+            </div>
+
+            <div className="hidden md:flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Funding</span>
+              <span className="text-[9px] md:text-[10px] text-[#0D9D5F] tabular-nums">0.0100%</span>
+            </div>
+
+            <div className="hidden md:flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">Next</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">02:15:32</span>
+            </div>
+
+            <div className="hidden lg:flex flex-col gap-0 min-w-fit shrink-0">
+              <span className="text-[8px] md:text-[9px] text-[#6b6b6b]">OI</span>
+              <span className="text-[9px] md:text-[10px] text-[#f5f5f5] tabular-nums">4.52B</span>
+            </div>
           </div>
         </div>
       </div>

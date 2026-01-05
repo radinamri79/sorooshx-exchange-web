@@ -69,33 +69,52 @@ function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
       
       if (typeof window !== 'undefined' && window.TradingView) {
         try {
-          new window.TradingView.widget({
-            autosize: true,
-            symbol: tvSymbol,
-            interval: '15',
-            timezone: 'Etc/UTC',
-            theme: 'dark',
-            style: '1',
-            locale: 'en',
-            toolbar_bg: '#0d0d0f',
-            enable_publishing: false,
-            allow_symbol_change: true,
-            container_id: containerId,
-            hide_side_toolbar: false,
-            withdateranges: true,
-            hide_volume: false,
-            studies: ['RSI@tv-basicstudies', 'MASimple@tv-basicstudies'],
-            backgroundColor: '#0d0d0f',
-            gridColor: 'rgba(42, 42, 45, 0.6)',
-            overrides: {
-              'paneProperties.background': '#0d0d0f',
-              'paneProperties.backgroundType': 'solid',
-              'scalesProperties.backgroundColor': '#0d0d0f',
-            },
-          });
-          if (isMountedRef.current) {
-            setIsLoading(false);
-          }
+          // Use requestAnimationFrame to ensure DOM is ready
+          const initializeWidget = () => {
+            if (!isMountedRef.current || !window.TradingView) return;
+
+            // Verify container exists in DOM before creating widget
+            const container = document.getElementById(containerId);
+            if (!container) {
+              console.error(`Container with id ${containerId} not found in DOM`);
+              if (isMountedRef.current) {
+                setError('Failed to initialize chart container');
+                setIsLoading(false);
+              }
+              return;
+            }
+
+            new window.TradingView.widget({
+              autosize: true,
+              symbol: tvSymbol,
+              interval: '15',
+              timezone: 'Etc/UTC',
+              theme: 'dark',
+              style: '1',
+              locale: 'en',
+              toolbar_bg: '#0d0d0f',
+              enable_publishing: false,
+              allow_symbol_change: true,
+              container_id: containerId,
+              hide_side_toolbar: false,
+              withdateranges: true,
+              hide_volume: false,
+              studies: ['RSI@tv-basicstudies', 'MASimple@tv-basicstudies'],
+              backgroundColor: '#0d0d0f',
+              gridColor: 'rgba(42, 42, 45, 0.6)',
+              overrides: {
+                'paneProperties.background': '#0d0d0f',
+                'paneProperties.backgroundType': 'solid',
+                'scalesProperties.backgroundColor': '#0d0d0f',
+              },
+            });
+            if (isMountedRef.current) {
+              setIsLoading(false);
+            }
+          };
+
+          // Use requestAnimationFrame to ensure DOM is ready
+          requestAnimationFrame(initializeWidget);
         } catch (err) {
           console.error('TradingView widget error:', err);
           if (isMountedRef.current) {

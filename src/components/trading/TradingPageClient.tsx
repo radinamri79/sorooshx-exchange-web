@@ -47,10 +47,18 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
       <div className="flex flex-col h-[100dvh] bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Symbol & Market Info Bar - Mobile */}
         <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0">
-          <div className="flex items-center justify-between px-3 py-1.5">
-            <TickerSwitcher className="shrink-0" />
+          {/* Top row: TickerSwitcher on left, Icons on right */}
+          <div className="flex items-center justify-between px-3 py-2 gap-2">
+            <div className="flex-shrink-0">
+              <TickerSwitcher className="shrink-0" />
+            </div>
+            {/* Market Info Icons Container */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {/* Info and Calculator buttons from MarketInfo */}
+            </div>
           </div>
-          <MarketInfo className="bg-transparent border-0 px-3 py-2 mobile-market-info" />
+          {/* Market Info Details - Full width below buttons */}
+          <MarketInfo className="bg-transparent border-0 px-3 py-1.5 mobile-market-info" />
         </div>
 
         {/* Main Content Area - Single scrollable page */}
