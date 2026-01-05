@@ -623,24 +623,22 @@ export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalc
     <>
       {/* Mobile Layout: Two rows - price/icons and market stats */}
       <div className="md:hidden flex flex-col gap-2">
-        {/* Row 1: Centered Price with Change */}
-        <div className="flex flex-col items-center justify-center py-1">
-          <div className="flex items-center gap-2">
-            <span
-              className={cn(
-                'text-3xl font-bold tabular-nums',
-                isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
-              )}
-            >
-              {stats.lastPrice}
-            </span>
-            <div className={cn(
-              'flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-semibold',
-              isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
-            )}>
-              {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-              {isPositive ? '+' : ''}{stats.priceChangePercent}
-            </div>
+        {/* Row 1: Left-aligned Price with Change */}
+        <div className="flex items-center justify-start gap-3 py-1">
+          <span
+            className={cn(
+              'text-2xl font-bold tabular-nums',
+              isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
+            )}
+          >
+            {stats.lastPrice}
+          </span>
+          <div className={cn(
+            'flex items-center gap-0.5 px-2 py-0.5 rounded text-[9px] font-semibold',
+            isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
+          )}>
+            {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            {isPositive ? '+' : ''}{stats.priceChangePercent}
           </div>
         </div>
 

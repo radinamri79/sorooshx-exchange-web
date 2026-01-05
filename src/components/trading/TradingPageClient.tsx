@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Info, Calculator as CalculatorIcon } from 'lucide-react';
+import { Info, Calculator as CalculatorIcon, CandlestickChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   MarketInfo,
@@ -67,6 +67,12 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                 title="Calculator"
               >
                 <CalculatorIcon size={20} />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
+                title="Candlestick Chart"
+              >
+                <CandlestickChart size={20} />
               </button>
             </div>
           </div>
