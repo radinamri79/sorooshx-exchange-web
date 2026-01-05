@@ -8,6 +8,7 @@ import { ShoppingCart, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 interface AccountAssetsProps {
   symbol?: string;
   className?: string;
+  isMobile?: boolean;
 }
 
 const COLORS = {
@@ -21,7 +22,7 @@ const COLORS = {
   borderColor: '#2B3139',
 };
 
-export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAssetsProps) {
+export function AccountAssets({ symbol = 'BTC/USDT', className = '', isMobile = false }: AccountAssetsProps) {
   const { wallet, positions } = useTradeStore();
 
   // Calculate margin statistics
@@ -89,7 +90,7 @@ export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAs
   };
 
   return (
-    <div className={`flex flex-col gap-3 px-3 py-3 ${className}`}>
+    <div className={`flex flex-col gap-3 px-3 py-3 ${isMobile ? 'gap-2 px-2 py-2' : ''} ${className}`}>
       {/* ================================================================ */}
       {/* MARGIN SECTION                                                  */}
       {/* ================================================================ */}
@@ -98,7 +99,7 @@ export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAs
 
         {/* Margin Info Row */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[11px]">
+          <div className={`flex items-center justify-between ${isMobile ? 'text-[10px]' : 'text-[11px]'}`}>
             <span className="text-[#848E9C]">Margin</span>
             <div className="flex items-center gap-1.5">
               <div
@@ -116,7 +117,7 @@ export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAs
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px]">
+          <div className={`flex items-center justify-between ${isMobile ? 'text-[10px]' : 'text-[11px]'}`}>
             <span className="text-[#848E9C]">Maintenance Margin</span>
             <span className="text-[#EAECEF]">{formatNumber(marginStats.maintenanceMargin)} USDT</span>
           </div>
@@ -132,7 +133,7 @@ export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAs
       <div className="space-y-2">
         <h3 className="text-[11px] font-semibold text-white uppercase tracking-wide">Assets USDT</h3>
 
-        <div className="space-y-1.5 text-[11px]">
+        <div className={`space-y-1.5 ${isMobile ? 'text-[10px]' : 'text-[11px]'}`}>
           {/* Currency Equity */}
           <div className="flex items-center justify-between">
             <span className="text-[#848E9C]">Currency Equity</span>
@@ -172,12 +173,12 @@ export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAs
         </div>
 
         {/* Action Buttons - Compact */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className={`grid grid-cols-3 gap-2 ${isMobile ? 'gap-1' : ''}`}>
           <button
-            className="h-8 px-2.5 py-1.5 text-[10px] font-semibold rounded transition-all duration-200
+            className={`px-2.5 py-1.5 text-[10px] font-semibold rounded transition-all duration-200
                        bg-[#1E2329] text-[#EAECEF] hover:bg-[#2B3139]
                        border border-[#2B3139] hover:border-[#3D4450]
-                       active:scale-[0.95]"
+                       active:scale-[0.95] ${isMobile ? 'h-7' : 'h-8'}`}
           >
             <div className="flex items-center justify-center gap-1">
               <ShoppingCart size={10} />
@@ -185,18 +186,18 @@ export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAs
             </div>
           </button>
           <button
-            className="h-8 px-2.5 py-1.5 text-[10px] font-semibold rounded transition-all duration-200
+            className={`px-2.5 py-1.5 text-[10px] font-semibold rounded transition-all duration-200
                        bg-[#1E2329] text-[#EAECEF] hover:bg-[#2B3139]
                        border border-[#2B3139] hover:border-[#3D4450]
-                       active:scale-[0.95]"
+                       active:scale-[0.95] ${isMobile ? 'h-7' : 'h-8'}`}
           >
             Deposit
           </button>
           <button
-            className="h-8 px-2.5 py-1.5 text-[10px] font-semibold rounded transition-all duration-200
+            className={`px-2.5 py-1.5 text-[10px] font-semibold rounded transition-all duration-200
                        bg-[#1E2329] text-[#EAECEF] hover:bg-[#2B3139]
                        border border-[#2B3139] hover:border-[#3D4450]
-                       active:scale-[0.95]"
+                       active:scale-[0.95] ${isMobile ? 'h-7' : 'h-8'}`}
           >
             Transfer
           </button>
@@ -212,7 +213,7 @@ export function AccountAssets({ symbol = 'BTC/USDT', className = '' }: AccountAs
           <span className="text-[9px] text-[#848E9C]">▲</span>
         </h3>
 
-        <div className="space-y-1.5 text-[11px]">
+        <div className={`space-y-1.5 ${isMobile ? 'text-[10px]' : 'text-[11px]'}`}>
           {/* Maturity */}
           <div className="flex items-center justify-between">
             <span className="text-[#848E9C]">Maturity date</span>

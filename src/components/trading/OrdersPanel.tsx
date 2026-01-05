@@ -12,11 +12,12 @@ import Decimal from 'decimal.js';
 
 interface OrdersPanelProps {
   className?: string;
+  isMobile?: boolean;
 }
 
 type TabValue = 'positions' | 'openOrders' | 'orderHistory' | 'positionHistory' | 'tradeHistory' | 'fundingHistory' | 'assets' | 'futuresBonus' | 'copyTrades' | 'tradingBots' | 'orderDetails' | 'transactionHistory';
 
-export function OrdersPanel({ className }: OrdersPanelProps) {
+export function OrdersPanel({ className, isMobile = false }: OrdersPanelProps) {
   // Translation hook ready for future localization
   useTranslations('trading');
   const { currentSymbol, tickers } = useMarketStore();
@@ -97,13 +98,13 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
   return (
     <div className={cn('flex flex-col bg-[#0d0d0f] overflow-hidden', className)}>
       {/* Header Tabs - Professional with all tabs like Bitget/Bitunix */}
-      <div className="flex items-center justify-between px-3 border-b border-[#2a2a2d] bg-[#0d0d0f] overflow-x-auto">
+      <div className={`flex items-center justify-between border-b border-[#2a2a2d] bg-[#0d0d0f] overflow-x-auto ${isMobile ? 'px-2 py-1' : 'px-3'}`}>
         <div className="flex items-center gap-0.5 shrink-0">
           {/* Positions Tab */}
           <button
             onClick={() => setActiveTab('positions')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'positions' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -119,7 +120,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('copyTrades')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'copyTrades' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -135,7 +136,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('tradingBots')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'tradingBots' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -151,7 +152,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('openOrders')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'openOrders' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -167,7 +168,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('orderHistory')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'orderHistory' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -183,7 +184,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('positionHistory')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'positionHistory' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -199,7 +200,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('tradeHistory')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'tradeHistory' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -215,7 +216,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('fundingHistory')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'fundingHistory' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -231,7 +232,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('assets')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'assets' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -247,7 +248,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('futuresBonus')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'futuresBonus' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -263,7 +264,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('orderDetails')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'orderDetails' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'
@@ -279,7 +280,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
           <button
             onClick={() => setActiveTab('transactionHistory')}
             className={cn(
-              'px-3 py-2.5 text-xs font-semibold transition-colors relative whitespace-nowrap',
+              `${isMobile ? 'px-2 py-1.5 text-[10px]' : 'px-3 py-2.5 text-xs'} font-semibold transition-colors relative whitespace-nowrap`,
               activeTab === 'transactionHistory' 
                 ? 'text-[#f5f5f5]' 
                 : 'text-[#6b6b6b] hover:text-[#a1a1a1]'

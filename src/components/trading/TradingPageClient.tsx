@@ -104,18 +104,22 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
           {/* Account Assets Section */}
           <div className="border-t border-[#2a2a2d] bg-[#0d0d0f]">
-            <div className="px-3 py-2 border-b border-[#2a2a2d]">
-              <h3 className="text-xs font-semibold text-[#a1a1a1]">Account</h3>
-            </div>
-            <AccountAssets symbol="BTC/USDT" />
+            {!isMobile && (
+              <div className="px-3 py-2 border-b border-[#2a2a2d]">
+                <h3 className="text-xs font-semibold text-[#a1a1a1]">Account</h3>
+              </div>
+            )}
+            <AccountAssets symbol="BTC/USDT" isMobile={isMobile} />
           </div>
 
           {/* Orders/Positions Section */}
           <div className="border-t border-[#2a2a2d] bg-[#0d0d0f]">
-            <div className="px-3 py-2 border-b border-[#2a2a2d]">
-              <h3 className="text-xs font-semibold text-[#a1a1a1]">Positions & Orders</h3>
-            </div>
-            <OrdersPanel className="w-full bg-[#0d0d0f] border-0 rounded-none" />
+            {!isMobile && (
+              <div className="px-3 py-2 border-b border-[#2a2a2d]">
+                <h3 className="text-xs font-semibold text-[#a1a1a1]">Positions & Orders</h3>
+              </div>
+            )}
+            <OrdersPanel className="w-full bg-[#0d0d0f] border-0 rounded-none" isMobile={isMobile} />
           </div>
         </div>
       </div>
