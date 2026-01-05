@@ -204,6 +204,71 @@ export function OrderForm({
       )}
       style={{ height: '100%' }}
     >
+      <style>{`
+        input[type='range'].slider {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 100%;
+          height: 6px;
+          outline: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+
+        input[type='range'].slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          background: #ffb496;
+          cursor: pointer;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(255, 180, 150, 0.4);
+          transition: all 0.2s ease;
+        }
+
+        input[type='range'].slider::-webkit-slider-thumb:hover {
+          background: #ffc4b0;
+          box-shadow: 0 2px 12px rgba(255, 180, 150, 0.6);
+          transform: scale(1.2);
+        }
+
+        input[type='range'].slider::-webkit-slider-thumb:active {
+          transform: scale(1.1);
+        }
+
+        input[type='range'].slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          background: #ffb496;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+          box-shadow: 0 2px 8px rgba(255, 180, 150, 0.4);
+          transition: all 0.2s ease;
+        }
+
+        input[type='range'].slider::-moz-range-thumb:hover {
+          background: #ffc4b0;
+          box-shadow: 0 2px 12px rgba(255, 180, 150, 0.6);
+          transform: scale(1.2);
+        }
+
+        input[type='range'].slider::-moz-range-thumb:active {
+          transform: scale(1.1);
+        }
+
+        input[type='range'].slider::-moz-range-track {
+          background: transparent;
+          border: none;
+        }
+
+        input[type='range'].slider::-moz-range-progress {
+          background: #ffb496;
+          height: 6px;
+          border-radius: 5px;
+        }
+      `}</style>
       {/* ================================================================ */}
       {/* MODALS with Smooth Animation                                     */}
       {/* ================================================================ */}
@@ -428,39 +493,38 @@ export function OrderForm({
 
         {/* Quantity Percentage Slider - Bitunix Style */}
         <div className="pt-1">
-          <div className="relative h-1.5 bg-[#2B3139] rounded-full">
-            {/* Progress Bar */}
-            <div
-              className="absolute h-full rounded-full transition-all duration-300 ease-out"
-              style={{
-                width: `${formData.quantityPercent}%`,
-                backgroundColor: COLORS.orange,
-              }}
-            />
-            {/* Dots */}
-            {[0, 25, 50, 75, 100].map((percent) => (
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[11px] text-[#848E9C]">Quick %</label>
+            <span className="text-[11px] font-semibold text-[#ffb496]">{formData.quantityPercent}%</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={formData.quantityPercent}
+            onChange={(e) => handleQuantityPercentChange(parseInt(e.target.value, 10))}
+            className="w-full h-1.5 bg-[#2B3139] rounded-full appearance-none cursor-pointer slider"
+            style={{
+              background: `linear-gradient(to right, #ffb496 0%, #ffb496 ${formData.quantityPercent}%, #2B3139 ${formData.quantityPercent}%, #2B3139 100%)`
+            }}
+          />
+          {/* Quick percentage buttons */}
+          <div className="flex gap-1 mt-2">
+            {[25, 50, 75, 100].map((percent) => (
               <button
                 key={percent}
                 type="button"
                 onClick={() => handleQuantityPercentChange(percent)}
                 className={cn(
-                  'absolute top-1/2 w-2.5 h-2.5 rounded-full border-2 transition-all duration-200',
-                  'hover:scale-125',
-                  formData.quantityPercent >= percent
-                    ? 'bg-[#ffb496] border-[#ffb496]'
-                    : 'bg-[#0B0E11] border-[#5E6673] hover:border-[#848E9C]'
+                  'flex-1 h-6 text-[10px] font-semibold rounded transition-all duration-200',
+                  formData.quantityPercent === percent
+                    ? 'text-black bg-[#ffb496]'
+                    : 'text-[#848E9C] bg-[#1E2329] hover:text-[#EAECEF] hover:bg-[#2B3139]'
                 )}
-                style={{ left: `${percent}%`, transform: 'translate(-50%, -50%)' }}
-              />
+              >
+                {percent}%
+              </button>
             ))}
-          </div>
-          {/* Labels */}
-          <div className="flex justify-between mt-1.5 text-[10px] text-[#5E6673]">
-            <span>0%</span>
-            <span>25%</span>
-            <span>50%</span>
-            <span>75%</span>
-            <span>100%</span>
           </div>
         </div>
 
