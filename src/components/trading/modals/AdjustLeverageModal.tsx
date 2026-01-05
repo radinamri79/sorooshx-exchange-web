@@ -231,8 +231,14 @@ interface LeverageSectionProps {
 }
 
 function LeverageSection({ label, value, onChange, color, isMobile = false }: LeverageSectionProps) {
+  // Calculate Max Position Nominal Value (using hypothetical account balance of 100,000 USDT)
+  const accountBalance = 100000;
+  const maxPositionValue = (accountBalance * value).toLocaleString('en-US', {
+    maximumFractionDigits: 0,
+  });
+
   return (
-    <div className={cn('space-y-2', isMobile ? 'py-1.5' : 'py-2')}>
+    <div className={cn('space-y-2.5', isMobile ? 'py-1.5' : 'py-2')}>
       {/* Label */}
       <span className={cn('block font-medium', isMobile ? 'text-xs' : 'text-sm')} style={{ color }}>
         {label}
@@ -248,17 +254,20 @@ function LeverageSection({ label, value, onChange, color, isMobile = false }: Le
           <Minus size={isMobile ? 16 : 18} />
         </button>
 
-        <input
-          type="number"
-          value={value}
-          onChange={(e) => onChange(parseInt(e.target.value) || MIN_LEVERAGE)}
-          className={cn('flex-1 rounded-lg outline-none transition-all duration-200 text-center font-bold', isMobile ? 'h-9 text-lg' : 'h-11 text-2xl')}
-          style={{
-            backgroundColor: COLORS.bgSecondary,
-            color,
-            border: `1.5px solid ${color}`,
-          }}
-        />
+        <div className={cn('flex-1 rounded-lg flex items-center justify-center relative', isMobile ? 'h-9' : 'h-11')} style={{ backgroundColor: COLORS.bgSecondary, border: `1.5px solid ${color}` }}>
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => onChange(parseInt(e.target.value) || MIN_LEVERAGE)}
+            className={cn('w-full rounded-lg outline-none transition-all duration-200 text-center font-bold bg-transparent', isMobile ? 'h-9 text-lg' : 'h-11 text-2xl')}
+            style={{
+              color,
+            }}
+          />
+          <span className={cn('font-bold pr-2 pointer-events-none', isMobile ? 'text-lg' : 'text-2xl')} style={{ color }}>
+            X
+          </span>
+        </div>
 
         <button
           onClick={() => onChange(value + 1)}
@@ -267,6 +276,19 @@ function LeverageSection({ label, value, onChange, color, isMobile = false }: Le
         >
           <Plus size={isMobile ? 16 : 18} />
         </button>
+      </div>
+
+      {/* Max Position Nominal Value */}
+      <div
+        className={cn('rounded-lg', isMobile ? 'p-2' : 'p-2.5')}
+        style={{ backgroundColor: COLORS.bgSecondary }}
+      >
+        <div className={cn('font-medium opacity-70', isMobile ? 'text-[11px]' : 'text-xs')} style={{ color: COLORS.textSecondary }}>
+          Max Position Nominal Value
+        </div>
+        <div className={cn('font-semibold', isMobile ? 'text-xs' : 'text-sm')} style={{ color: COLORS.textPrimary }}>
+          {maxPositionValue} USDT
+        </div>
       </div>
     </div>
   );
