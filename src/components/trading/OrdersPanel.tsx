@@ -95,9 +95,9 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
   };
 
   return (
-    <div className={cn('flex flex-col bg-[#0B0E11] overflow-hidden', className)}>
+    <div className={cn('flex flex-col bg-[#0d0d0f] overflow-hidden', className)}>
       {/* Header Tabs - Professional with all tabs like Bitget/Bitunix */}
-      <div className="flex items-center justify-between px-3 border-b border-[#2a2a2d] bg-[#0B0E11] overflow-x-auto">
+      <div className="flex items-center justify-between px-3 border-b border-[#2a2a2d] bg-[#0d0d0f] overflow-x-auto">
         <div className="flex items-center gap-0.5 shrink-0">
           {/* Positions Tab */}
           <button
@@ -329,7 +329,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
             <EmptyState message="No open positions" />
           ) : (
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-[#0B0E11]">
+              <thead className="sticky top-0 bg-[#0d0d0f]">
                 <tr className="text-[#6b6b6b] border-b border-[#2a2a2d]">
                   <th className="px-4 py-2.5 text-left font-medium">Symbol</th>
                   <th className="px-3 py-2.5 text-left font-medium">Size</th>
@@ -350,7 +350,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
                   const isProfitable = pnl >= 0;
 
                   return (
-                    <tr key={position.id} className="border-b border-[#2a2a2d]/50 hover:bg-[#17181b]">
+                    <tr key={position.id} className="border-b border-[#2a2a2d]/50 hover:bg-[#1E2329]">
                       <td className="px-3 py-2">
                         <div className="flex flex-col gap-0.5">
                           <span className="font-semibold text-[#f5f5f5] text-[10px]">
@@ -401,12 +401,12 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
                       </td>
                       <td className="px-2 py-2">
                         <div className="flex items-center justify-center gap-1">
-                          <button className="px-1.5 py-0.5 text-[9px] font-medium text-[#6b6b6b] hover:text-[#a1a1a1] bg-[#17181b] border border-[#2a2a2d] rounded transition-colors">
+                          <button className="px-1.5 py-0.5 text-[9px] font-medium text-[#6b6b6b] hover:text-[#a1a1a1] bg-[#0d0d0f] border border-[#2a2a2d] rounded transition-colors">
                             TP/SL
                           </button>
                           <button
                             onClick={() => handleClosePosition(position.id)}
-                            className="px-1.5 py-0.5 text-[9px] font-medium text-[#ef5350] hover:bg-[#ef5350]/10 bg-[#17181b] border border-[#2a2a2d] rounded transition-colors"
+                            className="px-1.5 py-0.5 text-[9px] font-medium text-[#ef5350] hover:bg-[#ef5350]/10 bg-[#0d0d0f] border border-[#2a2a2d] rounded transition-colors"
                           >
                             Close
                           </button>
@@ -428,7 +428,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
             <EmptyState message="No open orders" />
           ) : (
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-[#0B0E11]">
+              <thead className="sticky top-0 bg-[#0d0d0f]">
                 <tr className="text-[#6b6b6b] border-b border-[#2a2a2d]">
                   <th className="px-4 py-2.5 text-left font-medium">Time</th>
                   <th className="px-3 py-2.5 text-left font-medium">Symbol</th>
@@ -442,7 +442,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
               </thead>
               <tbody>
                 {openOrders.map((order) => (
-                  <tr key={order.id} className="border-b border-[#2a2a2d]/50 hover:bg-[#17181b]">
+                  <tr key={order.id} className="border-b border-[#2a2a2d]/50 hover:bg-[#1E2329]">
                     <td className="px-4 py-3 text-[#6b6b6b]">
                       {new Date(order.createdAt).toLocaleTimeString()}
                     </td>
@@ -492,7 +492,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
             <EmptyState message="No order history" />
           ) : (
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-[#0B0E11]">
+              <thead className="sticky top-0 bg-[#0d0d0f]">
                 <tr className="text-[#6b6b6b] border-b border-[#2a2a2d]">
                   <th className="px-4 py-2.5 text-left font-medium">Time</th>
                   <th className="px-3 py-2.5 text-left font-medium">Symbol</th>
@@ -505,7 +505,7 @@ export function OrdersPanel({ className }: OrdersPanelProps) {
               </thead>
               <tbody>
                 {orderHistory.slice(0, 50).map((order) => (
-                  <tr key={order.id} className="border-b border-[#2a2a2d]/50 hover:bg-[#17181b]">
+                  <tr key={order.id} className="border-b border-[#2a2a2d]/50 hover:bg-[#1E2329]">
                     <td className="px-4 py-3 text-[#6b6b6b]">
                       {new Date(order.createdAt).toLocaleString()}
                     </td>

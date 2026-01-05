@@ -278,7 +278,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
 
   return (
     <div className={cn(
-      'flex flex-col bg-[#0B0E11] overflow-hidden',
+      'flex flex-col bg-[#0d0d0f] overflow-hidden',
       'border-0 rounded-none',
       className
     )}>
@@ -402,7 +402,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
         )}
 
         {/* Current Price - Center Separator */}
-        <div className="flex items-center justify-between px-2 py-2.5 bg-[#0B0E11] border-y border-[#1E2329] shrink-0">
+        <div className="flex items-center justify-between px-2 py-2.5 bg-[#0d0d0f] border-y border-[#1E2329] shrink-0">
           <div className="flex items-center gap-1.5">
             <span 
               className="text-base font-bold tabular-nums"
@@ -448,7 +448,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
       </div>
 
       {/* Footer - Buy/Sell Ratio Bar - Professional Bitunix Style */}
-      <div className="flex items-center justify-between px-2 py-1.5 border-t border-[#1E2329] bg-[#0B0E11]">
+      <div className="flex items-center justify-between px-2 py-1.5 border-t border-[#1E2329] bg-[#0d0d0f]">
         {/* Buy Percentage */}
         <div className="flex items-center gap-1.5 text-sm">
           <div className="flex items-center gap-0.5">

@@ -163,19 +163,19 @@ export function DataExport({ className }: DataExportProps) {
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={handleExportJSON}
-            className="py-1.5 px-2 text-[9px] font-medium rounded bg-[#17181b] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
+            className="py-1.5 px-2 text-[9px] font-medium rounded bg-[#0d0d0f] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
           >
             Full Backup
           </button>
           <button
             onClick={handleExportTradesCSV}
-            className="py-1.5 px-2 text-[9px] font-medium rounded bg-[#17181b] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
+            className="py-1.5 px-2 text-[9px] font-medium rounded bg-[#0d0d0f] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
           >
             Trades CSV
           </button>
           <button
             onClick={handleExportPositionsCSV}
-            className="py-1.5 px-2 text-[9px] font-medium rounded bg-[#17181b] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
+            className="py-1.5 px-2 text-[9px] font-medium rounded bg-[#0d0d0f] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
           >
             Positions CSV
           </button>
@@ -209,7 +209,7 @@ export function DataExport({ className }: DataExportProps) {
 
         <button
           onClick={handleImportClick}
-          className="w-full py-1.5 px-2 text-[9px] font-medium rounded bg-[#17181b] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
+          className="w-full py-1.5 px-2 text-[9px] font-medium rounded bg-[#0d0d0f] text-[#a1a1a1] hover:text-[#f5f5f5] hover:bg-[#1e1f23] border border-[#2a2a2d] transition-colors"
         >
           Import Backup
         </button>
@@ -232,26 +232,26 @@ export function DataExport({ className }: DataExportProps) {
           </h3>
 
           <div className="grid grid-cols-2 gap-2 text-[9px]">
-            <div className="p-2 rounded bg-[#17181b] border border-[#2a2a2d]">
+            <div className="p-2 rounded bg-[#0d0d0f] border border-[#2a2a2d]">
               <div className="text-[#6b6b6b] mb-1">Total Trades</div>
               <div className="text-[#f5f5f5] font-semibold">{stats.totalTrades}</div>
             </div>
 
-            <div className="p-2 rounded bg-[#17181b] border border-[#2a2a2d]">
+            <div className="p-2 rounded bg-[#0d0d0f] border border-[#2a2a2d]">
               <div className="text-[#6b6b6b] mb-1">Win Rate</div>
               <div className={cn('font-semibold', stats.winRate > 50 ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
                 {stats.winRate.toFixed(1)}%
               </div>
             </div>
 
-            <div className="p-2 rounded bg-[#17181b] border border-[#2a2a2d]">
+            <div className="p-2 rounded bg-[#0d0d0f] border border-[#2a2a2d]">
               <div className="text-[#6b6b6b] mb-1">Total PnL</div>
               <div className={cn('font-semibold', stats.totalPnL >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]')}>
                 {stats.totalPnL >= 0 ? '+' : ''}{stats.totalPnL.toFixed(2)} USDT
               </div>
             </div>
 
-            <div className="p-2 rounded bg-[#17181b] border border-[#2a2a2d]">
+            <div className="p-2 rounded bg-[#0d0d0f] border border-[#2a2a2d]">
               <div className="text-[#6b6b6b] mb-1">Profit Factor</div>
               <div className="text-[#f5f5f5] font-semibold">{stats.profitFactor.toFixed(2)}</div>
             </div>

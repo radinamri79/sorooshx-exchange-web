@@ -33,7 +33,7 @@ function MarketInfoModal({ symbol, isOpen, onClose }: { symbol: string; isOpen: 
 
   return isOpen ? (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#121214] rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto border border-[#2a2a2d]">
+      <div className="bg-[#0d0d0f] rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto border border-[#2a2a2d]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2d]">
           <h2 className="text-lg font-bold text-[#EAECEF]">Information</h2>
@@ -622,7 +622,7 @@ export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalc
   return (
     <>
       {/* Mobile Layout: Two rows - price/icons and market stats */}
-      <div className="md:hidden flex flex-col gap-1 bg-[#121214] -mx-3 px-3 py-1">
+      <div className="md:hidden flex flex-col gap-1 bg-[#0d0d0f] -mx-3 px-3 py-1">
         {/* Row 1: Left-aligned Price with Change */}
         <div className="flex items-center justify-start gap-3 py-1">
           <span

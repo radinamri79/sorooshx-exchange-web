@@ -205,10 +205,10 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           'flex items-center gap-1.5 px-2 py-1 rounded transition-colors',
-          'bg-[#121214] md:bg-[#17181b] hover:bg-[#1e1f23]',
+          'bg-[#0d0d0f] md:bg-[#0d0d0f] hover:bg-[#1e1f23]',
           'border-0 md:border md:border-[#2a2a2d]',
           className,
-          isOpen && 'md:bg-[#1e1f23] md:border-[#ffb496]'
+          isOpen && 'bg-[#1e1f23] md:border-[#ffb496]'
         )}
       >
         <div className="flex items-center gap-1.5">
@@ -240,7 +240,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
           />
           
           {/* Dropdown Content */}
-          <div className="fixed md:absolute bottom-0 md:bottom-auto md:top-full md:left-0 left-0 right-0 md:mt-2 md:w-96 w-full h-[70vh] md:h-auto md:max-h-[500px] flex flex-col bg-[#0B0E11] border border-[#2a2a2d] md:rounded-lg shadow-2xl z-50 overflow-hidden rounded-t-lg md:rounded-b-lg animate-sheet-up md:animate-none">
+          <div className="fixed md:absolute bottom-0 md:bottom-auto md:top-full md:left-0 left-0 right-0 md:mt-2 md:w-96 w-full h-[70vh] md:h-auto md:max-h-[500px] flex flex-col bg-[#0d0d0f] border border-[#2a2a2d] md:rounded-lg shadow-2xl z-50 overflow-hidden rounded-t-lg md:rounded-b-lg animate-sheet-up md:animate-none">
             {/* Search Input */}
             <div className="relative px-4 pt-4 pb-2 flex items-center">
               <Search className="absolute left-6 w-4 h-4 text-[#6b6b6b]" />

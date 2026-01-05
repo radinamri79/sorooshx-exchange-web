@@ -198,7 +198,7 @@ export function OrderForm({
       onSubmit={handleSubmit}
       className={cn(
         'flex flex-col',
-        'bg-[#0B0E11] border-l border-[#2B3139]',
+        'bg-[#0d0d0f] border-l border-[#2B3139]',
         'font-sans antialiased select-none',
         className
       )}

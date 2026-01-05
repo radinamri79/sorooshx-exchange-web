@@ -87,7 +87,7 @@ export function Calculator({ className }: CalculatorProps) {
   return (
     <div
       className={cn(
-        'flex flex-col h-full bg-[#121214] border border-[#2a2a2d] rounded-lg overflow-hidden',
+        'flex flex-col h-full bg-[#0d0d0f] border border-[#2a2a2d] rounded-lg overflow-hidden',
         className
       )}
     >
