@@ -153,7 +153,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               </div>
 
               {/* Account Assets Section */}
-              <div className="border-t border-[#2a2a2d] bg-[#121214]">
+              <div className="border-t border-[#2a2a2d] bg-[#0d0d0f]">
                 <AccountAssets symbol="BTC/USDT" />
               </div>
             </div>
