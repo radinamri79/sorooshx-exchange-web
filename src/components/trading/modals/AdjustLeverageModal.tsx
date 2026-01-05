@@ -242,28 +242,30 @@ function LeverageSection({ label, value, onChange, color, isMobile = false }: Le
       <div className="flex items-center gap-2">
         <button
           onClick={() => onChange(value - 1)}
-          className={cn('rounded-lg transition-colors hover:brightness-110 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
+          className={cn('rounded-lg transition-colors hover:brightness-110 active:scale-95 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
           style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
         >
-          <Minus size={isMobile ? 14 : 16} />
+          <Minus size={isMobile ? 16 : 18} />
         </button>
+
         <input
           type="number"
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value) || MIN_LEVERAGE)}
-          className={cn('flex-1 rounded-lg outline-none transition-all duration-200 text-center font-bold', isMobile ? 'h-8 text-sm' : 'h-10 text-base')}
+          className={cn('flex-1 rounded-lg outline-none transition-all duration-200 text-center font-bold', isMobile ? 'h-9 text-lg' : 'h-11 text-2xl')}
           style={{
             backgroundColor: COLORS.bgSecondary,
             color,
-            border: `1px solid ${COLORS.borderColor}`,
+            border: `1.5px solid ${color}`,
           }}
         />
+
         <button
           onClick={() => onChange(value + 1)}
-          className={cn('rounded-lg transition-colors hover:brightness-110 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
+          className={cn('rounded-lg transition-colors hover:brightness-110 active:scale-95 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
           style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
         >
-          <Plus size={isMobile ? 14 : 16} />
+          <Plus size={isMobile ? 16 : 18} />
         </button>
       </div>
     </div>
