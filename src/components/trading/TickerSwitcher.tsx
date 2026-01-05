@@ -204,7 +204,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-2 rounded transition-colors',
+          'flex items-center gap-1.5 px-2 py-1 rounded transition-colors',
           'bg-[#121214] md:bg-[#17181b] hover:bg-[#1e1f23]',
           'border-0 md:border md:border-[#2a2a2d]',
           className,

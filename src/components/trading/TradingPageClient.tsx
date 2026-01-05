@@ -51,7 +51,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         {/* Symbol & Market Info Bar - Mobile */}
         <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0 flex flex-col">
           {/* Row 1: TickerSwitcher (left) + Icons (right, larger) */}
-          <div className="flex items-center justify-between px-3 py-2.5 gap-3">
+          <div className="flex items-center justify-between px-3 py-1.5 gap-2">
             <TickerSwitcher className="shrink-0" />
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -77,7 +77,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             </div>
           </div>
           {/* Row 2-3: Price centered and Market Stats */}
-          <div className="px-3 pb-2">
+          <div className="px-3 pb-1">
             <MarketInfo ref={marketInfoRef} className="bg-transparent border-0" />
           </div>
         </div>
@@ -135,7 +135,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <header className="bg-[#0d0d0f] border-b border-[#2a2a2d] px-3 h-14 flex items-center gap-3">
           <Image src="/sorooshx-logo.png" alt="SorooshX" width={120} height={32} className="object-contain" />
           <TickerSwitcher />
-          <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0 overflow-hidden" />
+          <MarketInfo className="flex-1 bg-[#0d0d0f] border-0 py-0 px-0 overflow-hidden" />
         </header>
 
         <div className="flex-1 flex overflow-hidden">

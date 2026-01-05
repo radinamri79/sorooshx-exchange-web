@@ -622,7 +622,7 @@ export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalc
   return (
     <>
       {/* Mobile Layout: Two rows - price/icons and market stats */}
-      <div className="md:hidden flex flex-col gap-2 bg-[#121214] -mx-3 px-3 py-2.5 rounded-none">
+      <div className="md:hidden flex flex-col gap-1 bg-[#121214] -mx-3 px-3 py-1">
         {/* Row 1: Left-aligned Price with Change */}
         <div className="flex items-center justify-start gap-3 py-1">
           <span
