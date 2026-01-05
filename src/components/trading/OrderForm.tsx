@@ -433,7 +433,7 @@ export function OrderForm({
         {/* Order Price Input - LIMIT */}
         {formData.orderType === 'LIMIT' && (
           <div>
-            <label className="text-[11px] text-[#848E9C] mb-1 block">Order Price</label>
+            <label className={cn('text-[#848E9C] mb-1 block', isMobile ? 'text-[10px]' : 'text-[11px]')}>Order Price</label>
             <div className="relative flex items-center">
               <input
                 type="text"
@@ -441,8 +441,9 @@ export function OrderForm({
                 onChange={(e) => handlePriceChange(e.target.value)}
                 placeholder={currentPrice}
                 className={cn(
-                  'w-full h-9 px-3 pr-20 text-sm font-medium rounded',
-                  'bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]',
+                  'w-full rounded',
+                  isMobile ? 'h-8 px-2 pr-18 text-xs' : 'h-9 px-3 pr-20 text-sm',
+                  'font-medium bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]',
                   'border outline-none transition-all duration-200',
                   errors.price 
                     ? 'border-[#F6465D] focus:border-[#F6465D]' 
@@ -452,12 +453,14 @@ export function OrderForm({
               <button
                 type="button"
                 onClick={setLastPrice}
-                className="absolute right-12 text-[10px] font-bold text-[#ffb496] hover:text-[#ffc4b0]
-                           transition-colors px-1"
+                className={cn(
+                  'absolute font-bold text-[#ffb496] hover:text-[#ffc4b0] transition-colors px-1',
+                  isMobile ? 'right-11 text-[9px]' : 'right-12 text-[10px]'
+                )}
               >
                 Last
               </button>
-              <span className="absolute right-3 text-[11px] text-[#848E9C]">USDT</span>
+              <span className={cn('absolute right-3 text-[#848E9C]', isMobile ? 'text-[10px]' : 'text-[11px]')}>USDT</span>
             </div>
           </div>
         )}
@@ -489,7 +492,7 @@ export function OrderForm({
 
         {/* Quantity Input */}
         <div>
-          <label className="text-[11px] text-[#848E9C] mb-1 block">Quantity</label>
+          <label className={cn('text-[#848E9C] mb-1 block', isMobile ? 'text-[10px]' : 'text-[11px]')}>Quantity</label>
           <div className="relative flex items-center">
             <input
               type="text"
@@ -497,19 +500,20 @@ export function OrderForm({
               onChange={(e) => handleQuantityChange(e.target.value)}
               placeholder="0"
               className={cn(
-                'w-full h-9 px-3 pr-16 text-sm font-medium rounded',
-                'bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]',
+                'w-full rounded',
+                isMobile ? 'h-8 px-2 pr-14 text-xs' : 'h-9 px-3 pr-16 text-sm',
+                'font-medium bg-[#1E2329] text-[#EAECEF] placeholder-[#5E6673]',
                 'border outline-none transition-all duration-200',
                 errors.quantity 
                   ? 'border-[#F6465D]' 
                   : 'border-[#2B3139] hover:border-[#3D4450] focus:border-[#ffb496]'
               )}
             />
-            <div className="absolute right-3 flex items-center gap-1 text-[11px] text-[#848E9C] cursor-pointer hover:text-[#EAECEF]"
+            <div className={cn('absolute right-3 flex items-center gap-1 cursor-pointer hover:text-[#EAECEF] transition-colors', isMobile ? 'text-[9px] text-[#848E9C]' : 'text-[11px] text-[#848E9C]')}
                  onClick={() => setUiState((prev) => ({ ...prev, showUnitSettingsModal: true }))}
             >
               BTC
-              <ChevronDown size={12} />
+              <ChevronDown size={isMobile ? 10 : 12} />
             </div>
           </div>
         </div>
@@ -624,15 +628,16 @@ export function OrderForm({
         {/* ================================================================ */}
         {/* ACTION BUTTONS - Open Long / Open Short                         */}
         {/* ================================================================ */}
-        <div className="grid grid-cols-2 gap-2 pt-2">
+        <div className={cn('grid grid-cols-2 gap-2', isMobile ? 'pt-1.5' : 'pt-2')}>
           <button
             type="submit"
             disabled={uiState.isSubmitting}
             onClick={() => setFormData((prev) => ({ ...prev, side: 'LONG' }))}
-            className="h-10 rounded text-sm font-bold text-white
-                       transition-all duration-200 
-                       disabled:opacity-50 disabled:cursor-not-allowed
-                       hover:brightness-110 active:brightness-90 active:scale-[0.98]"
+            className={cn(
+              'rounded font-bold text-white transition-all duration-200',
+              isMobile ? 'h-8 text-xs' : 'h-10 text-sm',
+              'disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 active:brightness-90 active:scale-[0.98]'
+            )}
             style={{ backgroundColor: COLORS.longGreen }}
           >
             {formData.action === 'OPEN' ? 'Open long' : 'Close short'}
@@ -641,10 +646,11 @@ export function OrderForm({
             type="submit"
             disabled={uiState.isSubmitting}
             onClick={() => setFormData((prev) => ({ ...prev, side: 'SHORT' }))}
-            className="h-10 rounded text-sm font-bold text-white
-                       transition-all duration-200 
-                       disabled:opacity-50 disabled:cursor-not-allowed
-                       hover:brightness-110 active:brightness-90 active:scale-[0.98]"
+            className={cn(
+              'rounded font-bold text-white transition-all duration-200',
+              isMobile ? 'h-8 text-xs' : 'h-10 text-sm',
+              'disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 active:brightness-90 active:scale-[0.98]'
+            )}
             style={{ backgroundColor: COLORS.shortRed }}
           >
             {formData.action === 'OPEN' ? 'Open short' : 'Close long'}
