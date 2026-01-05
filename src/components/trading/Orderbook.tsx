@@ -385,12 +385,22 @@ export function Orderbook({ className, maxRows = 10, isMobile = false }: Orderbo
       <div className={cn(
         'grid grid-cols-3 gap-1 font-medium border-b border-[#1E2329]',
         isMobile
-          ? 'px-1.5 py-1 text-[9px] text-[#5E6673]'
+          ? 'px-1.5 py-1 text-[8px] text-[#5E6673]'
           : 'px-2 py-1.5 text-[10px] text-[#5E6673]'
       )}>
-        <span>Price (USDT)</span>
-        <span className="text-right">Qty. (BTC)</span>
-        <span className="text-right">Sum (BTC)</span>
+        {isMobile ? (
+          <>
+            <span>Price</span>
+            <span className="text-right">Qty</span>
+            <span className="text-right">Sum</span>
+          </>
+        ) : (
+          <>
+            <span>Price (USDT)</span>
+            <span className="text-right">Qty. (BTC)</span>
+            <span className="text-right">Sum (BTC)</span>
+          </>
+        )}
       </div>
 
       {/* Orderbook Content - Compact layout with no empty space */}
@@ -463,29 +473,33 @@ export function Orderbook({ className, maxRows = 10, isMobile = false }: Orderbo
       </div>
 
       {/* Footer - Buy/Sell Ratio Bar - Professional Bitunix Style */}
-      <div className="flex items-center justify-between px-2 py-1.5 border-t border-[#1E2329] bg-[#0d0d0f]">
+      <div className={cn('flex items-center justify-between border-t border-[#1E2329] bg-[#0d0d0f]', isMobile ? 'px-1.5 py-1' : 'px-2 py-1.5')}>
         {/* Buy Percentage */}
-        <div className="flex items-center gap-1.5 text-sm">
-          <div className="flex items-center gap-0.5">
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#0D9D5F' }} />
-            <span className="text-[#0D9D5F] font-semibold" style={{ minWidth: '45px' }}>{buyPercentage}%</span>
+        <div className={cn('flex items-center gap-1 text-sm', isMobile ? 'gap-0.5' : 'gap-1.5')}>
+          <div className={cn('flex items-center', isMobile ? 'gap-0.5' : 'gap-0.5')}>
+            <div className={cn('rounded-sm', isMobile ? 'w-2 h-2' : 'w-3 h-3')} style={{ backgroundColor: '#0D9D5F' }} />
+            <span className="text-[#0D9D5F] font-semibold" style={{ minWidth: isMobile ? '30px' : '45px' }}>
+              <span className={isMobile ? 'text-[10px]' : 'text-sm'}>{buyPercentage}%</span>
+            </span>
           </div>
         </div>
 
         {/* Ratio Bar - Enhanced Bitunix Style */}
-        <div className="flex-1 h-3 mx-3 bg-[#1E2329] rounded-full overflow-hidden flex shadow-sm" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+        <div className={cn('flex-1 bg-[#1E2329] rounded-full overflow-hidden flex shadow-sm', isMobile ? 'h-2 mx-1' : 'h-3 mx-3')} style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
           <div 
-            className="h-full transition-all duration-300"
+            className="transition-all duration-300"
             style={{ 
               width: `${buyPercentage}%`,
+              height: '100%',
               backgroundColor: '#0D9D5F',
               boxShadow: '0 0 10px rgba(13, 157, 95, 0.6)'
             }} 
           />
           <div 
-            className="h-full transition-all duration-300"
+            className="transition-all duration-300"
             style={{ 
               width: `${sellPercentage}%`,
+              height: '100%',
               backgroundColor: '#C8102E',
               boxShadow: '0 0 10px rgba(200, 16, 46, 0.6)'
             }} 
@@ -493,10 +507,12 @@ export function Orderbook({ className, maxRows = 10, isMobile = false }: Orderbo
         </div>
         
         {/* Sell Percentage */}
-        <div className="flex items-center gap-1.5 text-sm">
-          <div className="flex items-center gap-0.5">
-            <span className="text-[#C8102E] font-semibold" style={{ minWidth: '45px', textAlign: 'right' }}>{sellPercentage}%</span>
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#C8102E' }} />
+        <div className={cn('flex items-center gap-1 text-sm', isMobile ? 'gap-0.5' : 'gap-1.5')}>
+          <div className={cn('flex items-center', isMobile ? 'gap-0.5' : 'gap-0.5')}>
+            <span className="text-[#C8102E] font-semibold" style={{ minWidth: isMobile ? '30px' : '45px', textAlign: 'right' }}>
+              <span className={isMobile ? 'text-[10px]' : 'text-sm'}>{sellPercentage}%</span>
+            </span>
+            <div className={cn('rounded-sm', isMobile ? 'w-2 h-2' : 'w-3 h-3')} style={{ backgroundColor: '#C8102E' }} />
           </div>
         </div>
       </div>
