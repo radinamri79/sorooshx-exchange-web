@@ -275,8 +275,8 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             </aside>
           </div>
 
-          {/* BOTTOM: Orders Panel - Dynamic height (220px or proportional) */}
-          <div className="h-[220px] flex-shrink-0 bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
+          {/* BOTTOM: Orders Panel - Reduced height to accommodate header and show full orderbook */}
+          <div className="h-[180px] flex-shrink-0 bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
             <OrdersPanel className="w-full h-full overflow-auto" />
           </div>
         </div>
