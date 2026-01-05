@@ -52,7 +52,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <div className="bg-[#0d0d0f] border-b border-[#2a2a2d] shrink-0 flex flex-col">
           {/* Row 1: TickerSwitcher (left) + Icons (right, larger) */}
           <div className="flex items-center justify-between px-3 py-1 gap-1.5">
-            <TickerSwitcher className="shrink-0" />
+            <TickerSwitcher className="shrink-0" isMobile={true} />
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => marketInfoRef.current?.triggerInfoModal()}

@@ -20,6 +20,7 @@ type Category = 'all' | 'favorites' | 'btc' | 'eth' | 'altcoins';
 
 interface TickerSwitcherProps {
   className?: string;
+  isMobile?: boolean;
 }
 
 const CATEGORIES: { id: Category; labelKey: string }[] = [
@@ -42,7 +43,7 @@ const POPULAR_PAIRS = [
   'AVAXUSDT',
 ];
 
-export function TickerSwitcher({ className }: TickerSwitcherProps) {
+export function TickerSwitcher({ className, isMobile = false }: TickerSwitcherProps) {
   const t = useTranslations('trading.tickerSwitcher');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -204,7 +205,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-1.5 px-2 py-1 rounded transition-colors',
+          `flex items-center gap-1.5 ${isMobile ? 'px-0' : 'px-2'} py-1 rounded transition-colors`,
           'bg-[#0d0d0f] md:bg-[#0d0d0f] hover:bg-[#1e1f23]',
           'border-0 md:border md:border-[#2a2a2d]',
           className,
@@ -212,7 +213,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
         )}
       >
         <div className="flex items-center gap-1.5">
-          <span className="font-bold text-[#f5f5f5] text-sm md:text-xs">
+          <span className={`font-bold text-[#f5f5f5] ${isMobile ? 'text-base' : 'text-sm'} md:text-xs`}>
             {currentSymbol.replace('USDT', '')}/USDT
           </span>
           <span className="text-[8px] font-medium px-1 py-0.5 rounded bg-[#ffb496]/10 text-[#ffb496]">
@@ -227,7 +228,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
             {currentTicker ? formatPercentage(currentTicker.P) : '--'}
           </span>
         </div>
-        <ChevronDown className={cn('w-5 h-5 md:w-3.5 md:h-3.5 text-[#6b6b6b] transition-transform', isOpen && 'rotate-180')} />
+        <ChevronDown className={cn(`w-5 h-5 md:w-3.5 md:h-3.5 text-[#6b6b6b] transition-transform`, isOpen && 'rotate-180')} />
       </button>
 
       {/* Dropdown Menu */}
