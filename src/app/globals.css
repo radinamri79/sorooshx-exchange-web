@@ -62,23 +62,27 @@
     min-height: 100vh;
   }
 
-  /* Custom scrollbar - Bitget style */
+  /* Hide scrollbars while keeping scroll functionality */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 0px;
+    height: 0px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #0d0d0f;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #2a2a2d;
-    border-radius: 3px;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #363639;
+    background: transparent;
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: none;
   }
 
   /* Remove autofill background */

@@ -54,6 +54,7 @@ interface OrderFormProps {
   currentPrice?: string;
   availableBalance?: string;
   onSubmit?: (formData: OrderFormState) => Promise<void>;
+  isMobile?: boolean;
 }
 
 const INITIAL_STATE: OrderFormState = {
@@ -85,6 +86,7 @@ export function OrderForm({
   currentPrice = '87,859.3',
   availableBalance = '0.0000',
   onSubmit,
+  isMobile = false,
 }: OrderFormProps) {
   const [formData, setFormData] = useState<OrderFormState>(INITIAL_STATE);
   const [uiState, setUiState] = useState<OrderFormUIState>(INITIAL_UI_STATE);
@@ -284,15 +286,23 @@ export function OrderForm({
       {/* ================================================================ */}
       {/* HEADER - Margin Mode & Leverage Button                          */}
       {/* ================================================================ */}
-      <div className="flex items-center justify-between px-3 py-2.5 border-b border-[#2B3139]">
+      <div className={cn(
+        'flex items-center justify-between border-b border-[#2B3139]',
+        isMobile ? 'px-2 py-1.5' : 'px-3 py-2.5'
+      )}>
         <div className="flex items-center gap-2">
           {/* Margin Mode Selector - Beautiful Dropdown */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setShowMarginModeDropdown(!showMarginModeDropdown)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded
-                         bg-[#1E2329] text-[#EAECEF] transition-all duration-200 border border-[#2B3139]"
+              className={cn(
+                'flex items-center gap-1.5 rounded transition-all duration-200 border',
+                isMobile
+                  ? 'px-2 py-1 text-[10px] font-semibold'
+                  : 'px-2.5 py-1.5 text-xs font-semibold',
+                'bg-[#1E2329] text-[#EAECEF] border-[#2B3139]'
+              )}
               style={{ borderColor: showMarginModeDropdown ? '#ffb496' : '#2B3139' }}
             >
               {formData.marginMode === 'CROSS' ? 'Cross' : 'Isolated'}
@@ -334,9 +344,13 @@ export function OrderForm({
           <button
             type="button"
             onClick={() => setUiState((prev) => ({ ...prev, showLeverageModal: true }))}
-            className="flex items-center gap-1 px-3 py-1.5 rounded text-xs font-bold
-                       bg-[#1E2329] hover:bg-[#2B3139] 
-                       transition-all duration-200 border border-[#2B3139]"
+            className={cn(
+              'flex items-center gap-1 rounded font-bold transition-all duration-200 border',
+              isMobile
+                ? 'px-2 py-1 text-[10px]'
+                : 'px-3 py-1.5 text-xs',
+              'bg-[#1E2329] hover:bg-[#2B3139] border-[#2B3139]'
+            )}
           >
             <span style={{ color: COLORS.longGreen }}>{longLeverage}X</span>
             <span className="text-[#5E6673]">|</span>
@@ -358,14 +372,17 @@ export function OrderForm({
       {/* ================================================================ */}
       {/* ACTION TABS - Open / Close                                       */}
       {/* ================================================================ */}
-      <div className="flex px-2 py-2 gap-2">
+      <div className={cn('flex gap-2', isMobile ? 'px-1.5 py-1.5' : 'px-2 py-2')}>
         {(['OPEN', 'CLOSE'] as const).map((action) => (
           <button
             key={action}
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, action }))}
             className={cn(
-              'flex-1 py-2.5 text-sm font-semibold transition-all duration-200 rounded',
+              'flex-1 font-semibold transition-all duration-200 rounded',
+              isMobile
+                ? 'py-1.5 text-[10px]'
+                : 'py-2.5 text-sm',
               formData.action === action
                 ? 'text-black bg-[#ffb496]'
                 : 'text-[#848E9C] bg-[#1E2329] hover:text-[#EAECEF] hover:bg-[#2B3139]'
@@ -379,14 +396,20 @@ export function OrderForm({
       {/* ================================================================ */}
       {/* ORDER TYPE TABS - Limit / Market / Trigger                       */}
       {/* ================================================================ */}
-      <div className="flex items-center px-2 py-2 gap-2 border-b border-[#2B3139]">
+      <div className={cn(
+        'flex items-center gap-2 border-b border-[#2B3139]',
+        isMobile ? 'px-1.5 py-1.5' : 'px-2 py-2'
+      )}>
         {(['LIMIT', 'MARKET', 'TRIGGER'] as const).map((type) => (
           <button
             key={type}
             type="button"
             onClick={() => handleOrderTypeChange(type)}
             className={cn(
-              'flex-1 px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200 text-center',
+              'flex-1 font-semibold rounded transition-all duration-200 text-center',
+              isMobile
+                ? 'px-2 py-1 text-[9px]'
+                : 'px-3 py-1.5 text-xs',
               formData.orderType === type
                 ? 'text-black bg-[#ffb496]'
                 : 'text-[#848E9C] hover:text-[#EAECEF] hover:bg-[#1E2329]'
@@ -400,7 +423,7 @@ export function OrderForm({
       {/* ================================================================ */}
       {/* FORM CONTENT - Optimized to fit without scroll                   */}
       {/* ================================================================ */}
-      <div className="flex-1 px-3 py-2 space-y-2.5 overflow-y-auto">
+      <div className={cn('flex-1 space-y-2.5 overflow-y-auto', isMobile ? 'px-2 py-1.5' : 'px-3 py-2')}>
         {/* Available Balance */}
         <div className="flex items-center justify-between">
           <span className="text-[11px] text-[#848E9C]">Available</span>

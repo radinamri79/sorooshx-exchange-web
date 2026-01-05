@@ -92,19 +92,13 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           {/* Two-column layout for Orderbook and Order Form on mobile */}
           <div className="flex gap-px bg-[#2a2a2d]">
             {/* Left Column: Orderbook */}
-            <div className="flex-1 min-w-0 bg-[#0d0d0f] max-h-[350px] overflow-hidden">
-              <div className="px-2 py-2 border-b border-[#2a2a2d]">
-                <h3 className="text-xs font-semibold text-[#a1a1a1]">Order Book</h3>
-              </div>
-              <Orderbook className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={12} />
+            <div className="flex-1 min-w-0 bg-[#0d0d0f] overflow-hidden">
+              <Orderbook className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={12} isMobile={true} />
             </div>
 
             {/* Right Column: Order Form */}
             <div className="flex-1 min-w-0 bg-[#0d0d0f] border-l border-[#2a2a2d] overflow-y-auto">
-              <div className="px-2 py-2 border-b border-[#2a2a2d]">
-                <h3 className="text-xs font-semibold text-[#a1a1a1]">Trading</h3>
-              </div>
-              <OrderForm className="bg-transparent border-0 rounded-none" />
+              <OrderForm className="bg-transparent border-0 rounded-none" isMobile={true} />
             </div>
           </div>
 

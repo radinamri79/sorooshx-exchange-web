@@ -17,6 +17,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 interface OrderbookProps {
   className?: string;
   maxRows?: number;
+  isMobile?: boolean;
 }
 
 type DisplayMode = 'both' | 'buyOnly' | 'sellOnly';
@@ -31,6 +32,7 @@ interface OrderbookRowProps {
   flashDirection?: 'up' | 'down';
   onClick?: (price: string) => void;
   precision: DecimalPrecision;
+  isMobile?: boolean;
 }
 
 // Format number with precision
@@ -50,7 +52,8 @@ function OrderbookRow({
   isFlashing,
   flashDirection,
   onClick,
-  precision 
+  precision,
+  isMobile = false
 }: OrderbookRowProps) {
   const [price, quantity] = entry;
   const depthPercentage = maxSum > 0 ? (cumulativeSum / maxSum) * 100 : 0;
@@ -73,9 +76,12 @@ function OrderbookRow({
     <div
       onClick={() => onClick?.(price)}
       className={cn(
-        'grid grid-cols-3 gap-1 px-2 py-1 text-xs cursor-pointer relative w-full',
+        'grid grid-cols-3 gap-1 cursor-pointer relative w-full',
         'transition-colors duration-75 hover:bg-[#1E2329]',
         'tabular-nums',
+        isMobile
+          ? 'px-1.5 py-0.5 text-[8px]'
+          : 'px-2 py-1 text-xs',
         flashClass
       )}
     >
@@ -109,7 +115,7 @@ function OrderbookRow({
   );
 }
 
-export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
+export function Orderbook({ className, maxRows = 10, isMobile = false }: OrderbookProps) {
   const { currentSymbol, tickers } = useMarketStore();
   const { bids, asks, lastUpdateId, setOrderbook, mergeOrderbook, reset } = useOrderbookStore();
   
@@ -282,7 +288,8 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
       'border-0 rounded-none',
       className
     )}>
-      {/* Header - Orderbook Title + Controls */}
+      {/* Header - Orderbook Title + Controls - Hidden on mobile */}
+      {!isMobile && (
       <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#1E2329]">
         {/* Title */}
         <span className="text-xs font-medium text-[#EAECEF]">Orderbook</span>
@@ -372,9 +379,15 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
           </div>
         </div>
       </div>
+      )}
 
-      {/* Column Headers */}
-      <div className="grid grid-cols-3 gap-1 px-2 py-1.5 text-[10px] text-[#5E6673] font-medium border-b border-[#1E2329]">
+      {/* Column Headers - Adjusted sizing for mobile */}
+      <div className={cn(
+        'grid grid-cols-3 gap-1 font-medium border-b border-[#1E2329]',
+        isMobile
+          ? 'px-1.5 py-1 text-[9px] text-[#5E6673]'
+          : 'px-2 py-1.5 text-[10px] text-[#5E6673]'
+      )}>
         <span>Price (USDT)</span>
         <span className="text-right">Qty. (BTC)</span>
         <span className="text-right">Sum (BTC)</span>
@@ -396,6 +409,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
                 flashDirection={flashingPrices.get(entry[0])}
                 onClick={handlePriceClick}
                 precision={precision}
+                isMobile={isMobile}
               />
             ))}
           </div>
@@ -441,6 +455,7 @@ export function Orderbook({ className, maxRows = 10 }: OrderbookProps) {
                 flashDirection={flashingPrices.get(entry[0])}
                 onClick={handlePriceClick}
                 precision={precision}
+                isMobile={isMobile}
               />
             ))}
           </div>
