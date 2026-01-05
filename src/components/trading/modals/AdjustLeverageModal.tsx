@@ -93,9 +93,6 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
 
   if (!isVisible) return null;
 
-  const quickButtons = [1, 40, 80, 120, 160, 200];
-  const sliderTicks = [1, 40, 80, 120, 160, 200];
-
   return (
     <div
       className={cn(
@@ -176,8 +173,6 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
             value={longLeverage}
             onChange={handleLongChange}
             color={COLORS.longGreen}
-            quickButtons={quickButtons}
-            sliderTicks={sliderTicks}
             isMobile={isMobile}
           />
 
@@ -187,8 +182,6 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
             value={shortLeverage}
             onChange={handleShortChange}
             color={COLORS.shortRed}
-            quickButtons={quickButtons}
-            sliderTicks={sliderTicks}
             isMobile={isMobile}
           />
         </div>
@@ -234,136 +227,43 @@ interface LeverageSectionProps {
   value: number;
   onChange: (value: number) => void;
   color: string;
-  quickButtons: number[];
-  sliderTicks: number[];
   isMobile?: boolean;
 }
 
-function LeverageSection({ label, value, onChange, color, quickButtons, sliderTicks, isMobile = false }: LeverageSectionProps) {
+function LeverageSection({ label, value, onChange, color, isMobile = false }: LeverageSectionProps) {
   return (
-    <div className="space-y-2">
+    <div className={cn('space-y-2', isMobile ? 'py-1.5' : 'py-2')}>
       {/* Label */}
-      <div className="flex items-center justify-between">
-        <span className={cn('font-medium', isMobile ? 'text-xs' : 'text-sm')} style={{ color }}>
-          {label}
-        </span>
-      </div>
+      <span className={cn('block font-medium', isMobile ? 'text-xs' : 'text-sm')} style={{ color }}>
+        {label}
+      </span>
 
-      {/* Value Display with +/- Controls */}
-      <div className="flex items-center gap-2">
-        <span className={cn(isMobile ? 'text-[11px]' : 'text-xs')} style={{ color: COLORS.textSecondary }}>Leverage</span>
-        <div className={cn('flex-1 flex items-center justify-center gap-3 rounded-lg', isMobile ? 'py-1.5 px-3' : 'py-2 px-4')}
-             style={{ backgroundColor: COLORS.bgSecondary }}>
-          <button
-            onClick={() => onChange(value - 1)}
-            className="p-1 rounded hover:bg-[#2B3139] transition-colors"
-            style={{ color: COLORS.textSecondary }}
-          >
-            <Plus size={isMobile ? 14 : 16} className="rotate-45" />
-          </button>
-          
-          <span className={cn('font-bold min-w-[60px] text-center', isMobile ? 'text-lg' : 'text-xl')} style={{ color }}>
-            {value}X
-          </span>
-
-          <button
-            onClick={() => onChange(value + 1)}
-            className="p-1 rounded hover:bg-[#2B3139] transition-colors"
-            style={{ color: COLORS.textSecondary }}
-          >
-            <Plus size={isMobile ? 14 : 16} />
-          </button>
-        </div>
-        
-        {/* +/- Buttons on Right */}
-        <div className="flex flex-col gap-0.5">
-          <button
-            onClick={() => onChange(value + 1)}
-            className={cn('rounded hover:bg-[#2B3139] transition-colors', isMobile ? 'p-1' : 'p-1.5')}
-            style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
-          >
-            <Plus size={isMobile ? 12 : 12} />
-          </button>
-          <button
-            onClick={() => onChange(value - 1)}
-            className={cn('rounded hover:bg-[#2B3139] transition-colors', isMobile ? 'p-1' : 'p-1.5')}
-            style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
-          >
-            <Minus size={12} />
-          </button>
-        </div>
-      </div>
-
-      {/* Slider */}
-      <div className={cn('relative', isMobile ? 'pt-1.5 pb-3' : 'pt-2 pb-4')}>
-        <input
-          type="range"
-          min={MIN_LEVERAGE}
-          max={MAX_LEVERAGE}
-          value={value}
-          onChange={(e) => onChange(parseInt(e.target.value))}
-          className={cn('w-full rounded-full cursor-pointer appearance-none', isMobile ? 'h-0.5' : 'h-1')}
-          style={{
-            background: `linear-gradient(to right, ${color} 0%, ${color} ${((value - MIN_LEVERAGE) / (MAX_LEVERAGE - MIN_LEVERAGE)) * 100}%, ${COLORS.bgTertiary} ${((value - MIN_LEVERAGE) / (MAX_LEVERAGE - MIN_LEVERAGE)) * 100}%, ${COLORS.bgTertiary} 100%)`,
-            accentColor: color,
-          }}
-        />
-        
-        {/* Tick Marks */}
-        <div className={cn('flex justify-between mt-1', isMobile ? 'text-[9px]' : 'text-[10px]')} style={{ color: COLORS.textMuted }}>
-          {sliderTicks.map((tick) => (
-            <span key={tick}>{tick}X</span>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Selection Buttons */}
-      <div className={cn('grid gap-1.5', isMobile ? 'grid-cols-6 gap-1' : 'grid-cols-6 gap-1.5')}>
-        {quickButtons.map((btn) => (
-          <button
-            key={btn}
-            onClick={() => onChange(btn)}
-            className={cn(
-              'rounded font-semibold transition-all duration-200 hover:brightness-110 active:scale-95',
-              isMobile ? 'py-1.5 text-[10px]' : 'py-2 text-xs'
-            )}
-            style={{
-              backgroundColor: value === btn ? color : COLORS.bgSecondary,
-              color: value === btn ? 'white' : COLORS.textSecondary,
-            }}
-          >
-            {btn}x
-          </button>
-        ))}
-      </div>
-
-      {/* Input Field */}
+      {/* Input Field with +/- Buttons */}
       <div className="flex items-center gap-2">
         <button
           onClick={() => onChange(value - 1)}
-          className="p-2.5 rounded-lg transition-colors hover:brightness-110"
+          className={cn('rounded-lg transition-colors hover:brightness-110 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
           style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
         >
-          <Minus size={14} />
+          <Minus size={isMobile ? 14 : 16} />
         </button>
         <input
           type="number"
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value) || MIN_LEVERAGE)}
-          className="flex-1 h-10 px-4 text-center text-base font-bold rounded-lg
-                     outline-none transition-all duration-200"
+          className={cn('flex-1 rounded-lg outline-none transition-all duration-200 text-center font-bold', isMobile ? 'h-8 text-sm' : 'h-10 text-base')}
           style={{
             backgroundColor: COLORS.bgSecondary,
-            color: COLORS.textPrimary,
+            color,
             border: `1px solid ${COLORS.borderColor}`,
           }}
         />
         <button
           onClick={() => onChange(value + 1)}
-          className="p-2.5 rounded-lg transition-colors hover:brightness-110"
+          className={cn('rounded-lg transition-colors hover:brightness-110 flex-shrink-0', isMobile ? 'p-1.5' : 'p-2')}
           style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
         >
-          <Plus size={14} />
+          <Plus size={isMobile ? 14 : 16} />
         </button>
       </div>
     </div>
