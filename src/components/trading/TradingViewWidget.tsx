@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, memo, useState, useCallback } from 'react';
+import { useEffect, useRef, memo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
 
@@ -17,107 +17,118 @@ declare global {
 }
 
 function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const widgetContainerRef = useRef<HTMLDivElement | null>(null);
-  const widgetIdRef = useRef<string>(`tradingview_${Math.random().toString(36).substring(7)}`);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
+  const containerMapRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  const scriptLoadedRef = useRef(false);
   const { currentSymbol } = useMarketStore();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const isMountedRef = useRef(true);
 
-  const cleanupWidget = useCallback(() => {
-    if (widgetContainerRef.current && containerRef.current) {
-      try {
-        if (containerRef.current.contains(widgetContainerRef.current)) {
-          containerRef.current.removeChild(widgetContainerRef.current);
-        }
-      } catch {
-        // Ignore cleanup errors
+  // Effect to load TradingView script
+  useEffect(() => {
+    if (scriptLoadedRef.current) return;
+
+    const loadTradingViewScript = () => {
+      if (document.querySelector('script[src="https://s3.tradingview.com/tv.js"]')) {
+        scriptLoadedRef.current = true;
+        return;
       }
-      widgetContainerRef.current = null;
-    }
+
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/tv.js';
+      script.async = true;
+      script.onload = () => {
+        scriptLoadedRef.current = true;
+      };
+      script.onerror = () => {
+        if (isMountedRef.current) {
+          setError('Failed to load TradingView library');
+          setIsLoading(false);
+        }
+      };
+      document.head.appendChild(script);
+    };
+
+    loadTradingViewScript();
+
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
+  // Effect to create/update the widget
   useEffect(() => {
     isMountedRef.current = true;
-    
-    if (!containerRef.current) return;
 
-    setIsLoading(true);
-    setError(null);
-
-    // Clean up previous widget
-    cleanupWidget();
-
-    // Generate new unique ID for this instance
-    widgetIdRef.current = `tradingview_${Math.random().toString(36).substring(7)}`;
-    const containerId = widgetIdRef.current;
-    
-    // Create widget container
-    const widgetContainer = document.createElement('div');
-    widgetContainer.id = containerId;
-    widgetContainer.style.cssText = 'height: 100%; width: 100%;';
-    containerRef.current.appendChild(widgetContainer);
-    widgetContainerRef.current = widgetContainer;
+    if (!mainContainerRef.current || !scriptLoadedRef.current) return;
 
     // Symbol format for TradingView (Binance perpetual futures)
     const tvSymbol = `BINANCE:${currentSymbol.replace('USDT', '')}USDT.P`;
+    const containerId = `tradingview-${currentSymbol}`;
 
-    // Load TradingView library script if not already loaded
-    const loadWidget = () => {
-      if (!isMountedRef.current) return;
+    const initializeWidget = () => {
+      if (!isMountedRef.current || !window.TradingView) return;
+
+      // Get or create the container for this symbol
+      let container = containerMapRef.current.get(currentSymbol);
       
-      if (typeof window !== 'undefined' && window.TradingView) {
-        try {
-          // Use requestAnimationFrame to ensure DOM is ready
-          const initializeWidget = () => {
-            if (!isMountedRef.current || !window.TradingView) return;
+      if (!container) {
+        container = document.createElement('div');
+        container.id = containerId;
+        container.style.cssText = 'width: 100%; height: 100%;';
+        mainContainerRef.current?.appendChild(container);
+        containerMapRef.current.set(currentSymbol, container);
+      }
 
-            // Verify container exists in DOM before creating widget
-            const container = document.getElementById(containerId);
-            if (!container) {
-              console.error(`Container with id ${containerId} not found in DOM`);
-              if (isMountedRef.current) {
-                setError('Failed to initialize chart container');
-                setIsLoading(false);
-              }
-              return;
-            }
+      // Show this container, hide others
+      containerMapRef.current.forEach((cont, symbol) => {
+        if (symbol === currentSymbol) {
+          cont.style.display = 'block';
+        } else {
+          cont.style.display = 'none';
+        }
+      });
 
-            new window.TradingView.widget({
-              autosize: true,
-              symbol: tvSymbol,
-              interval: '15',
-              timezone: 'Etc/UTC',
-              theme: 'dark',
-              style: '1',
-              locale: 'en',
-              toolbar_bg: '#0d0d0f',
-              enable_publishing: false,
-              allow_symbol_change: true,
-              container_id: containerId,
-              hide_side_toolbar: false,
-              withdateranges: true,
-              hide_volume: false,
-              studies: ['RSI@tv-basicstudies', 'MASimple@tv-basicstudies'],
-              backgroundColor: '#0d0d0f',
-              gridColor: 'rgba(42, 42, 45, 0.6)',
-              overrides: {
-                'paneProperties.background': '#0d0d0f',
-                'paneProperties.backgroundType': 'solid',
-                'scalesProperties.backgroundColor': '#0d0d0f',
-              },
-            });
-            if (isMountedRef.current) {
-              setIsLoading(false);
-            }
-          };
+      try {
+        // Create the widget - TradingView will append to the container
+        new window.TradingView.widget({
+          autosize: true,
+          symbol: tvSymbol,
+          interval: '15',
+          timezone: 'Etc/UTC',
+          theme: 'dark',
+          style: '1',
+          locale: 'en',
+          toolbar_bg: '#0d0d0f',
+          enable_publishing: false,
+          allow_symbol_change: true,
+          container_id: containerId,
+          hide_side_toolbar: false,
+          withdateranges: true,
+          hide_volume: false,
+          studies: ['RSI@tv-basicstudies', 'MASimple@tv-basicstudies'],
+          backgroundColor: '#0d0d0f',
+          gridColor: 'rgba(42, 42, 45, 0.6)',
+          overrides: {
+            'paneProperties.background': '#0d0d0f',
+            'paneProperties.backgroundType': 'solid',
+            'scalesProperties.backgroundColor': '#0d0d0f',
+          },
+        });
 
-          // Use requestAnimationFrame to ensure DOM is ready
-          requestAnimationFrame(initializeWidget);
-        } catch (err) {
-          console.error('TradingView widget error:', err);
-          if (isMountedRef.current) {
+        if (isMountedRef.current) {
+          setIsLoading(false);
+          setError(null);
+        }
+      } catch (err) {
+        console.error('TradingView widget error:', err);
+        if (isMountedRef.current) {
+          // If widget already exists, just show it
+          if (container && container.children.length > 0) {
+            setIsLoading(false);
+            setError(null);
+          } else {
             setError('Failed to load chart');
             setIsLoading(false);
           }
@@ -125,39 +136,32 @@ function TradingViewWidgetComponent({ className }: TradingViewWidgetProps) {
       }
     };
 
-    // Check if TradingView is already loaded
+    // Wait for TradingView to be available
     if (window.TradingView) {
-      loadWidget();
+      setIsLoading(true);
+      const timeoutId = setTimeout(initializeWidget, 150);
+      return () => {
+        clearTimeout(timeoutId);
+      };
     } else {
-      // Load the TradingView library
-      const existingScript = document.querySelector('script[src="https://s3.tradingview.com/tv.js"]');
-      if (existingScript) {
-        // Script exists, wait for it to load
-        existingScript.addEventListener('load', loadWidget);
-      } else {
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/tv.js';
-        script.async = true;
-        script.onload = loadWidget;
-        script.onerror = () => {
-          if (isMountedRef.current) {
-            setError('Failed to load TradingView library');
-            setIsLoading(false);
-          }
-        };
-        document.head.appendChild(script);
-      }
-    }
+      // If TradingView is not loaded yet, wait
+      const checkInterval = setInterval(() => {
+        if (window.TradingView && isMountedRef.current) {
+          clearInterval(checkInterval);
+          setIsLoading(true);
+          setTimeout(initializeWidget, 150);
+        }
+      }, 100);
 
-    return () => {
-      isMountedRef.current = false;
-      cleanupWidget();
-    };
-  }, [currentSymbol, cleanupWidget]);
+      return () => {
+        clearInterval(checkInterval);
+      };
+    }
+  }, [currentSymbol]);
 
   return (
     <div 
-      ref={containerRef}
+      ref={mainContainerRef}
       className={cn('relative w-full h-full', className)}
       style={{ minHeight: '400px' }}
     >
