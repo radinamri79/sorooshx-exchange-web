@@ -277,10 +277,12 @@ export function OrderForm({
       <FuturesUnitSettingsModal
         isOpen={uiState.showUnitSettingsModal}
         onClose={() => setUiState((prev) => ({ ...prev, showUnitSettingsModal: false }))}
+        isMobile={isMobile}
       />
       <AdjustLeverageModal
         isOpen={uiState.showLeverageModal}
         onClose={() => setUiState((prev) => ({ ...prev, showLeverageModal: false }))}
+        isMobile={isMobile}
       />
 
       {/* ================================================================ */}

@@ -33,9 +33,10 @@ const COLORS = {
 interface AdjustLeverageModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isMobile?: boolean;
 }
 
-export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProps) {
+export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: AdjustLeverageModalProps) {
   const { longLeverage, shortLeverage, setLongLeverage, setShortLeverage } = useLeverageStore();
   const [adjustBoth, setAdjustBoth] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -98,8 +99,8 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center',
-        'transition-all duration-200 ease-out',
+        'fixed inset-0 z-50 flex transition-all duration-200 ease-out',
+        isMobile ? 'items-end' : 'items-center justify-center',
         isAnimating ? 'bg-black/70 backdrop-blur-sm' : 'bg-transparent'
       )}
       onClick={handleClose}
@@ -107,10 +108,16 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'w-full max-w-md mx-4 rounded-xl shadow-2xl',
-          'transition-all duration-200 ease-out',
+          'w-full transition-all duration-200 ease-out',
+          isMobile
+            ? 'max-h-[70vh] rounded-t-xl'
+            : 'max-w-md mx-4 rounded-xl shadow-2xl',
           isAnimating
-            ? 'opacity-100 scale-100 translate-y-0'
+            ? isMobile
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-100 scale-100 translate-y-0'
+            : isMobile
+            ? 'opacity-0 translate-y-full'
             : 'opacity-0 scale-95 translate-y-4'
         )}
         style={{ backgroundColor: COLORS.bgPrimary, border: `1px solid ${COLORS.borderColor}` }}
@@ -118,8 +125,8 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
         {/* ================================================================ */}
         {/* HEADER                                                          */}
         {/* ================================================================ */}
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: COLORS.borderColor }}>
-          <h2 className="text-base font-semibold" style={{ color: COLORS.textPrimary }}>
+        <div className={cn('flex items-center justify-between border-b', isMobile ? 'px-4 py-3' : 'px-5 py-4')} style={{ borderColor: COLORS.borderColor }}>
+          <h2 className={cn('font-semibold', isMobile ? 'text-sm' : 'text-base')} style={{ color: COLORS.textPrimary }}>
             Adjust Leverage
           </h2>
           <button
@@ -127,27 +134,28 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
             className="p-1 rounded hover:bg-[#2B3139] transition-colors"
             style={{ color: COLORS.textSecondary }}
           >
-            <X size={18} />
+            <X size={isMobile ? 16 : 18} />
           </button>
         </div>
 
         {/* ================================================================ */}
         {/* SIMULTANEOUS TOGGLE                                             */}
         {/* ================================================================ */}
-        <div className="px-5 py-3 border-b" style={{ borderColor: COLORS.borderColor }}>
+        <div className={cn('border-b', isMobile ? 'px-4 py-2.5' : 'px-5 py-3')} style={{ borderColor: COLORS.borderColor }}>
           <label className="flex items-center gap-2 cursor-pointer group">
             <div
               onClick={() => setAdjustBoth(!adjustBoth)}
               className={cn(
-                'w-4 h-4 rounded flex items-center justify-center transition-all duration-200',
-                'border-2 cursor-pointer',
+                'rounded flex items-center justify-center transition-all duration-200',
+                'border-2 cursor-pointer flex-shrink-0',
+                isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4',
                 adjustBoth
                   ? 'bg-[#ffb496] border-[#ffb496]'
                   : 'bg-transparent border-[#5E6673] group-hover:border-[#848E9C]'
               )}
             >
               {adjustBoth && (
-                <svg className="w-2.5 h-2.5" fill="#000000" viewBox="0 0 20 20">
+                <svg className={isMobile ? 'w-2 h-2' : 'w-2.5 h-2.5'} fill="#000000" viewBox="0 0 20 20">
                   <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
                 </svg>
               )}
@@ -161,7 +169,7 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
         {/* ================================================================ */}
         {/* CONTENT                                                         */}
         {/* ================================================================ */}
-        <div className="px-5 py-4 space-y-5">
+        <div className={cn('space-y-4', isMobile ? 'px-4 py-3' : 'px-5 py-4')}>
           {/* Long Leverage Section */}
           <LeverageSection
             label="Leverage (Open Long)"
@@ -170,6 +178,7 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
             color={COLORS.longGreen}
             quickButtons={quickButtons}
             sliderTicks={sliderTicks}
+            isMobile={isMobile}
           />
 
           {/* Short Leverage Section */}
@@ -180,14 +189,15 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
             color={COLORS.shortRed}
             quickButtons={quickButtons}
             sliderTicks={sliderTicks}
+            isMobile={isMobile}
           />
         </div>
 
         {/* ================================================================ */}
         {/* WARNING MESSAGE                                                 */}
         {/* ================================================================ */}
-        <div className="mx-5 mb-4 p-3 rounded-lg" style={{ backgroundColor: COLORS.warningBg }}>
-          <p className="text-xs leading-relaxed" style={{ color: COLORS.warning }}>
+        <div className={cn('mb-4 p-3 rounded-lg', isMobile ? 'mx-4' : 'mx-5')} style={{ backgroundColor: COLORS.warningBg }}>
+          <p className={cn('leading-relaxed', isMobile ? 'text-[11px]' : 'text-xs')} style={{ color: COLORS.warning }}>
             Reminder: Maximum openings are limited by leverage, available funds, and open position quantity.
           </p>
         </div>
@@ -195,19 +205,17 @@ export function AdjustLeverageModal({ isOpen, onClose }: AdjustLeverageModalProp
         {/* ================================================================ */}
         {/* ACTION BUTTONS                                                  */}
         {/* ================================================================ */}
-        <div className="px-5 pb-5 flex gap-3">
+        <div className={cn('flex gap-3', isMobile ? 'px-4 pb-4' : 'px-5 pb-5')}>
           <button
             onClick={handleClose}
-            className="flex-1 h-11 rounded-lg text-sm font-semibold transition-all duration-200
-                       hover:brightness-110 active:brightness-90 active:scale-[0.98]"
+            className={cn('flex-1 rounded-lg font-semibold transition-all duration-200 hover:brightness-110 active:brightness-90 active:scale-[0.98]', isMobile ? 'h-8 text-xs' : 'h-11 text-sm')}
             style={{ backgroundColor: COLORS.bgTertiary, color: COLORS.textPrimary }}
           >
             Cancel
           </button>
           <button
             onClick={handleClose}
-            className="flex-1 h-11 rounded-lg text-sm font-bold text-black transition-all duration-200
-                       hover:brightness-110 active:brightness-90 active:scale-[0.98]"
+            className={cn('flex-1 rounded-lg font-bold text-black transition-all duration-200 hover:brightness-110 active:brightness-90 active:scale-[0.98]', isMobile ? 'h-8 text-xs' : 'h-11 text-sm')}
             style={{ backgroundColor: COLORS.orange }}
           >
             Confirm
@@ -228,32 +236,33 @@ interface LeverageSectionProps {
   color: string;
   quickButtons: number[];
   sliderTicks: number[];
+  isMobile?: boolean;
 }
 
-function LeverageSection({ label, value, onChange, color, quickButtons, sliderTicks }: LeverageSectionProps) {
+function LeverageSection({ label, value, onChange, color, quickButtons, sliderTicks, isMobile = false }: LeverageSectionProps) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Label */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium" style={{ color }}>
+        <span className={cn('font-medium', isMobile ? 'text-xs' : 'text-sm')} style={{ color }}>
           {label}
         </span>
       </div>
 
       {/* Value Display with +/- Controls */}
       <div className="flex items-center gap-2">
-        <span className="text-xs" style={{ color: COLORS.textSecondary }}>Leverage</span>
-        <div className="flex-1 flex items-center justify-center gap-3 py-2 px-4 rounded-lg"
+        <span className={cn(isMobile ? 'text-[11px]' : 'text-xs')} style={{ color: COLORS.textSecondary }}>Leverage</span>
+        <div className={cn('flex-1 flex items-center justify-center gap-3 rounded-lg', isMobile ? 'py-1.5 px-3' : 'py-2 px-4')}
              style={{ backgroundColor: COLORS.bgSecondary }}>
           <button
             onClick={() => onChange(value - 1)}
             className="p-1 rounded hover:bg-[#2B3139] transition-colors"
             style={{ color: COLORS.textSecondary }}
           >
-            <Plus size={16} className="rotate-45" />
+            <Plus size={isMobile ? 14 : 16} className="rotate-45" />
           </button>
           
-          <span className="text-xl font-bold min-w-[60px] text-center" style={{ color }}>
+          <span className={cn('font-bold min-w-[60px] text-center', isMobile ? 'text-lg' : 'text-xl')} style={{ color }}>
             {value}X
           </span>
 
@@ -262,7 +271,7 @@ function LeverageSection({ label, value, onChange, color, quickButtons, sliderTi
             className="p-1 rounded hover:bg-[#2B3139] transition-colors"
             style={{ color: COLORS.textSecondary }}
           >
-            <Plus size={16} />
+            <Plus size={isMobile ? 14 : 16} />
           </button>
         </div>
         
@@ -270,14 +279,14 @@ function LeverageSection({ label, value, onChange, color, quickButtons, sliderTi
         <div className="flex flex-col gap-0.5">
           <button
             onClick={() => onChange(value + 1)}
-            className="p-1.5 rounded hover:bg-[#2B3139] transition-colors"
+            className={cn('rounded hover:bg-[#2B3139] transition-colors', isMobile ? 'p-1' : 'p-1.5')}
             style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
           >
-            <Plus size={12} />
+            <Plus size={isMobile ? 12 : 12} />
           </button>
           <button
             onClick={() => onChange(value - 1)}
-            className="p-1.5 rounded hover:bg-[#2B3139] transition-colors"
+            className={cn('rounded hover:bg-[#2B3139] transition-colors', isMobile ? 'p-1' : 'p-1.5')}
             style={{ backgroundColor: COLORS.bgSecondary, color: COLORS.textSecondary }}
           >
             <Minus size={12} />
@@ -286,14 +295,14 @@ function LeverageSection({ label, value, onChange, color, quickButtons, sliderTi
       </div>
 
       {/* Slider */}
-      <div className="relative pt-2 pb-4">
+      <div className={cn('relative', isMobile ? 'pt-1.5 pb-3' : 'pt-2 pb-4')}>
         <input
           type="range"
           min={MIN_LEVERAGE}
           max={MAX_LEVERAGE}
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value))}
-          className="w-full h-1 rounded-full cursor-pointer appearance-none"
+          className={cn('w-full rounded-full cursor-pointer appearance-none', isMobile ? 'h-0.5' : 'h-1')}
           style={{
             background: `linear-gradient(to right, ${color} 0%, ${color} ${((value - MIN_LEVERAGE) / (MAX_LEVERAGE - MIN_LEVERAGE)) * 100}%, ${COLORS.bgTertiary} ${((value - MIN_LEVERAGE) / (MAX_LEVERAGE - MIN_LEVERAGE)) * 100}%, ${COLORS.bgTertiary} 100%)`,
             accentColor: color,
@@ -301,7 +310,7 @@ function LeverageSection({ label, value, onChange, color, quickButtons, sliderTi
         />
         
         {/* Tick Marks */}
-        <div className="flex justify-between mt-1 text-[10px]" style={{ color: COLORS.textMuted }}>
+        <div className={cn('flex justify-between mt-1', isMobile ? 'text-[9px]' : 'text-[10px]')} style={{ color: COLORS.textMuted }}>
           {sliderTicks.map((tick) => (
             <span key={tick}>{tick}X</span>
           ))}
@@ -309,14 +318,14 @@ function LeverageSection({ label, value, onChange, color, quickButtons, sliderTi
       </div>
 
       {/* Quick Selection Buttons */}
-      <div className="grid grid-cols-6 gap-1.5">
+      <div className={cn('grid gap-1.5', isMobile ? 'grid-cols-6 gap-1' : 'grid-cols-6 gap-1.5')}>
         {quickButtons.map((btn) => (
           <button
             key={btn}
             onClick={() => onChange(btn)}
             className={cn(
-              'py-2 rounded text-xs font-semibold transition-all duration-200',
-              'hover:brightness-110 active:scale-95'
+              'rounded font-semibold transition-all duration-200 hover:brightness-110 active:scale-95',
+              isMobile ? 'py-1.5 text-[10px]' : 'py-2 text-xs'
             )}
             style={{
               backgroundColor: value === btn ? color : COLORS.bgSecondary,

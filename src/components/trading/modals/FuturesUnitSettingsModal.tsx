@@ -4,6 +4,7 @@
  */
 'use client';
 
+import React from 'react';
 import { useFuturesUnitStore, type FuturesUnit } from '@/stores/useFuturesUnitStore';
 import { X, DollarSign, TrendingUp, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -27,6 +28,7 @@ const COLORS = {
 interface FuturesUnitSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isMobile?: boolean;
 }
 
 const UNIT_OPTIONS: Array<{
@@ -58,6 +60,7 @@ const UNIT_OPTIONS: Array<{
 export function FuturesUnitSettingsModal({
   isOpen,
   onClose,
+  isMobile = false,
 }: FuturesUnitSettingsModalProps) {
   const { unit, setUnit } = useFuturesUnitStore();
   const [isVisible, setIsVisible] = useState(false);
@@ -105,8 +108,8 @@ export function FuturesUnitSettingsModal({
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center',
-        'transition-all duration-200 ease-out',
+        'fixed inset-0 z-50 flex transition-all duration-200 ease-out',
+        isMobile ? 'items-end' : 'items-center justify-center',
         isAnimating ? 'bg-black/70 backdrop-blur-sm' : 'bg-transparent'
       )}
       onClick={handleClose}
@@ -114,17 +117,23 @@ export function FuturesUnitSettingsModal({
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'w-full max-w-sm mx-4 rounded-xl shadow-2xl',
-          'transition-all duration-200 ease-out',
+          'w-full transition-all duration-200 ease-out',
+          isMobile
+            ? 'max-h-[70vh] rounded-t-xl'
+            : 'max-w-sm mx-4 rounded-xl',
           isAnimating
-            ? 'opacity-100 scale-100 translate-y-0'
+            ? isMobile
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-100 scale-100 translate-y-0'
+            : isMobile
+            ? 'opacity-0 translate-y-full'
             : 'opacity-0 scale-95 translate-y-4'
         )}
         style={{ backgroundColor: COLORS.bgPrimary, border: `1px solid ${COLORS.borderColor}` }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: COLORS.borderColor }}>
-          <h2 className="text-base font-semibold" style={{ color: COLORS.textPrimary }}>
+        <div className={cn('flex items-center justify-between border-b', isMobile ? 'px-4 py-3' : 'px-5 py-4')} style={{ borderColor: COLORS.borderColor }}>
+          <h2 className={cn('font-semibold', isMobile ? 'text-sm' : 'text-base')} style={{ color: COLORS.textPrimary }}>
             Order Unit Type
           </h2>
           <button
@@ -132,18 +141,20 @@ export function FuturesUnitSettingsModal({
             className="p-1 rounded hover:bg-[#2B3139] transition-colors"
             style={{ color: COLORS.textSecondary }}
           >
-            <X size={18} />
+            <X size={isMobile ? 16 : 18} />
           </button>
         </div>
 
         {/* Unit Options */}
-        <div className="p-4 space-y-2">
+        <div className={cn('space-y-2', isMobile ? 'p-3 overflow-y-auto' : 'p-4')}>
           {UNIT_OPTIONS.map((option) => (
             <label
               key={option.id}
               className={cn(
-                'flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200',
-                'border hover:border-[#ffb496]/50',
+                'flex items-center gap-3 cursor-pointer transition-all duration-200',
+                isMobile ? 'p-2.5' : 'p-3',
+                'rounded-lg border',
+                'hover:border-[#ffb496]/50',
                 unit === option.id 
                   ? 'border-[#ffb496] bg-[#ffb496]/10' 
                   : 'border-[#2B3139] bg-[#1E2329]'
@@ -153,31 +164,37 @@ export function FuturesUnitSettingsModal({
               {/* Radio */}
               <div
                 className={cn(
-                  'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200',
+                  'flex items-center justify-center transition-all duration-200 border-2 rounded-full flex-shrink-0',
+                  isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4',
                   unit === option.id
                     ? 'border-[#ffb496]'
                     : 'border-[#5E6673]'
                 )}
               >
                 {unit === option.id && (
-                  <div className="w-2 h-2 rounded-full bg-[#ffb496]" />
+                  <div className={cn('rounded-full bg-[#ffb496]', isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2')} />
                 )}
               </div>
 
               {/* Icon */}
               <div style={{ color: unit === option.id ? COLORS.orange : COLORS.textSecondary }}>
-                {option.icon}
+                {React.isValidElement(option.icon) 
+                  ? React.cloneElement(option.icon, {
+                      style: { width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }
+                    } as any)
+                  : option.icon
+                }
               </div>
 
               {/* Label & Description */}
               <div className="flex-1 min-w-0">
                 <div 
-                  className="text-sm font-medium"
+                  className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}
                   style={{ color: unit === option.id ? COLORS.textPrimary : COLORS.textSecondary }}
                 >
                   {option.label}
                 </div>
-                <div className="text-[11px]" style={{ color: COLORS.textMuted }}>
+                <div className={isMobile ? 'text-[10px]' : 'text-[11px]'} style={{ color: COLORS.textMuted }}>
                   {option.description}
                 </div>
               </div>
@@ -186,11 +203,14 @@ export function FuturesUnitSettingsModal({
         </div>
 
         {/* Confirm Button */}
-        <div className="px-4 pb-4">
+        <div className={isMobile ? 'px-3 pb-3' : 'px-4 pb-4'}>
           <button
             onClick={handleClose}
-            className="w-full h-10 rounded-lg text-sm font-bold text-black transition-all duration-200
-                       hover:brightness-110 active:brightness-90 active:scale-[0.98]"
+            className={cn(
+              'w-full font-bold text-black transition-all duration-200 rounded-lg',
+              isMobile ? 'h-8 text-xs' : 'h-10 text-sm',
+              'hover:brightness-110 active:brightness-90 active:scale-[0.98]'
+            )}
             style={{ backgroundColor: COLORS.orange }}
           >
             Confirm
