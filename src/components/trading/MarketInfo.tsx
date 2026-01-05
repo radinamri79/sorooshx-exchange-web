@@ -10,6 +10,7 @@ import { TrendingUp, TrendingDown, Info, X, Calculator as CalculatorIcon } from 
 
 interface MarketInfoProps {
   className?: string;
+  isMobile?: boolean;
 }
 
 // Market Info Modal
@@ -554,7 +555,7 @@ function CalculatorModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 }
 
 export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalculatorModal: () => void }, MarketInfoProps>(
-  function MarketInfo({ className }, ref) {
+  function MarketInfo({ className, isMobile = false }, ref) {
     useTranslations('trading');
     const { currentSymbol, tickers, setTicker } = useMarketStore();
     const tickerRef = useRef<BinanceTicker | null>(null);
@@ -622,52 +623,52 @@ export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalc
   return (
     <>
       {/* Mobile Layout: Two rows - price/icons and market stats */}
-      <div className="md:hidden flex flex-col gap-1 bg-[#0d0d0f] -mx-3 px-3 py-1">
+      <div className={`md:hidden flex flex-col ${isMobile ? 'gap-0.5' : 'gap-1'} bg-[#0d0d0f] -mx-3 px-3 py-1`}>
         {/* Row 1: Left-aligned Price with Change */}
-        <div className="flex items-center justify-start gap-3 py-1">
+        <div className={`flex items-center justify-start ${isMobile ? 'gap-1.5' : 'gap-3'} py-0.5`}>
           <span
             className={cn(
-              'text-2xl font-bold tabular-nums',
+              `${isMobile ? 'text-lg' : 'text-2xl'} font-bold tabular-nums`,
               isPositive ? 'text-[#0D9D5F]' : 'text-[#C8102E]'
             )}
           >
             {stats.lastPrice}
           </span>
           <div className={cn(
-            'flex items-center gap-0.5 px-2 py-0.5 rounded text-[9px] font-semibold',
+            `flex items-center gap-0.5 px-1.5 py-0.5 rounded ${isMobile ? 'text-[8px]' : 'text-[9px]'} font-semibold`,
             isPositive ? 'bg-[#0D9D5F]/10 text-[#0D9D5F]' : 'bg-[#C8102E]/10 text-[#C8102E]'
           )}>
-            {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            {isPositive ? <TrendingUp className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'}`} /> : <TrendingDown className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'}`} />}
             {isPositive ? '+' : ''}{stats.priceChangePercent}
           </div>
         </div>
 
         {/* Row 2: Market details - full width with larger text and dividers */}
-        <div className="flex items-center justify-between gap-2 px-0 py-1.5">
-          <div className="flex-1 flex flex-col gap-1 items-center text-center">
-            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">Market</span>
-            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.markPrice}</span>
+        <div className={`flex items-center justify-between gap-2 px-0 ${isMobile ? 'py-0.5' : 'py-1.5'}`}>
+          <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
+            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>Market</span>
+            <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.markPrice}</span>
           </div>
 
-          <div className="w-px h-8 bg-[#2a2a2d] flex-shrink-0" />
+          <div className={`w-px ${isMobile ? 'h-6' : 'h-8'} bg-[#2a2a2d] flex-shrink-0`} />
 
-          <div className="flex-1 flex flex-col gap-1 items-center text-center">
-            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">24H High</span>
-            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.high24h}</span>
+          <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
+            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>24H High</span>
+            <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.high24h}</span>
           </div>
 
-          <div className="w-px h-8 bg-[#2a2a2d] flex-shrink-0" />
+          <div className={`w-px ${isMobile ? 'h-6' : 'h-8'} bg-[#2a2a2d] flex-shrink-0`} />
 
-          <div className="flex-1 flex flex-col gap-1 items-center text-center">
-            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">24H Low</span>
-            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.low24h}</span>
+          <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
+            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>24H Low</span>
+            <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.low24h}</span>
           </div>
 
-          <div className="w-px h-8 bg-[#2a2a2d] flex-shrink-0" />
+          <div className={`w-px ${isMobile ? 'h-6' : 'h-8'} bg-[#2a2a2d] flex-shrink-0`} />
 
-          <div className="flex-1 flex flex-col gap-1 items-center text-center">
-            <span className="text-[10px] text-[#6b6b6b] uppercase tracking-wider font-medium">Volume</span>
-            <span className="text-[13px] text-[#f5f5f5] font-semibold tabular-nums">{stats.volume24h}</span>
+          <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
+            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>Volume</span>
+            <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.volume24h}</span>
           </div>
         </div>
       </div>

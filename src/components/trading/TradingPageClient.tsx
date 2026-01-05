@@ -51,7 +51,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         {/* Symbol & Market Info Bar - Mobile */}
         <div className="bg-[#0d0d0f] border-b border-[#2a2a2d] shrink-0 flex flex-col">
           {/* Row 1: TickerSwitcher (left) + Icons (right, larger) */}
-          <div className="flex items-center justify-between px-3 py-1.5 gap-2">
+          <div className="flex items-center justify-between px-3 py-1 gap-1.5">
             <TickerSwitcher className="shrink-0" />
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -77,8 +77,8 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             </div>
           </div>
           {/* Row 2-3: Price centered and Market Stats */}
-          <div className="px-3 pb-1">
-            <MarketInfo ref={marketInfoRef} className="bg-transparent border-0" />
+          <div className="px-3 pb-0.5">
+            <MarketInfo ref={marketInfoRef} className="bg-transparent border-0" isMobile={true} />
           </div>
         </div>
 
