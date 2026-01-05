@@ -254,9 +254,24 @@ function LeverageSection({ label, value, onChange, color, isMobile = false }: Le
           <Minus size={isMobile ? 16 : 18} />
         </button>
 
-        {/* Display Value with X - Bitunix Style */}
-        <div className={cn('flex-1 rounded-lg flex items-center justify-center font-bold', isMobile ? 'h-9 text-xl' : 'h-11 text-3xl')} style={{ backgroundColor: COLORS.bgSecondary, border: `1.5px solid ${color}`, color }}>
-          {value}X
+        {/* Display Value - Editable Input */}
+        <div className={cn('flex-1 rounded-lg flex items-center justify-center relative overflow-hidden', isMobile ? 'h-9' : 'h-11')} style={{ backgroundColor: COLORS.bgSecondary, border: `1.5px solid ${color}` }}>
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => {
+              const inputValue = parseInt(e.target.value) || MIN_LEVERAGE;
+              onChange(Math.max(MIN_LEVERAGE, Math.min(MAX_LEVERAGE, inputValue)));
+            }}
+            onBlur={(e) => {
+              const inputValue = parseInt(e.target.value) || MIN_LEVERAGE;
+              onChange(Math.max(MIN_LEVERAGE, Math.min(MAX_LEVERAGE, inputValue)));
+            }}
+            className={cn('flex-1 outline-none transition-all duration-200 text-center font-bold bg-transparent', isMobile ? 'text-xl' : 'text-3xl')}
+            style={{ color }}
+            min={MIN_LEVERAGE}
+            max={MAX_LEVERAGE}
+          />
         </div>
 
         <button
