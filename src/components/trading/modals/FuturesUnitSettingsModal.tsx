@@ -152,7 +152,7 @@ export function FuturesUnitSettingsModal({
               key={option.id}
               className={cn(
                 'flex items-center gap-3 cursor-pointer transition-all duration-200',
-                isMobile ? 'p-2.5' : 'p-3',
+                isMobile ? 'p-3 min-h-[72px]' : 'p-3',
                 'rounded-lg border',
                 'hover:border-[#ffb496]/50',
                 unit === option.id 
@@ -202,20 +202,21 @@ export function FuturesUnitSettingsModal({
           ))}
         </div>
 
-        {/* Confirm Button */}
-        <div className={isMobile ? 'px-3 pb-3' : 'px-4 pb-4'}>
-          <button
-            onClick={handleClose}
-            className={cn(
-              'w-full font-bold text-black transition-all duration-200 rounded-lg',
-              isMobile ? 'h-8 text-xs' : 'h-10 text-sm',
-              'hover:brightness-110 active:brightness-90 active:scale-[0.98]'
-            )}
-            style={{ backgroundColor: COLORS.orange }}
-          >
-            Confirm
-          </button>
-        </div>
+        {/* Confirm Button - Desktop Only */}
+        {!isMobile && (
+          <div className="px-4 pb-4">
+            <button
+              onClick={handleClose}
+              className={cn(
+                'w-full h-10 font-bold text-black transition-all duration-200 rounded-lg text-sm',
+                'hover:brightness-110 active:brightness-90 active:scale-[0.98]'
+              )}
+              style={{ backgroundColor: COLORS.orange }}
+            >
+              Confirm
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
