@@ -247,13 +247,13 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0" />
       </div>
 
-      {/* MAIN TRADING AREA: Left section fixed height, right column expands with content - page scrolls */}
-      <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
+      {/* MAIN TRADING AREA: Flex container for all content - fills remaining height */}
+      <div className="flex-1 flex min-h-0 overflow-hidden bg-[#0d0d0f]">
         
-        {/* LEFT SECTION: Chart (top) + Orders Panel (bottom) - Fixed height, takes flex-1 */}
-        <div className="flex-1 flex flex-col overflow-hidden bg-[#0d0d0f]">
+        {/* LEFT SECTION: Chart (top) + Orders Panel (bottom) - Flex column with flex-1 */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-[#0d0d0f]">
           {/* TOP: Chart + Orderbook */}
-          <div className="flex-1 flex overflow-hidden bg-[#0d0d0f]">
+          <div className="flex-1 flex min-h-0 overflow-hidden bg-[#0d0d0f]">
             {/* Chart */}
             <main className={cn('flex-1 flex flex-col overflow-hidden min-w-0', isRTL && 'order-2')}>
               <div className="flex-1 overflow-hidden bg-[#0d0d0f]">
@@ -275,15 +275,15 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             </aside>
           </div>
 
-          {/* BOTTOM: Orders Panel - Fixed height */}
-          <div className="h-[220px] bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
+          {/* BOTTOM: Orders Panel - Dynamic height (220px or proportional) */}
+          <div className="h-[220px] flex-shrink-0 bg-[#0B0E11] border-t border-[#2a2a2d] overflow-hidden">
             <OrdersPanel className="w-full h-full overflow-auto" />
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Order Form + Account Assets - Expands naturally, scrolls with page */}
+        {/* RIGHT COLUMN: Order Form + Account Assets - Fixed width, scrolls with page */}
         <aside className={cn(
-          'w-[280px] flex flex-col border-l border-[#2a2a2d] bg-[#0B0E11] shrink-0 overflow-y-auto',
+          'w-[280px] flex flex-col flex-shrink-0 border-l border-[#2a2a2d] bg-[#0B0E11] overflow-y-auto',
           isRTL && 'border-l-0 border-r'
         )}>
           {/* Order Form Section */}
