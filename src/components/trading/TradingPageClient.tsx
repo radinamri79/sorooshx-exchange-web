@@ -17,9 +17,6 @@ import { binanceWS } from '@/services/websocket';
 import { 
   Bell, 
   Wallet,
-  User,
-  Menu, 
-  X, 
 } from 'lucide-react';
 
 interface TradingPageClientProps {
@@ -31,7 +28,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const isRTL = locale === 'fa';
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -53,52 +49,20 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   if (isMobile) {
     return (
       <div className="flex flex-col h-[100dvh] bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Mobile Header - Compact */}
-        <header className="flex items-center justify-between px-3 h-11 bg-[#121214] border-b border-[#2a2a2d] shrink-0">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="SorooshX" width={22} height={22} className="rounded" />
-            <span className="font-bold text-white text-[11px] tracking-tight">SOROOSHX</span>
-          </div>
-          <div className="flex items-center gap-0.5">
-            <button className="p-2 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
-              <Bell className="w-[18px] h-[18px]" />
-            </button>
-            <button className="p-2 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
-              <Wallet className="w-[18px] h-[18px]" />
-            </button>
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors"
-            >
-              {mobileMenuOpen ? <X className="w-[18px] h-[18px]" /> : <Menu className="w-[18px] h-[18px]" />}
-            </button>
-          </div>
-        </header>
-
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <div className="absolute top-11 left-0 right-0 z-50 bg-[#121214] border-b border-[#2a2a2d] shadow-lg">
-            <div className="p-3 space-y-2">
-              <button className="w-full py-2.5 px-3 text-left text-sm text-[#f5f5f5] hover:bg-[#1e1f23] rounded-lg flex items-center gap-2">
-                <User className="w-4 h-4 text-[#ffb496]" />
-                Login / Register
+        {/* Symbol & Market Info Bar - Mobile */}
+        <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0 pt-2">
+          <div className="flex items-center justify-between px-3 py-1.5">
+            <TickerSwitcher className="shrink-0" />
+            <div className="flex items-center gap-3">
+              <button className="p-1.5 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
+                <Bell className="w-4 h-4" />
               </button>
-              <div className="border-t border-[#2a2a2d] pt-2 grid grid-cols-2 gap-2">
-                <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Spot</button>
-                <button className="py-2 px-3 text-xs text-[#ffb496] bg-[#ffb496]/10 rounded-lg font-medium">Futures</button>
-                <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Convert</button>
-                <button className="py-2 px-3 text-xs text-[#a1a1a1] hover:text-white hover:bg-[#1e1f23] rounded-lg">Copy Trade</button>
-              </div>
+              <button className="p-1.5 text-[#6b6b6b] hover:text-white active:bg-[#1e1f23] rounded transition-colors">
+                <Wallet className="w-4 h-4" />
+              </button>
             </div>
           </div>
-        )}
-
-        {/* Symbol & Market Info Bar */}
-        <div className="bg-[#121214] border-b border-[#2a2a2d] shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2">
-            <TickerSwitcher className="shrink-0" />
-          </div>
-          <MarketInfo className="bg-transparent border-0 px-3 py-1.5 overflow-x-auto" />
+          <MarketInfo className="bg-transparent border-0 px-3 py-2 overflow-x-auto mobile-market-info" />
         </div>
 
         {/* Main Content Area - Single scrollable page */}

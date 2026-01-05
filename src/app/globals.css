@@ -248,4 +248,15 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+
+  /* Mobile Market Info - Only show essential stats */
+  .mobile-market-info > div {
+    gap: 1rem;
+  }
+
+  @media (max-width: 767px) {
+    .mobile-market-info > div > :nth-child(n+3) {
+      display: none;
+    }
+  }
 }
