@@ -623,7 +623,7 @@ export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalc
   return (
     <>
       {/* Mobile Layout: Two rows - price/icons and market stats */}
-      <div className={`md:hidden flex flex-col ${isMobile ? 'gap-0.5' : 'gap-1'} bg-[#0d0d0f] -mx-3 px-3 py-1`}>
+      <div className={`md:hidden flex flex-col ${isMobile ? 'gap-0.5' : 'gap-1'} bg-[#0d0d0f] ${isMobile ? '-mx-3 px-3' : 'px-3'} py-1`}>
         {/* Row 1: Left-aligned Price with Change */}
         <div className={`flex items-center justify-start ${isMobile ? 'gap-1.5' : 'gap-3'} py-0.5`}>
           <span
@@ -644,30 +644,30 @@ export const MarketInfo = forwardRef<{ triggerInfoModal: () => void; triggerCalc
         </div>
 
         {/* Row 2: Market details - full width with larger text and dividers */}
-        <div className={`flex items-center justify-between gap-2 px-0 ${isMobile ? 'py-0.5' : 'py-1.5'}`}>
+        <div className={`flex items-center justify-between gap-2 ${isMobile ? 'px-0' : 'px-0'} ${isMobile ? 'py-0.5' : 'py-1.5'}`}>
           <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
-            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>Market</span>
+            <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>Market</span>
             <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.markPrice}</span>
           </div>
 
           <div className={`w-px ${isMobile ? 'h-6' : 'h-8'} bg-[#2a2a2d] flex-shrink-0`} />
 
           <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
-            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>24H High</span>
+            <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>24H High</span>
             <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.high24h}</span>
           </div>
 
           <div className={`w-px ${isMobile ? 'h-6' : 'h-8'} bg-[#2a2a2d] flex-shrink-0`} />
 
           <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
-            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>24H Low</span>
+            <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>24H Low</span>
             <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.low24h}</span>
           </div>
 
           <div className={`w-px ${isMobile ? 'h-6' : 'h-8'} bg-[#2a2a2d] flex-shrink-0`} />
 
           <div className="flex-1 flex flex-col gap-0.5 items-center text-center">
-            <span className={`${isMobile ? 'text-[8px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>Volume</span>
+            <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-[#6b6b6b] uppercase tracking-wider font-medium`}>Volume</span>
             <span className={`${isMobile ? 'text-[11px]' : 'text-[13px]'} text-[#f5f5f5] font-semibold tabular-nums`}>{stats.volume24h}</span>
           </div>
         </div>
