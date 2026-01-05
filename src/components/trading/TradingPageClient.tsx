@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Info, Calculator as CalculatorIcon, CandlestickChart } from 'lucide-react';
+import { Info, Calculator as CalculatorIcon, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   MarketInfo,
@@ -72,7 +72,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                 className="p-2 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
                 title="Candlestick Chart"
               >
-                <CandlestickChart size={20} />
+                <TrendingUp size={20} />
               </button>
             </div>
           </div>
@@ -92,15 +92,15 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           {/* Two-column layout for Orderbook and Order Form on mobile */}
           <div className="flex gap-px bg-[#2a2a2d]">
             {/* Left Column: Orderbook */}
-            <div className="flex-1 min-w-0 bg-[#0d0d0f] max-h-[350px] overflow-hidden">
+            <div className="flex-1 min-w-0 bg-[#121214] max-h-[350px] overflow-hidden">
               <div className="px-2 py-2 border-b border-[#2a2a2d]">
                 <h3 className="text-xs font-semibold text-[#a1a1a1]">Order Book</h3>
               </div>
-              <Orderbook className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={12} />
+              <Orderbook className="w-full h-full bg-[#121214] border-0 rounded-none" maxRows={12} />
             </div>
 
             {/* Right Column: Order Form */}
-            <div className="flex-1 min-w-0 bg-[#0d0d0f] border-l border-[#2a2a2d] overflow-y-auto">
+            <div className="flex-1 min-w-0 bg-[#121214] border-l border-[#2a2a2d] overflow-y-auto">
               <div className="px-2 py-2 border-b border-[#2a2a2d]">
                 <h3 className="text-xs font-semibold text-[#a1a1a1]">Trading</h3>
               </div>
@@ -121,7 +121,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
             <div className="px-3 py-2 border-b border-[#2a2a2d]">
               <h3 className="text-xs font-semibold text-[#a1a1a1]">Positions & Orders</h3>
             </div>
-            <OrdersPanel className="w-full bg-[#0d0d0f] border-0 rounded-none" />
+            <OrdersPanel className="w-full bg-[#121214] border-0 rounded-none" />
           </div>
         </div>
       </div>
