@@ -276,7 +276,7 @@ export function TickerSwitcher({ className }: TickerSwitcherProps) {
               ) : filteredSymbols.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-32 text-[#6b6b6b] py-4">
                   <Search className="w-8 h-8 mb-1 opacity-50" />
-                  <p className="text-xs">{t('noData')}</p>
+                  <p className="text-xs">{t('noResults')}</p>
                 </div>
               ) : (
                 filteredSymbols.slice(0, 100).map((symbol) => {
