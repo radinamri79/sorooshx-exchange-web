@@ -22,10 +22,8 @@ import {
   Menu, 
   X, 
   Bell, 
-  Settings, 
-  User, 
-  HelpCircle,
-  Wallet
+  Wallet,
+  User
 } from 'lucide-react';
 
 interface TradingPageClientProps {
@@ -185,18 +183,13 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   if (isTablet) {
     return (
       <div className="flex flex-col h-screen bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
-        <header className="bg-[#121214] border-b border-[#2a2a2d] px-3 h-11 flex items-center">
-          <div className="flex items-center gap-2 w-full">
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Image src="/logo.svg" alt="SorooshX" width={22} height={22} className="rounded" />
-              <span className="font-bold text-white text-xs">SOROOSHX</span>
-            </div>
-            <TickerSwitcher />
-            <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0 overflow-hidden" />
-            <button className="p-1.5 text-[#6b6b6b] hover:text-white rounded hover:bg-[#1e1f23]">
-              <User className="w-4 h-4" />
-            </button>
-          </div>
+        <header className="bg-[#0d0d0f] border-b border-[#2a2a2d] px-3 h-14 flex items-center gap-3">
+          <Image src="/sorooshx-logo.png" alt="SorooshX" width={120} height={32} className="object-contain" />
+          <TickerSwitcher />
+          <MarketInfo className="flex-1 bg-transparent border-0 py-0 px-0 overflow-hidden" />
+          <button className="p-1.5 text-[#a1a1a1] hover:text-white rounded hover:bg-[#1e1f23]">
+            <Wallet className="w-4 h-4" />
+          </button>
         </header>
 
         <div className="flex-1 flex overflow-hidden">
@@ -227,44 +220,20 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   // Desktop Layout (1024px+) - Compact Bitget Style with visible OrderBook
   return (
     <div className="flex flex-col h-screen bg-[#0d0d0f]" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* TOP NAV BAR - Compact */}
-      <header className="bg-[#121214] border-b border-[#2a2a2d] px-3 h-10 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 shrink-0">
-            <Image src="/logo.svg" alt="SorooshX" width={24} height={24} className="rounded" />
-            <span className="font-bold text-white text-sm tracking-tight">SOROOSHX</span>
-          </div>
-
-          <nav className="hidden lg:flex items-center gap-0.5">
-            <button className="px-2 py-1 text-xs font-medium text-[#ed7620] bg-[#ed7620]/10 rounded">
-              Futures
-            </button>
-            <button className="px-2 py-1 text-xs font-medium text-[#a1a1a1] hover:text-white transition-colors">
-              Spot
-            </button>
-            <button className="px-2 py-1 text-xs font-medium text-[#a1a1a1] hover:text-white transition-colors">
-              Convert
-            </button>
-            <button className="px-2 py-1 text-xs font-medium text-[#a1a1a1] hover:text-white transition-colors">
-              Copy
-            </button>
-          </nav>
+      {/* TOP NAV BAR - Matches main website design */}
+      <header className="bg-[#0d0d0f] border-b border-[#2a2a2d] px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center shrink-0">
+          <Image src="/sorooshx-logo.png" alt="SorooshX" width={160} height={40} className="object-contain" />
         </div>
 
-        <div className="flex items-center gap-2">
-          <button className="p-1.5 text-[#a1a1a1] hover:text-white transition-colors rounded hover:bg-[#1e1f23]">
-            <HelpCircle className="w-4 h-4" />
-          </button>
-          <button className="p-1.5 text-[#a1a1a1] hover:text-white transition-colors rounded hover:bg-[#1e1f23]">
-            <Bell className="w-4 h-4" />
-          </button>
-          <button className="p-1.5 text-[#a1a1a1] hover:text-white transition-colors rounded hover:bg-[#1e1f23]">
-            <Settings className="w-4 h-4" />
-          </button>
-          <div className="w-px h-4 bg-[#2a2a2d]" />
-          <button className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-white bg-[#ed7620] hover:bg-[#ff8c3a] rounded transition-colors">
-            <User className="w-3.5 h-3.5" />
+        {/* Right side: Login / Sign up (optional, can be hidden or removed) */}
+        <div className="flex items-center gap-3">
+          <button className="px-3 py-1.5 text-sm font-medium text-white hover:text-[#ed7620] transition-colors">
             Login
+          </button>
+          <button className="px-4 py-1.5 text-sm font-medium text-white border border-white rounded hover:bg-white/10 transition-colors">
+            Sign up
           </button>
         </div>
       </header>
