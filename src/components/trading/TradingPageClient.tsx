@@ -162,8 +162,8 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                   </div>
                 </div>
 
-                {/* OrderBook - Two Column Layout (Buy Left, Sell Right) */}
-                <div className="flex-1 overflow-hidden flex flex-col bg-[#0d0d0f]">
+                {/* OrderBook - Single Column Layout (Buy Left, Sell Right) */}
+                <div className="flex-1 flex flex-col bg-[#0d0d0f]">
                   {/* OrderBook Header */}
                   <div className="shrink-0 flex gap-px border-b border-[#2a2a2d] bg-[#0d0d0f]">
                     <div className="flex-1 px-3 py-2 text-center border-r border-[#2a2a2d]">
@@ -174,98 +174,98 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                     </div>
                   </div>
 
-                  {/* OrderBook Rows - All 10 Items Visible */}
-                  <div className="flex-1 flex gap-px overflow-hidden">
+                  {/* OrderBook Rows - Single Item Per Row */}
+                  <div className="flex gap-px overflow-hidden">
                     {/* Buy Side (Left) */}
-                    <div className="flex-1 bg-[#0d0d0f] overflow-hidden">
-                      <div className="grid grid-cols-2 gap-0.5 px-1.5 py-1.5">
-                        {/* Buy Orders - 10 items */}
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,669.1</div>
-                          <div className="text-[#EAECEF]">0.5407</div>
+                    <div className="flex-1 bg-[#0d0d0f] overflow-y-auto">
+                      <div className="space-y-0.5 px-2 py-1.5">
+                        {/* Buy Orders - 10 items, 1 per row */}
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,669.1</span>
+                          <span className="text-[#EAECEF]">0.5407</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,668.0</div>
-                          <div className="text-[#EAECEF]">1.4796</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,668.0</span>
+                          <span className="text-[#EAECEF]">1.4796</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,666.8</div>
-                          <div className="text-[#EAECEF]">1.6862</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,666.8</span>
+                          <span className="text-[#EAECEF]">1.6862</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,665.4</div>
-                          <div className="text-[#EAECEF]">0.0001</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,665.4</span>
+                          <span className="text-[#EAECEF]">0.0001</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,664.0</div>
-                          <div className="text-[#EAECEF]">0.0128</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,664.0</span>
+                          <span className="text-[#EAECEF]">0.0128</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,662.8</div>
-                          <div className="text-[#EAECEF]">1.8114</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,662.8</span>
+                          <span className="text-[#EAECEF]">1.8114</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,661.5</div>
-                          <div className="text-[#EAECEF]">0.6473</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,661.5</span>
+                          <span className="text-[#EAECEF]">0.6473</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,660.2</div>
-                          <div className="text-[#EAECEF]">0.9785</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,660.2</span>
+                          <span className="text-[#EAECEF]">0.9785</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,659.0</div>
-                          <div className="text-[#EAECEF]">1.2345</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,659.0</span>
+                          <span className="text-[#EAECEF]">1.2345</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <div className="text-[#0D9D5F] font-semibold">93,657.8</div>
-                          <div className="text-[#EAECEF]">0.7654</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F] font-semibold">93,657.8</span>
+                          <span className="text-[#EAECEF]">0.7654</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Sell Side (Right) */}
-                    <div className="flex-1 bg-[#0d0d0f] overflow-hidden">
-                      <div className="grid grid-cols-2 gap-0.5 px-1.5 py-1.5">
-                        {/* Sell Orders - 10 items */}
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,670.2</div>
-                          <div className="text-[#EAECEF]">0.5524</div>
+                    <div className="flex-1 bg-[#0d0d0f] overflow-y-auto">
+                      <div className="space-y-0.5 px-2 py-1.5">
+                        {/* Sell Orders - 10 items, 1 per row */}
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,670.2</span>
+                          <span className="text-[#EAECEF]">0.5524</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,671.5</div>
-                          <div className="text-[#EAECEF]">0.0001</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,671.5</span>
+                          <span className="text-[#EAECEF]">0.0001</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,672.7</div>
-                          <div className="text-[#EAECEF]">1.6862</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,672.7</span>
+                          <span className="text-[#EAECEF]">1.6862</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,673.9</div>
-                          <div className="text-[#EAECEF]">0.0001</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,673.9</span>
+                          <span className="text-[#EAECEF]">0.0001</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,675.0</div>
-                          <div className="text-[#EAECEF]">0.0036</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,675.0</span>
+                          <span className="text-[#EAECEF]">0.0036</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,676.2</div>
-                          <div className="text-[#EAECEF]">1.8114</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,676.2</span>
+                          <span className="text-[#EAECEF]">1.8114</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,677.5</div>
-                          <div className="text-[#EAECEF]">0.4567</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,677.5</span>
+                          <span className="text-[#EAECEF]">0.4567</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,678.8</div>
-                          <div className="text-[#EAECEF]">1.2345</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,678.8</span>
+                          <span className="text-[#EAECEF]">1.2345</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,680.0</div>
-                          <div className="text-[#EAECEF]">0.8901</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,680.0</span>
+                          <span className="text-[#EAECEF]">0.8901</span>
                         </div>
-                        <div className="text-[9px] py-0.5 px-1 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <div className="text-[#C8102E] font-semibold">93,681.3</div>
-                          <div className="text-[#EAECEF]">0.6234</div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E] font-semibold">93,681.3</span>
+                          <span className="text-[#EAECEF]">0.6234</span>
                         </div>
                       </div>
                     </div>
