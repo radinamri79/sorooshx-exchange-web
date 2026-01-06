@@ -121,7 +121,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               {/* Chart Content */}
               <div className="flex-1 overflow-y-auto flex flex-col pb-28 bg-[#0d0d0f]">
                 {/* Trading Chart */}
-                <div className="shrink-0 h-[200px] border-b border-[#2a2a2d]">
+                <div className="shrink-0 h-auto border-b border-[#2a2a2d]">
                   <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
                 </div>
 
@@ -163,7 +163,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                 </div>
 
                 {/* OrderBook - Single Column Layout (Buy Left, Sell Right) */}
-                <div className="flex-1 flex flex-col bg-[#0d0d0f]">
+                <div className="flex flex-col bg-[#0d0d0f]">
                   {/* OrderBook Header */}
                   <div className="shrink-0 flex gap-px border-b border-[#2a2a2d] bg-[#0d0d0f]">
                     <div className="flex-1 px-3 py-2 text-center border-r border-[#2a2a2d]">
@@ -175,9 +175,9 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                   </div>
 
                   {/* OrderBook Rows - Single Item Per Row */}
-                  <div className="flex gap-px overflow-hidden">
+                  <div className="flex gap-px">
                     {/* Buy Side (Left) */}
-                    <div className="flex-1 bg-[#0d0d0f] overflow-y-auto">
+                    <div className="flex-1 bg-[#0d0d0f]">
                       <div className="space-y-0.5 px-2 py-1.5">
                         {/* Buy Orders - 10 items, 1 per row */}
                         <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
@@ -224,7 +224,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                     </div>
 
                     {/* Sell Side (Right) */}
-                    <div className="flex-1 bg-[#0d0d0f] overflow-y-auto">
+                    <div className="flex-1 bg-[#0d0d0f]">
                       <div className="space-y-0.5 px-2 py-1.5">
                         {/* Sell Orders - 10 items, 1 per row */}
                         <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
