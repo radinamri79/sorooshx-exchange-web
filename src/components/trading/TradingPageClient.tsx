@@ -163,7 +163,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                 </div>
 
                 {/* OrderBook - Single Column Layout (Buy Left, Sell Right) */}
-                <div className="flex flex-col bg-[#0d0d0f]">
+                <div className="h-auto flex flex-col bg-[#0d0d0f]">
                   {/* OrderBook Header */}
                   <div className="shrink-0 flex gap-px border-b border-[#2a2a2d] bg-[#0d0d0f]">
                     <div className="flex-1 px-3 py-2 text-center border-r border-[#2a2a2d]">
