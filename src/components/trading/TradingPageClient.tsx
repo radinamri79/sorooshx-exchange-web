@@ -159,7 +159,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                     {/* Buy Side (Left) */}
                     <div className="flex-1 overflow-y-auto bg-[#0d0d0f]">
                       <div className="space-y-0.5 px-2 py-1.5">
-                        {/* Buy Orders - 10 items */}
+                        {/* Sample Buy Orders */}
                         <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
                           <span className="text-[#0D9D5F]">93,669.1</span>
                           <span className="text-[#EAECEF]">0.5407</span>
@@ -184,29 +184,13 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                           <span className="text-[#0D9D5F]">93,662.8</span>
                           <span className="text-[#EAECEF]">1.8114</span>
                         </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F]">93,661.5</span>
-                          <span className="text-[#EAECEF]">0.6473</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F]">93,660.2</span>
-                          <span className="text-[#EAECEF]">0.9785</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F]">93,659.0</span>
-                          <span className="text-[#EAECEF]">1.2345</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F]">93,657.8</span>
-                          <span className="text-[#EAECEF]">0.7654</span>
-                        </div>
                       </div>
                     </div>
 
                     {/* Sell Side (Right) */}
                     <div className="flex-1 overflow-y-auto bg-[#0d0d0f]">
                       <div className="space-y-0.5 px-2 py-1.5">
-                        {/* Sell Orders - 10 items */}
+                        {/* Sample Sell Orders */}
                         <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
                           <span className="text-[#C8102E]">93,670.2</span>
                           <span className="text-[#EAECEF]">0.5524</span>
@@ -231,22 +215,6 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                           <span className="text-[#C8102E]">93,676.2</span>
                           <span className="text-[#EAECEF]">1.8114</span>
                         </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E]">93,677.5</span>
-                          <span className="text-[#EAECEF]">0.4567</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E]">93,678.8</span>
-                          <span className="text-[#EAECEF]">1.2345</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E]">93,680.0</span>
-                          <span className="text-[#EAECEF]">0.8901</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E]">93,681.3</span>
-                          <span className="text-[#EAECEF]">0.6234</span>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -254,11 +222,11 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               </div>
 
               {/* Sticky Buttons - Fixed at Bottom */}
-              <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0f] border-t border-[#2a2a2d] px-3 py-3 flex gap-2">
-                <button className="flex-1 h-10 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#0D9D5F] text-sm">
+              <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0f] border-t border-[#2a2a2d] px-3 py-2 flex gap-2">
+                <button className="flex-1 h-12 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#ffb496]">
                   Open Long
                 </button>
-                <button className="flex-1 h-10 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#C8102E] text-sm">
+                <button className="flex-1 h-12 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#ef5350]">
                   Open Short
                 </button>
               </div>
