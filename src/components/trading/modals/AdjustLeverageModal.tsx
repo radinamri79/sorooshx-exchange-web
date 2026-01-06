@@ -105,10 +105,10 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'w-full transition-all duration-200 ease-out flex flex-col',
+          'w-full transition-all duration-200 ease-out',
           isMobile
-            ? 'max-h-[80vh] rounded-t-xl'
-            : 'max-w-md mx-4 rounded-xl shadow-2xl',
+            ? 'rounded-t-xl'
+            : 'flex flex-col max-w-md mx-4 rounded-xl shadow-2xl',
           isAnimating
             ? isMobile
               ? 'opacity-100 translate-y-0'
@@ -122,7 +122,7 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
         {/* ================================================================ */}
         {/* HEADER                                                          */}
         {/* ================================================================ */}
-        <div className={cn('flex items-center justify-between border-b', isMobile ? 'sticky top-0 z-10 px-4 py-3' : 'px-5 py-4')} style={{ borderColor: COLORS.borderColor, backgroundColor: isMobile ? COLORS.bgPrimary : undefined }}>
+        <div className={cn('flex items-center justify-between border-b', isMobile ? 'px-4 py-3' : 'px-5 py-4')} style={{ borderColor: COLORS.borderColor }}>
           <h2 className={cn('font-semibold', isMobile ? 'text-sm' : 'text-base')} style={{ color: COLORS.textPrimary }}>
             Adjust Leverage
           </h2>
@@ -136,9 +136,9 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
         </div>
 
         {/* ================================================================ */}
-        {/* SIMULTANEOUS TOGGLE - STICKY BELOW HEADER                       */}
+        {/* SIMULTANEOUS TOGGLE                                             */}
         {/* ================================================================ */}
-        <div className={cn('border-b', isMobile ? 'sticky top-12 z-10 px-4 py-2.5' : 'px-5 py-3')} style={{ borderColor: COLORS.borderColor, backgroundColor: isMobile ? COLORS.bgPrimary : undefined }}>
+        <div className={cn('border-b', isMobile ? 'px-4 py-2.5' : 'px-5 py-3')} style={{ borderColor: COLORS.borderColor }}>
           <label className="flex items-center gap-2 cursor-pointer group">
             <div
               onClick={() => setAdjustBoth(!adjustBoth)}
@@ -164,10 +164,9 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
         </div>
 
         {/* ================================================================ */}
-        {/* CONTENT - SCROLLABLE ON MOBILE                                 */}
+        {/* CONTENT - FULLY VISIBLE ON MOBILE                              */}
         {/* ================================================================ */}
         <div className={cn(
-          isMobile ? 'flex-1 overflow-y-auto' : '',
           'space-y-4',
           isMobile ? 'px-4 py-3' : 'px-5 py-4'
         )}>
@@ -191,29 +190,29 @@ export function AdjustLeverageModal({ isOpen, onClose, isMobile = false }: Adjus
         </div>
 
         {/* ================================================================ */}
-        {/* WARNING MESSAGE - STICKY BOTTOM ON MOBILE                       */}
+        {/* WARNING MESSAGE                                                 */}
         {/* ================================================================ */}
-        <div className={cn('mb-4 p-3 rounded-lg', isMobile ? 'sticky bottom-0 z-10 mx-4' : 'mx-5')} style={{ backgroundColor: COLORS.warningBg }}>
+        <div className={cn('mb-4 p-3 rounded-lg', isMobile ? 'mx-4' : 'mx-5')} style={{ backgroundColor: COLORS.warningBg }}>
           <p className={cn('leading-relaxed', isMobile ? 'text-[11px]' : 'text-xs')} style={{ color: COLORS.warning }}>
             Reminder: Maximum openings are limited by leverage, available funds, and open position quantity.
           </p>
         </div>
 
         {/* ================================================================ */}
-        {/* ACTION BUTTONS - STICKY BOTTOM ON MOBILE                        */}
+        {/* ACTION BUTTONS - DESKTOP ONLY                                   */}
         {/* ================================================================ */}
         {!isMobile && (
-          <div className={cn('flex gap-3 sticky bottom-0 z-10', isMobile ? 'px-4 pb-4' : 'px-5 pb-5')} style={{ backgroundColor: isMobile ? COLORS.bgPrimary : undefined }}>
+          <div className={cn('flex gap-3 px-5 pb-5')}>
             <button
               onClick={handleClose}
-              className={cn('flex-1 rounded-lg font-semibold transition-all duration-200 hover:brightness-110 active:brightness-90 active:scale-[0.98]', isMobile ? 'h-8 text-xs' : 'h-11 text-sm')}
+              className={cn('flex-1 rounded-lg font-semibold transition-all duration-200 hover:brightness-110 active:brightness-90 active:scale-[0.98]', 'h-11 text-sm')}
               style={{ backgroundColor: COLORS.bgTertiary, color: COLORS.textPrimary }}
             >
               Cancel
             </button>
             <button
               onClick={handleClose}
-              className={cn('flex-1 rounded-lg font-bold text-black transition-all duration-200 hover:brightness-110 active:brightness-90 active:scale-[0.98]', isMobile ? 'h-8 text-xs' : 'h-11 text-sm')}
+              className={cn('flex-1 rounded-lg font-bold text-black transition-all duration-200 hover:brightness-110 active:brightness-90 active:scale-[0.98]', 'h-11 text-sm')}
               style={{ backgroundColor: COLORS.orange }}
             >
               Confirm
