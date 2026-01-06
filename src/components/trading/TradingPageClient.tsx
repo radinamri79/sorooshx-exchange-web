@@ -127,42 +127,52 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                   <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
                 </div>
 
-                {/* Buy-Sell Ratio Bar - Desktop Style */}
-                <div className="shrink-0 flex items-center justify-between gap-1 border-b border-[#2a2a2d] bg-[#0d0d0f] px-1.5 py-1">
-                  {/* Buy Percentage with Square Indicator */}
-                  <div className="flex items-center gap-0.5">
-                    <div className="rounded-sm w-2 h-2" style={{ backgroundColor: '#0D9D5F' }} />
-                    <span className="text-[10px] font-semibold text-[#0D9D5F]" style={{ minWidth: '30px' }}>38.94%</span>
-                  </div>
+                {/* Buy-Sell Ratio Bar - Desktop Style with Real Data */}
+                {(() => {
+                  const totalBids = bids.reduce((sum, [_, qty]) => sum + (typeof qty === 'string' ? parseFloat(qty) : qty), 0);
+                  const totalAsks = asks.reduce((sum, [_, qty]) => sum + (typeof qty === 'string' ? parseFloat(qty) : qty), 0);
+                  const total = totalBids + totalAsks;
+                  const buyPercentage = total > 0 ? (totalBids / total) * 100 : 0;
+                  const sellPercentage = total > 0 ? (totalAsks / total) * 100 : 0;
 
-                  {/* Ratio Bar */}
-                  <div className="flex-1 h-2 bg-[#1E2329] rounded-full overflow-hidden flex shadow-sm" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                    <div 
-                      className="transition-all duration-300"
-                      style={{ 
-                        width: '38.94%',
-                        height: '100%',
-                        backgroundColor: '#0D9D5F',
-                        boxShadow: '0 0 10px rgba(13, 157, 95, 0.6)'
-                      }} 
-                    />
-                    <div 
-                      className="transition-all duration-300"
-                      style={{ 
-                        width: '61.06%',
-                        height: '100%',
-                        backgroundColor: '#C8102E',
-                        boxShadow: '0 0 10px rgba(200, 16, 46, 0.6)'
-                      }} 
-                    />
-                  </div>
-                  
-                  {/* Sell Percentage with Square Indicator */}
-                  <div className="flex items-center gap-0.5">
-                    <span className="text-[10px] font-semibold text-[#C8102E]" style={{ minWidth: '30px', textAlign: 'right' }}>61.06%</span>
-                    <div className="rounded-sm w-2 h-2" style={{ backgroundColor: '#C8102E' }} />
-                  </div>
-                </div>
+                  return (
+                    <div className="shrink-0 flex items-center justify-between gap-1 border-b border-[#2a2a2d] bg-[#0d0d0f] px-1.5 py-1">
+                      {/* Buy Percentage with Square Indicator */}
+                      <div className="flex items-center gap-0.5">
+                        <div className="rounded-sm w-2 h-2" style={{ backgroundColor: '#0D9D5F' }} />
+                        <span className="text-[10px] font-semibold text-[#0D9D5F]" style={{ minWidth: '30px' }}>{buyPercentage.toFixed(2)}%</span>
+                      </div>
+
+                      {/* Ratio Bar */}
+                      <div className="flex-1 h-2 bg-[#1E2329] rounded-full overflow-hidden flex shadow-sm" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                        <div 
+                          className="transition-all duration-300"
+                          style={{ 
+                            width: `${buyPercentage}%`,
+                            height: '100%',
+                            backgroundColor: '#0D9D5F',
+                            boxShadow: '0 0 10px rgba(13, 157, 95, 0.6)'
+                          }} 
+                        />
+                        <div 
+                          className="transition-all duration-300"
+                          style={{ 
+                            width: `${sellPercentage}%`,
+                            height: '100%',
+                            backgroundColor: '#C8102E',
+                            boxShadow: '0 0 10px rgba(200, 16, 46, 0.6)'
+                          }} 
+                        />
+                      </div>
+                      
+                      {/* Sell Percentage with Square Indicator */}
+                      <div className="flex items-center gap-0.5">
+                        <span className="text-[10px] font-semibold text-[#C8102E]" style={{ minWidth: '30px', textAlign: 'right' }}>{sellPercentage.toFixed(2)}%</span>
+                        <div className="rounded-sm w-2 h-2" style={{ backgroundColor: '#C8102E' }} />
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* OrderBook - Single Column Layout (Buy Left, Sell Right) */}
                 <div className="h-auto flex flex-col bg-[#0d0d0f]">
