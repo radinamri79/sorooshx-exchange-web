@@ -25,6 +25,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const isRTL = locale === 'fa';
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [showChartModal, setShowChartModal] = useState(false);
   
   const marketInfoRef = useRef<{ triggerInfoModal: () => void; triggerCalculatorModal: () => void } | null>(null);
 
@@ -69,6 +70,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                 <CalculatorIcon size={20} />
               </button>
               <button
+                onClick={() => setShowChartModal(true)}
                 className="p-2 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
                 title="Candlestick Chart"
               >
@@ -84,10 +86,32 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
         {/* Main Content Area - Single scrollable page */}
         <div className="flex-1 overflow-y-auto bg-[#0d0d0f]">
-          {/* Chart Section */}
-          <div className="w-full h-[280px] shrink-0 border-b border-[#2a2a2d]">
-            <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
-          </div>
+          {/* Chart Modal - Full screen */}
+          {showChartModal && (
+            <div className="fixed inset-0 bg-[#0d0d0f] z-50 flex flex-col">
+              {/* Header with Back Button and TickerSwitcher */}
+              <div className="bg-[#0d0d0f] border-b border-[#2a2a2d] shrink-0 px-3 py-2 flex items-center justify-between">
+                <button
+                  onClick={() => setShowChartModal(false)}
+                  className="p-2 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
+                  title="Back"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <div className="flex-1 flex justify-center">
+                  <TickerSwitcher className="shrink-0" isMobile={true} />
+                </div>
+                <div className="w-10" />
+              </div>
+              
+              {/* Chart Content */}
+              <div className="flex-1 overflow-hidden">
+                <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
+              </div>
+            </div>
+          )}
 
           {/* Two-column layout for Orderbook and Order Form on mobile */}
           <div className="flex gap-px bg-[#2a2a2d]">
