@@ -214,8 +214,8 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="shrink-0 bg-[#0d0d0f] border-t border-[#2a2a2d] px-3 py-3 flex gap-2">
+                {/* Action Buttons - Sticky at bottom */}
+                <div className="sticky bottom-0 bg-[#0d0d0f] border-t border-[#2a2a2d] px-3 py-3 flex gap-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
                   <button
                     onClick={() => {
                       setShowChartModal(false);
