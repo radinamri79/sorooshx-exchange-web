@@ -119,8 +119,116 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               </div>
               
               {/* Chart Content */}
-              <div className="flex-1 overflow-hidden">
-                <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
+              <div className="flex-1 overflow-y-auto flex flex-col pb-32 bg-[#0d0d0f]">
+                {/* Trading Chart */}
+                <div className="shrink-0 h-[300px] border-b border-[#2a2a2d]">
+                  <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
+                </div>
+
+                {/* Buy-Sell Ratio Bar */}
+                <div className="shrink-0 px-3 py-3 border-b border-[#2a2a2d]">
+                  <div className="flex items-center justify-between gap-2">
+                    {/* Bid Percentage */}
+                    <span className="text-[11px] font-semibold text-[#0D9D5F]">38.94%</span>
+                    
+                    {/* Ratio Bar */}
+                    <div className="flex-1 h-2 bg-[#2a2a2d] rounded-full overflow-hidden flex">
+                      <div className="bg-[#0D9D5F] h-full" style={{ width: '38.94%' }}></div>
+                      <div className="bg-[#C8102E] h-full flex-1"></div>
+                    </div>
+                    
+                    {/* Ask Percentage */}
+                    <span className="text-[11px] font-semibold text-[#C8102E]">61.06%</span>
+                  </div>
+                </div>
+
+                {/* OrderBook - Two Column Layout (Buy Left, Sell Right) */}
+                <div className="flex-1 overflow-hidden flex flex-col bg-[#0d0d0f]">
+                  {/* OrderBook Header */}
+                  <div className="shrink-0 flex gap-px border-b border-[#2a2a2d] bg-[#0d0d0f]">
+                    <div className="flex-1 px-3 py-2 text-center border-r border-[#2a2a2d]">
+                      <p className="text-xs font-semibold text-[#848E9C] uppercase">Buy Orders</p>
+                    </div>
+                    <div className="flex-1 px-3 py-2 text-center">
+                      <p className="text-xs font-semibold text-[#848E9C] uppercase">Sell Orders</p>
+                    </div>
+                  </div>
+
+                  {/* OrderBook Rows */}
+                  <div className="flex-1 overflow-y-auto flex gap-px">
+                    {/* Buy Side (Left) */}
+                    <div className="flex-1 overflow-y-auto bg-[#0d0d0f]">
+                      <div className="space-y-0.5 px-2 py-1.5">
+                        {/* Sample Buy Orders */}
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F]">93,669.1</span>
+                          <span className="text-[#EAECEF]">0.5407</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F]">93,668.0</span>
+                          <span className="text-[#EAECEF]">1.4796</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F]">93,666.8</span>
+                          <span className="text-[#EAECEF]">1.6862</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F]">93,665.4</span>
+                          <span className="text-[#EAECEF]">0.0001</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F]">93,664.0</span>
+                          <span className="text-[#EAECEF]">0.0128</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                          <span className="text-[#0D9D5F]">93,662.8</span>
+                          <span className="text-[#EAECEF]">1.8114</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sell Side (Right) */}
+                    <div className="flex-1 overflow-y-auto bg-[#0d0d0f]">
+                      <div className="space-y-0.5 px-2 py-1.5">
+                        {/* Sample Sell Orders */}
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E]">93,670.2</span>
+                          <span className="text-[#EAECEF]">0.5524</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E]">93,671.5</span>
+                          <span className="text-[#EAECEF]">0.0001</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E]">93,672.7</span>
+                          <span className="text-[#EAECEF]">1.6862</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E]">93,673.9</span>
+                          <span className="text-[#EAECEF]">0.0001</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E]">93,675.0</span>
+                          <span className="text-[#EAECEF]">0.0036</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                          <span className="text-[#C8102E]">93,676.2</span>
+                          <span className="text-[#EAECEF]">1.8114</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sticky Buttons - Fixed at Bottom */}
+              <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0f] border-t border-[#2a2a2d] px-3 py-2 flex gap-2">
+                <button className="flex-1 h-12 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#ffb496]">
+                  Open Long
+                </button>
+                <button className="flex-1 h-12 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#ef5350]">
+                  Open Short
+                </button>
               </div>
             </div>
           )}
