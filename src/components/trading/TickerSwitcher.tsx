@@ -31,8 +31,9 @@ const CATEGORIES: { id: Category; labelKey: string }[] = [
   { id: 'altcoins', labelKey: 'altcoins' },
 ];
 
-// Popular trading pairs to show at top
+// Popular trading pairs to show at top - expanded list of 50+ currencies
 const POPULAR_PAIRS = [
+  // Top 10 by market cap
   'BTCUSDT',
   'ETHUSDT',
   'BNBUSDT',
@@ -41,6 +42,55 @@ const POPULAR_PAIRS = [
   'DOGEUSDT',
   'ADAUSDT',
   'AVAXUSDT',
+  'MATICUSDT',
+  'LINKUSDT',
+  // DeFi & Layer 2
+  'UNIUSDT',
+  'AAVEUSDT',
+  'ARBITUSDT',
+  'OPUSDT',
+  'GNOSISUSDT',
+  // Exchange & Gaming
+  'FTUSDT',
+  'GUSDT',
+  'AXSUSDT',
+  'SANDUSDT',
+  'ENJUSDT',
+  // AI & Emerging
+  'AIUSDT',
+  'RENDERUSDT',
+  'WLDUSDT',
+  'ARBUSDT',
+  'NOTUSDT',
+  // Staking & L2
+  'STXUSDT',
+  'INJUSDT',
+  'JUPUSDT',
+  // Major Altcoins
+  'LTCUSDT',
+  'BCHUSDT',
+  'ETCUSDT',
+  'ZECUSDT',
+  'DASHUSDT',
+  'COSMOSUSDT',
+  'ATOMUSDT',
+  'NEARUSDT',
+  'ALGOUSDT',
+  'FLOWUSDT',
+  'THETAUSDT',
+  'HBARUSDT',
+  'TRXUSDT',
+  'VEUSDT',
+  'VETUSDT',
+  'QTUMUSDT',
+  'ICONUSDT',
+  'ONEUSDT',
+  'FILUSDT',
+  'SUSHIUSDT',
+  'COMPUSDT',
+  'MKRUSDT',
+  'CDTUSDT',
+  'PEPEUSDT',
 ];
 
 export function TickerSwitcher({ className, isMobile = false }: TickerSwitcherProps) {
