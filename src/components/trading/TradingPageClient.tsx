@@ -119,7 +119,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
               </div>
               
               {/* Chart Content */}
-              <div className="flex-1 overflow-y-auto flex flex-col pb-28 bg-[#0d0d0f]">
+              <div className="flex-1 overflow-y-auto flex flex-col bg-[#0d0d0f]">
                 {/* Trading Chart */}
                 <div className="shrink-0 h-auto border-b border-[#2a2a2d]">
                   <TradingChart className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" />
@@ -271,16 +271,26 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Sticky Buttons - Fixed at Bottom */}
-              <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0f] border-t border-[#2a2a2d] px-3 py-2 flex gap-2">
-                <button className="flex-1 h-10 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#0D9D5F] text-sm">
-                  Open Long
-                </button>
-                <button className="flex-1 h-10 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#C8102E] text-sm">
-                  Open Short
-                </button>
+                {/* Action Buttons */}
+                <div className="shrink-0 bg-[#0d0d0f] border-t border-[#2a2a2d] px-3 py-3 flex gap-2">
+                  <button
+                    onClick={() => {
+                      setShowChartModal(false);
+                    }}
+                    className="flex-1 h-10 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#0D9D5F] text-sm"
+                  >
+                    Open Long
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowChartModal(false);
+                    }}
+                    className="flex-1 h-10 rounded font-semibold text-white transition-all active:scale-95 hover:brightness-110 bg-[#C8102E] text-sm"
+                  >
+                    Open Short
+                  </button>
+                </div>
               </div>
             </div>
           )}
