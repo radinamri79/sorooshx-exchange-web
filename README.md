@@ -70,7 +70,14 @@
   - Account Assets
   - More...
 
-- **Ticker Switcher Modal** with 100+ cryptocurrency pairs
+- **Ticker Switcher Modal** with:
+  - **50+ popular cryptocurrency pairs** (BTC, ETH, SOL, DOGE, ADA, AVAX, LINK, UNIA, etc.)
+  - **All USDT trading pairs** from Binance API (500+ pairs available)
+  - Quick access to top cryptos by market cap
+  - Search functionality to find any pair
+  - Favorites system for quick access to preferred pairs
+  - Real-time price updates for all pairs
+  - DeFi, Layer 2, Gaming, and AI token categories
 
 ### 🌐 Multi-Source Data Integration
 
@@ -281,6 +288,22 @@ Real-time updates for:
 - Maintenance margin tracking
 - Risk/reward ratio analysis
 - Position risk indicators
+
+### Pair Discovery & Switching
+
+- **50+ Popular Pairs**: Quick access to top cryptocurrencies including:
+  - **Top 10 by Market Cap**: BTC, ETH, BNB, SOL, XRP, DOGE, ADA, AVAX, MATIC, LINK
+  - **DeFi**: UNI, AAVE, ARBITR, OP, GNOSYS
+  - **Layer 2 & Scaling**: ARB, OP, STARKX
+  - **Gaming & Metaverse**: AXS, SAND, ENJ
+  - **AI & Emerging**: AI, RENDER, WLD
+  - **Major Altcoins**: LTC, BCH, ATOM, NEAR, ALGO, THETA, TRX, VET, FIL, SUSHI
+  
+- **500+ USDT Pairs**: Full access to all cryptocurrency pairs from Binance API
+- **Smart Search**: Find any pair with instant filtering
+- **Favorites System**: Star your preferred pairs for quick access
+- **Real-time Updates**: Live price and percentage changes for all displayed pairs
+- **Category Filters**: Browse by favorites, all pairs, BTC pairs, ETH pairs, or altcoins
 
 ### Market Analysis
 
