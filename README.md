@@ -293,17 +293,23 @@ Real-time updates for:
 
 - **50+ Popular Pairs**: Quick access to top cryptocurrencies including:
   - **Top 10 by Market Cap**: BTC, ETH, BNB, SOL, XRP, DOGE, ADA, AVAX, MATIC, LINK
-  - **DeFi**: UNI, AAVE, ARBITR, OP, GNOSYS
-  - **Layer 2 & Scaling**: ARB, OP, STARKX
-  - **Gaming & Metaverse**: AXS, SAND, ENJ
-  - **AI & Emerging**: AI, RENDER, WLD
-  - **Major Altcoins**: LTC, BCH, ATOM, NEAR, ALGO, THETA, TRX, VET, FIL, SUSHI
+  - **DeFi**: UNI, AAVE, ARB, OP, GNOSIS
+  - **Layer 2 & Staking**: STX, INJ, JUP
+  - **Gaming & Emerging**: AXS, SAND, ENJ, AI, RENDER, WLD
+  - **Major Altcoins**: LTC, BCH, ETC, ZEC, DASH, ATOM, NEAR, ALGO, FLOW, THETA, HBAR, TRX, VET, QTUM, ICON, ONE, FIL, SUSHI, COMP, MKR
+  
+- **Reliable Multi-Source Data Pipeline**:
+  - Primary sources: Binance, OKX, Bybit, Bitget, CoinGecko
+  - Automatic fallback mechanism for Vercel deployment
+  - 5-minute cache for improved performance
+  - Graceful degradation with fallback pricing data
   
 - **500+ USDT Pairs**: Full access to all cryptocurrency pairs from Binance API
-- **Smart Search**: Find any pair with instant filtering
-- **Favorites System**: Star your preferred pairs for quick access
-- **Real-time Updates**: Live price and percentage changes for all displayed pairs
+- **Smart Search**: Find any pair with instant filtering and fuzzy search
+- **Favorites System**: Star your preferred pairs for quick access with persistent storage
+- **Real-time Updates**: Live price and percentage changes via WebSocket
 - **Category Filters**: Browse by favorites, all pairs, BTC pairs, ETH pairs, or altcoins
+- **Mobile Responsive**: Touch-friendly pair switcher on mobile and tablet devices
 
 ### Market Analysis
 
@@ -437,6 +443,52 @@ Add new languages by:
 - Largest Contentful Paint (LCP): <3s
 - Cumulative Layout Shift (CLS): <0.1
 - Time to Interactive (TTI): <4s
+
+---
+
+## 🌐 API Resilience & Multi-Source Strategy
+
+### Data Source Architecture
+
+The platform uses a **multi-source fallback strategy** to ensure reliable data delivery:
+
+```
+Ticker Data Pipeline:
+Binance → OKX → Bybit → Bitget → CoinGecko → Fallback Cache
+```
+
+### Key Features
+
+1. **Graceful Failure Handling**
+   - `Promise.allSettled` prevents cascade failures
+   - Individual API failures don't block other data sources
+   - Partial results returned when some sources fail
+
+2. **Intelligent Caching**
+   - 5-minute TTL for ticker data
+   - In-memory cache reduces API calls
+   - Fallback cache with ~50 popular pairs pre-loaded
+
+3. **Vercel Deployment Optimization**
+   - Handles IP-blocking from exchange APIs
+   - CoinGecko ID mappings for 45+ cryptocurrencies
+   - Fallback pricing data ensures UI functionality
+
+4. **Request Optimization**
+   - 10-second timeout per API source
+   - User-Agent headers for better compatibility
+   - Concurrent batch requests for efficiency
+
+### Supported Data Sources
+
+| Source | Type | Coverage | Reliability |
+|--------|------|----------|-------------|
+| **Binance** | Futures API | 500+ pairs | ⭐⭐⭐⭐⭐ (Local) |
+| **OKX** | Spot & Futures | 200+ pairs | ⭐⭐⭐⭐ |
+| **Bybit** | Linear Futures | 150+ pairs | ⭐⭐⭐⭐ |
+| **Bitget** | Spot API | 100+ pairs | ⭐⭐⭐ |
+| **CoinGecko** | Free API | 45+ mapped | ⭐⭐⭐⭐⭐ (Vercel) |
+| **Fallback Cache** | Pre-loaded | 50 pairs | ⭐⭐⭐ |
 
 ---
 
