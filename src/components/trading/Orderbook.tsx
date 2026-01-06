@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, calculateBuySellRatio } from '@/lib/utils';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { useOrderbookStore } from '@/stores/useOrderbookStore';
 import { binanceWS } from '@/services/websocket';
@@ -265,12 +265,8 @@ export function Orderbook({ className, maxRows = 10, isMobile = false }: Orderbo
 
     const maxSum = Math.max(bidSum, askSum);
 
-    // Calculate buy/sell percentages based on total volume
-    const totalBidVolume = slicedBids.reduce((sum, [, q]) => sum + parseFloat(q), 0);
-    const totalAskVolume = slicedAsks.reduce((sum, [, q]) => sum + parseFloat(q), 0);
-    const total = totalBidVolume + totalAskVolume;
-    const buyPercentage = total > 0 ? ((totalBidVolume / total) * 100).toFixed(2) : '50.00';
-    const sellPercentage = total > 0 ? ((totalAskVolume / total) * 100).toFixed(2) : '50.00';
+    // Calculate buy/sell percentages based on the same number of rows displayed
+    const { buyPercentage, sellPercentage } = calculateBuySellRatio(bids, asks, rowCount);
 
     return { displayedBids, displayedAsks, maxSum, buyPercentage, sellPercentage };
   }, [bids, asks, maxRows, displayMode]);

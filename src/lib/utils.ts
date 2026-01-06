@@ -181,3 +181,35 @@ export function getSessionKey(): string {
   }
   return sessionKey;
 }
+
+/**
+ * Calculate buy-sell ratio percentages from orderbook data
+ * @param bids Array of [price, quantity] tuples (buy orders)
+ * @param asks Array of [price, quantity] tuples (sell orders)
+ * @param limit Optional limit on number of items to consider (default: all)
+ * @returns Object with buyPercentage and sellPercentage as strings
+ */
+export function calculateBuySellRatio(
+  bids: Array<[string | number, string | number]>,
+  asks: Array<[string | number, string | number]>,
+  limit?: number
+): { buyPercentage: string; sellPercentage: string } {
+  const bidSlice = limit ? bids.slice(0, limit) : bids;
+  const askSlice = limit ? asks.slice(0, limit) : asks;
+
+  const totalBidVolume = bidSlice.reduce((sum, [_, qty]) => {
+    const q = typeof qty === 'string' ? parseFloat(qty) : qty;
+    return sum + (isNaN(q) ? 0 : q);
+  }, 0);
+
+  const totalAskVolume = askSlice.reduce((sum, [_, qty]) => {
+    const q = typeof qty === 'string' ? parseFloat(qty) : qty;
+    return sum + (isNaN(q) ? 0 : q);
+  }, 0);
+
+  const total = totalBidVolume + totalAskVolume;
+  const buyPercentage = total > 0 ? ((totalBidVolume / total) * 100).toFixed(2) : '50.00';
+  const sellPercentage = total > 0 ? ((totalAskVolume / total) * 100).toFixed(2) : '50.00';
+
+  return { buyPercentage, sellPercentage };
+}

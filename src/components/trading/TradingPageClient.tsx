@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Info, Calculator as CalculatorIcon, TrendingUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, calculateBuySellRatio } from '@/lib/utils';
 import {
   MarketInfo,
   TickerSwitcher,
@@ -129,18 +129,15 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
 
                 {/* Buy-Sell Ratio Bar - Desktop Style with Real Data */}
                 {(() => {
-                  const totalBids = bids.reduce((sum, [_, qty]) => sum + (typeof qty === 'string' ? parseFloat(qty) : qty), 0);
-                  const totalAsks = asks.reduce((sum, [_, qty]) => sum + (typeof qty === 'string' ? parseFloat(qty) : qty), 0);
-                  const total = totalBids + totalAsks;
-                  const buyPercentage = total > 0 ? (totalBids / total) * 100 : 0;
-                  const sellPercentage = total > 0 ? (totalAsks / total) * 100 : 0;
+                  // Use same 10-item limit as Orderbook component for consistency
+                  const { buyPercentage, sellPercentage } = calculateBuySellRatio(bids, asks, 10);
 
                   return (
                     <div className="shrink-0 flex items-center justify-between gap-1 border-b border-[#2a2a2d] bg-[#0d0d0f] px-1.5 py-1">
                       {/* Buy Percentage with Square Indicator */}
                       <div className="flex items-center gap-0.5">
                         <div className="rounded-sm w-2 h-2" style={{ backgroundColor: '#0D9D5F' }} />
-                        <span className="text-[10px] font-semibold text-[#0D9D5F]" style={{ minWidth: '30px' }}>{buyPercentage.toFixed(2)}%</span>
+                        <span className="text-[10px] font-semibold text-[#0D9D5F]" style={{ minWidth: '30px' }}>{buyPercentage}%</span>
                       </div>
 
                       {/* Ratio Bar */}
@@ -167,7 +164,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                       
                       {/* Sell Percentage with Square Indicator */}
                       <div className="flex items-center gap-0.5">
-                        <span className="text-[10px] font-semibold text-[#C8102E]" style={{ minWidth: '30px', textAlign: 'right' }}>{sellPercentage.toFixed(2)}%</span>
+                        <span className="text-[10px] font-semibold text-[#C8102E]" style={{ minWidth: '30px', textAlign: 'right' }}>{sellPercentage}%</span>
                         <div className="rounded-sm w-2 h-2" style={{ backgroundColor: '#C8102E' }} />
                       </div>
                     </div>
