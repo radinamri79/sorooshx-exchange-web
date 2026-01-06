@@ -26,8 +26,17 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [showChartModal, setShowChartModal] = useState(false);
+  const [isClosingModal, setIsClosingModal] = useState(false);
   
   const marketInfoRef = useRef<{ triggerInfoModal: () => void; triggerCalculatorModal: () => void } | null>(null);
+
+  const handleCloseChartModal = () => {
+    setIsClosingModal(true);
+    setTimeout(() => {
+      setShowChartModal(false);
+      setIsClosingModal(false);
+    }, 300);
+  };
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -88,11 +97,14 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
         <div className="flex-1 overflow-y-auto bg-[#0d0d0f]">
           {/* Chart Modal - Full screen */}
           {showChartModal && (
-            <div className="fixed inset-0 bg-[#0d0d0f] z-50 flex flex-col">
+            <div className={cn(
+              'fixed inset-0 bg-[#0d0d0f] z-50 flex flex-col',
+              isClosingModal ? 'animate-slide-out-left' : 'animate-slide-in-right'
+            )}>
               {/* Header with Back Button and TickerSwitcher */}
               <div className="bg-[#0d0d0f] border-b border-[#2a2a2d] shrink-0 px-3 py-2 flex items-center justify-between">
                 <button
-                  onClick={() => setShowChartModal(false)}
+                  onClick={handleCloseChartModal}
                   className="p-2 rounded hover:bg-[#1E2329] transition-colors text-[#848E9C] hover:text-[#ffb496]"
                   title="Back"
                 >
