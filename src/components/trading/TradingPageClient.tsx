@@ -28,6 +28,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const [isTablet, setIsTablet] = useState(false);
   const [showChartModal, setShowChartModal] = useState(false);
   const [isClosingModal, setIsClosingModal] = useState(false);
+  const [isTpSlEnabled, setIsTpSlEnabled] = useState(false);
   
   const marketInfoRef = useRef<{ triggerInfoModal: () => void; triggerCalculatorModal: () => void } | null>(null);
   const { bids, asks } = useOrderbookStore();
@@ -240,12 +241,20 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           <div className="flex gap-px bg-[#2a2a2d]">
             {/* Left Column: Orderbook */}
             <div className="flex-1 min-w-0 bg-[#0d0d0f] overflow-hidden">
-              <Orderbook className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" maxRows={12} isMobile={true} />
+              <Orderbook 
+                className="w-full h-full bg-[#0d0d0f] border-0 rounded-none" 
+                maxRows={isTpSlEnabled ? 16 : 12} 
+                isMobile={true} 
+              />
             </div>
 
             {/* Right Column: Order Form */}
             <div className="flex-1 min-w-0 bg-[#0d0d0f] border-l border-[#2a2a2d] overflow-y-auto">
-              <OrderForm className="bg-transparent border-0 rounded-none" isMobile={true} />
+              <OrderForm 
+                className="bg-transparent border-0 rounded-none" 
+                isMobile={true} 
+                onTpSlChange={setIsTpSlEnabled}
+              />
             </div>
           </div>
 

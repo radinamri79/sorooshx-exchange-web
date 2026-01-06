@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Decimal from 'decimal.js';
 import { cn } from '@/lib/utils';
 import { useLeverageStore } from '@/stores/useLeverageStore';
@@ -55,6 +55,7 @@ interface OrderFormProps {
   availableBalance?: string;
   onSubmit?: (formData: OrderFormState) => Promise<void>;
   isMobile?: boolean;
+  onTpSlChange?: (enabled: boolean) => void;
 }
 
 const INITIAL_STATE: OrderFormState = {
@@ -87,6 +88,7 @@ export function OrderForm({
   availableBalance = '0.0000',
   onSubmit,
   isMobile = false,
+  onTpSlChange,
 }: OrderFormProps) {
   const [formData, setFormData] = useState<OrderFormState>(INITIAL_STATE);
   const [uiState, setUiState] = useState<OrderFormUIState>(INITIAL_UI_STATE);
@@ -96,6 +98,11 @@ export function OrderForm({
   const { longLeverage, shortLeverage } = useLeverageStore();
 
   const currentLeverage = formData.side === 'LONG' ? longLeverage : shortLeverage;
+
+  // Call parent callback when TP/SL enabled state changes
+  useEffect(() => {
+    onTpSlChange?.(formData.tpsl.enabled);
+  }, [formData.tpsl.enabled, onTpSlChange]);
 
   // Calculate order cost and estimates
   const costEstimate = useMemo((): OrderCostEstimate => {
@@ -561,12 +568,12 @@ export function OrderForm({
         <div className="flex items-center justify-between pt-1">
           <label className="flex items-center gap-2 cursor-pointer group">
             <div
-              onClick={() =>
+              onClick={() => {
                 setFormData((prev) => ({
                   ...prev,
                   tpsl: { ...prev.tpsl, enabled: !prev.tpsl.enabled },
-                }))
-              }
+                }));
+              }}
               className={cn(
                 'w-4 h-4 rounded flex items-center justify-center transition-all duration-200',
                 'border-2 cursor-pointer',
