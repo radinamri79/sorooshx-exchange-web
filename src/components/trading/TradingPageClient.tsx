@@ -99,7 +99,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
           {showChartModal && (
             <div className={cn(
               'fixed inset-0 bg-[#0d0d0f] z-50 flex flex-col',
-              isClosingModal ? 'animate-slide-out-left' : 'animate-slide-in-right'
+              isClosingModal ? 'animate-slide-out-right' : 'animate-slide-in-right'
             )}>
               {/* Header with Back Button and TickerSwitcher */}
               <div className="bg-[#0d0d0f] border-b border-[#2a2a2d] shrink-0 px-3 py-2 flex items-center justify-between">
