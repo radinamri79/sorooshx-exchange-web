@@ -15,6 +15,7 @@ import {
   AccountAssets,
 } from '@/components/trading';
 import { binanceWS } from '@/services/websocket';
+import { useOrderbookStore } from '@/stores/useOrderbookStore';
 
 interface TradingPageClientProps {
   locale: string;
@@ -29,6 +30,7 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
   const [isClosingModal, setIsClosingModal] = useState(false);
   
   const marketInfoRef = useRef<{ triggerInfoModal: () => void; triggerCalculatorModal: () => void } | null>(null);
+  const { bids, asks } = useOrderbookStore();
 
   const handleCloseChartModal = () => {
     setIsClosingModal(true);
@@ -179,94 +181,26 @@ export function TradingPageClient({ locale }: TradingPageClientProps) {
                     {/* Buy Side (Left) */}
                     <div className="flex-1 bg-[#0d0d0f]">
                       <div className="space-y-0.5 px-2 py-1.5">
-                        {/* Buy Orders - 10 items, 1 per row */}
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,669.1</span>
-                          <span className="text-[#EAECEF]">0.5407</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,668.0</span>
-                          <span className="text-[#EAECEF]">1.4796</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,666.8</span>
-                          <span className="text-[#EAECEF]">1.6862</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,665.4</span>
-                          <span className="text-[#EAECEF]">0.0001</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,664.0</span>
-                          <span className="text-[#EAECEF]">0.0128</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,662.8</span>
-                          <span className="text-[#EAECEF]">1.8114</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,661.5</span>
-                          <span className="text-[#EAECEF]">0.6473</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,660.2</span>
-                          <span className="text-[#EAECEF]">0.9785</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,659.0</span>
-                          <span className="text-[#EAECEF]">1.2345</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
-                          <span className="text-[#0D9D5F] font-semibold">93,657.8</span>
-                          <span className="text-[#EAECEF]">0.7654</span>
-                        </div>
+                        {/* Buy Orders - Dynamic from store, max 10 items */}
+                        {bids.slice(0, 10).map(([price, qty], idx) => (
+                          <div key={`bid-${idx}`} className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#0D9D5F]/5 border border-[#0D9D5F]/10">
+                            <span className="text-[#0D9D5F] font-semibold">{price}</span>
+                            <span className="text-[#EAECEF]">{qty}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
                     {/* Sell Side (Right) */}
                     <div className="flex-1 bg-[#0d0d0f]">
                       <div className="space-y-0.5 px-2 py-1.5">
-                        {/* Sell Orders - 10 items, 1 per row */}
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,670.2</span>
-                          <span className="text-[#EAECEF]">0.5524</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,671.5</span>
-                          <span className="text-[#EAECEF]">0.0001</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,672.7</span>
-                          <span className="text-[#EAECEF]">1.6862</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,673.9</span>
-                          <span className="text-[#EAECEF]">0.0001</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,675.0</span>
-                          <span className="text-[#EAECEF]">0.0036</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,676.2</span>
-                          <span className="text-[#EAECEF]">1.8114</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,677.5</span>
-                          <span className="text-[#EAECEF]">0.4567</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,678.8</span>
-                          <span className="text-[#EAECEF]">1.2345</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,680.0</span>
-                          <span className="text-[#EAECEF]">0.8901</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
-                          <span className="text-[#C8102E] font-semibold">93,681.3</span>
-                          <span className="text-[#EAECEF]">0.6234</span>
-                        </div>
+                        {/* Sell Orders - Dynamic from store, max 10 items */}
+                        {asks.slice(0, 10).map(([price, qty], idx) => (
+                          <div key={`ask-${idx}`} className="flex justify-between text-[10px] py-1 px-1.5 rounded bg-[#C8102E]/5 border border-[#C8102E]/10">
+                            <span className="text-[#C8102E] font-semibold">{price}</span>
+                            <span className="text-[#EAECEF]">{qty}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
