@@ -8,10 +8,10 @@ export const metadata: Metadata = {
   authors: [{ name: 'SorooshX Team' }],
   icons: {
     icon: [
-      { url: '/sorooshx-logo.png', type: 'image/png' },
+      { url: '/sorooshx-logo-web.png', type: 'image/png' },
     ],
-    apple: '/sorooshx-logo.png',
-    shortcut: '/sorooshx-logo.png',
+    apple: '/sorooshx-logo-web.png',
+    shortcut: '/sorooshx-logo-web.png',
   },
   openGraph: {
     title: 'SorooshX - Crypto Futures Trading Platform',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     alternateLocale: 'fa_IR',
     images: [
       {
-        url: '/sorooshx-logo.png',
+        url: '/sorooshx-logo-web.png',
         width: 1200,
         height: 630,
         alt: 'SorooshX Trading Platform',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'SorooshX - Crypto Futures Trading Platform',
     description: 'Professional cryptocurrency futures trading platform',
-    images: ['/sorooshx-logo.png'],
+    images: ['/sorooshx-logo-web.png'],
   },
   robots: {
     index: true,
